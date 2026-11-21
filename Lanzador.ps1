@@ -11,12 +11,12 @@
 if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
     Write-Host "  [!] Se necesitan permisos de administrador." -ForegroundColor Yellow
     Write-Host "      Relanzando..." -ForegroundColor Yellow
-    Start-Process powershell -Verb RunAs -ArgumentList "-NoProfile -ExecutionPolicy Bypass -Command `"irm https://raw.githubusercontent.com/TU_USUARIO/TU_REPO/main/Lanzador.ps1 | iex`""
+    Start-Process powershell -Verb RunAs -ArgumentList "-NoProfile -ExecutionPolicy Bypass -Command `"irm https://raw.githubusercontent.com/ggonn-arg/gonix/main/Lanzador.ps1 | iex`""
     exit
 }
 
-# 2. Configuración de la descarga (Aquí irá tu URL de GitHub)
-$urlZip = "https://github.com/TU_USUARIO/TU_REPO/archive/refs/heads/main.zip"
+# 2. Configuración de la descarga
+$urlZip = "https://github.com/ggonn-arg/gonix/archive/refs/heads/main.zip"
 $carpetaDestino = Join-Path $env:TEMP "Gonix"
 
 Write-Host "`n  ⚡ Iniciando Gonix..." -ForegroundColor Cyan
@@ -35,7 +35,6 @@ try {
     Remove-Item $zipTemp -Force
 
     # 5. Buscar el ejecutable dentro de la carpeta extraída
-    # (GitHub añade el nombre de la rama al extraer, ej: Gonix-main)
     $carpetaReal = Get-ChildItem -Path $carpetaDestino -Directory | Select-Object -First 1
     $scriptPath = Join-Path $carpetaReal.FullName "Gonix.ps1"
 
