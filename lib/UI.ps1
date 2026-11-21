@@ -13,10 +13,11 @@ function Show-MainMenu {
         Write-Banner
         Write-Host "   [1] Aplicar Perfil (Gaming / Oficina)" -ForegroundColor White
         Write-Host "   [2] Tweaks individuales" -ForegroundColor White
-        Write-Host "   [3] Simular cambios (Dry-Run)" -ForegroundColor White
-        Write-Host "   [4] Historial y Deshacer" -ForegroundColor White
+        Write-Host "   [3] Historial y Deshacer" -ForegroundColor White
+        Write-Host "   [4] Actualizaciones de Windows (Pausar/Reanudar)" -ForegroundColor White
+        Write-Host "   [5] Crear Punto de Restauración" -ForegroundColor White
         Write-Host ""
-        Write-Host "   [5] ⚡ OPTIMIZACIÓN RÁPIDA (Recomendado)" -ForegroundColor Green
+        Write-Host "   [9] ⚡ OPTIMIZACIÓN RÁPIDA (Recomendado)" -ForegroundColor Green
         Write-Host ""
         Write-Host "   [0] Salir" -ForegroundColor DarkGray
         Write-Host ""
@@ -25,8 +26,7 @@ function Show-MainMenu {
         switch ($opcion) {
             "1" { Show-ProfilesMenu }
             "2" { Show-TweaksMenu }
-            "3" { Show-DryRunMenu }
-            "4" { 
+            "3" { 
                 $lotes = Get-Lotes
                 if ($lotes.Count -eq 0) { Write-Host "   [!] No hay historial." -ForegroundColor Yellow }
                 else {
@@ -42,7 +42,9 @@ function Show-MainMenu {
                 }
                 Read-Host "   Enter para continuar" 
             }
-            "5" { Invoke-QuickOptimize }
+            "4" { Show-UpdateMenu }
+            "5" { New-GonixRestorePoint }
+            "9" { Invoke-QuickOptimize }
             "0" { Write-Host "   Chau, Gon!" -ForegroundColor Cyan; return }
             default { Write-Host "   Opción inválida." -ForegroundColor Red; Start-Sleep 1 }
         }
@@ -67,6 +69,7 @@ function Show-TweaksMenu {
             "3" { Invoke-BloatwareRemoval }
             "4" { Show-AdvancedTweaks }
             "0" { return }
+            default { Write-Host "   Opción inválida." -ForegroundColor Red; Start-Sleep 1; continue }
         }
     }
 }
@@ -85,11 +88,17 @@ function Show-PrivacyTweaks {
         Write-Host "   [8] Desactivar Experiencias Personalizadas" -ForegroundColor White
         Write-Host "   [9] Desactivar Reconocimiento de Voz en Línea" -ForegroundColor White
         Write-Host "   [10] Desactivar Solicitudes de Comentarios" -ForegroundColor White
+        Write-Host "   [A] APLICAR TODOS LOS DE ESTA LISTA" -ForegroundColor Green
         Write-Host "   [0] Volver" -ForegroundColor DarkGray
         Write-Host ""
         $op = Read-Host "   Elegí un tweak"
         
         if ($op -eq "0") { return }
+        if ($op -match "^[Aa]$") { 
+            Invoke-AllTweaks -Categoria "privacidad"
+            Read-Host "   Enter para continuar"
+            continue
+        }
         
         switch ($op) {
             "1" { Invoke-Tweak -Id "disable-telemetry" }
@@ -102,7 +111,7 @@ function Show-PrivacyTweaks {
             "8" { Invoke-Tweak -Id "disable-tailored-experiences" }
             "9" { Invoke-Tweak -Id "disable-online-speech-privacy" }
             "10" { Invoke-Tweak -Id "disable-feedback" }
-            default { Write-Host "   Opción inválida." -ForegroundColor Red; Start-Sleep 1 }
+            default { Write-Host "   Opción inválida." -ForegroundColor Red; Start-Sleep 1; continue }
         }
         Write-Host ""
         Read-Host "   Presioná Enter para continuar"
@@ -126,11 +135,17 @@ function Show-SystemTweaks {
         Write-Host "   [11] Evitar Suspensión de Puertos USB (Menos lag)" -ForegroundColor White
         Write-Host "   [12] Eliminar Retraso de Arranque" -ForegroundColor White
         Write-Host "   [13] Configurar DNS de Cloudflare (1.1.1.1)" -ForegroundColor White
+        Write-Host "   [A] APLICAR TODOS LOS DE ESTA LISTA" -ForegroundColor Green
         Write-Host "   [0] Volver" -ForegroundColor DarkGray
         Write-Host ""
         $op = Read-Host "   Elegí un tweak"
         
         if ($op -eq "0") { return }
+        if ($op -match "^[Aa]$") { 
+            Invoke-AllTweaks -Categoria "sistema"
+            Read-Host "   Enter para continuar"
+            continue
+        }
         
         switch ($op) {
             "1" { Invoke-Tweak -Id "disable-hibernation" }
@@ -146,7 +161,7 @@ function Show-SystemTweaks {
             "11" { Invoke-Tweak -Id "disable-usb-selective-suspend" }
             "12" { Invoke-Tweak -Id "disable-startup-delay" }
             "13" { Invoke-Tweak -Id "set-dns-cloudflare" }
-            default { Write-Host "   Opción inválida." -ForegroundColor Red; Start-Sleep 1 }
+            default { Write-Host "   Opción inválida." -ForegroundColor Red; Start-Sleep 1; continue }
         }
         Write-Host ""
         Read-Host "   Presioná Enter para continuar"
@@ -185,32 +200,6 @@ function Show-AdvancedTweaks {
             "2" { Invoke-Tweak -Id "disable-core-parking" }
             "3" { Invoke-Tweak -Id "win32-priority-separation" }
             "4" { Invoke-Tweak -Id "disable-system-responsiveness" }
-            default { Write-Host "   Opción inválida." -ForegroundColor Red; Start-Sleep 1; continue }
-        }
-        Write-Host ""
-        Read-Host "   Presioná Enter para continuar"
-    }
-}
-
-function Show-DryRunMenu {
-    while ($true) {
-        Write-Banner
-        Write-Host "   --- Simulador (Dry-Run) ---" -ForegroundColor Magenta
-        Write-Host "   [1] Simular: Desactivar telemetría" -ForegroundColor White
-        Write-Host "   [2] Simular: Desactivar Cortana" -ForegroundColor White
-        Write-Host "   [3] Simular: Quitar anuncios del menú Inicio" -ForegroundColor White
-        Write-Host "   [4] Simular: Desactivar Widgets" -ForegroundColor White
-        Write-Host "   [0] Volver al menú principal" -ForegroundColor DarkGray
-        Write-Host ""
-        $op = Read-Host "   Elegí qué simular"
-
-        if ($op -eq "0") { return }
-
-        switch ($op) {
-            "1" { Show-DryRun -Id "disable-telemetry" }
-            "2" { Show-DryRun -Id "disable-cortana" }
-            "3" { Show-DryRun -Id "disable-start-suggestions" }
-            "4" { Show-DryRun -Id "disable-widgets" }
             default { Write-Host "   Opción inválida." -ForegroundColor Red; Start-Sleep 1; continue }
         }
         Write-Host ""
