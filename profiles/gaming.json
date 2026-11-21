@@ -1,0 +1,23 @@
+{
+  "nombre": "Perfil Gaming Extremo (Máximo FPS y Cero Lag)",
+  "descripcion": "Aplica la configuración más agresiva para gaming: Plan de energía máximo, sin telemetría, red optimizada, GPU al máximo y CPU sin reposo.",
+  "tweaks": [
+    "ultimate-performance-plan",
+    "disable-telemetry",
+    "disable-cortana",
+    "disable-widgets",
+    "disable-background-apps",
+    "disable-gamedvr",
+    "disable-xbox-gamebar",
+    "gpu-scheduling",
+    "disable-nagle-algorithm",
+    "disable-network-throttling",
+    "disable-system-responsiveness",
+    "disable-core-parking",
+    "disable-usb-selective-suspend",
+    "win32-priority-separation",
+    "optimize-services",
+    "disable-advertising-id",
+    "disable-tailored-experiences"
+  ]
+}

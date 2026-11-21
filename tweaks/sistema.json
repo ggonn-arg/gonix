@@ -1,0 +1,24 @@
+[
+  {
+    "id": "disable-hibernation", "nombre": "Desactivar Hibernación", "descripcion": "Libera espacio.", "riesgo": "bajo", "tipo": "comando",
+    "comando": "powercfg -h off", "comandoOriginal": "powercfg -h on"
+  },
+  {
+    "id": "disable-gamedvr", "nombre": "Desactivar GameDVR", "descripcion": "Evita caídas de FPS.", "riesgo": "bajo", "tipo": "registro",
+    "cambios": [ { "ruta": "HKCU:\\System\\GameConfigStore", "nombre": "GameDVR_Enabled", "valor": 0, "tipoValor": "DWord" } ]
+  },
+  {
+    "id": "disable-onedrive-startup", "nombre": "Quitar OneDrive del Inicio", "descripcion": "Arranque más rápido.", "riesgo": "bajo", "tipo": "comando",
+    "comando": "Get-Process OneDrive -ErrorAction SilentlyContinue | Stop-Process -Force",
+    "comandoOriginal": "Start-Process OneDrive"
+  },
+  {
+    "id": "disable-startup-delay", "nombre": "Eliminar Retraso de Arranque", "descripcion": "Quita 10 seg de espera.", "riesgo": "bajo", "tipo": "registro",
+    "cambios": [ { "ruta": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Serialize", "nombre": "StartupDelayInMSec", "valor": 0, "tipoValor": "DWord" } ]
+  },
+  {
+    "id": "set-dns-cloudflare", "nombre": "DNS Cloudflare", "descripcion": "DNS rápido y privado.", "riesgo": "bajo", "tipo": "comando",
+    "comando": "Get-DnsClientServerAddress -AddressFamily IPv4 | ForEach-Object { Set-DnsClientServerAddress -InterfaceIndex $_.InterfaceIndex -ServerAddresses ('1.1.1.1','1.0.0.1') }",
+    "comandoOriginal": "Set-DnsClientServerAddress -InterfaceIndex (Get-DnsClientServerAddress -AddressFamily IPv4).InterfaceIndex -ResetServerAddresses"
+  }
+]

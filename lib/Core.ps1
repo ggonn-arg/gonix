@@ -1,0 +1,149 @@
+﻿function Get-TweaksFromFile {
+    param($Archivo)
+    $path = Join-Path $scriptDir "tweaks\$Archivo"
+    if (Test-Path $path) { return @(Get-Content $path -Raw | ConvertFrom-Json) }
+    return @()
+}
+
+function Get-TweakById {
+    param([string]$Id)
+    $files = @("privacidad.json", "sistema.json", "rendimiento.json", "avanzado.json")
+    foreach ($f in $files) {
+        $t = Get-TweaksFromFile -Archivo $f | Where-Object { $_.id -eq $Id }
+        if ($t) { return $t }
+    }
+    return $null
+}
+
+function Invoke-Tweak {
+    param([string]$Id)
+    
+    $tweak = Get-TweakById -Id $Id
+    if (-not $tweak) { Write-Host "   [!] Tweak '$Id' no encontrado." -ForegroundColor Red; return }
+
+    Write-Host ""
+    Write-Host "   >>> $($tweak.nombre)" -ForegroundColor Cyan
+    Write-Host "       $($tweak.descripcion)" -ForegroundColor Gray
+    Write-Host ""
+
+    $conf = Read-Host "   ¿Aplicar? (s/n)"
+    if ($conf -ne "s") { Write-Host "   Cancelado." -ForegroundColor Yellow; return }
+
+    try {
+        if ($tweak.tipo -eq 'registro') {
+            # Formato viejo: ruta directa
+            if ($tweak.PSObject.Properties.Name -contains 'ruta') {
+                if (-not (Test-Path $tweak.ruta)) { New-Item -Path $tweak.ruta -Force | Out-Null }
+                $actual = $null; $existe = $false
+                try { $item = Get-ItemProperty -Path $tweak.ruta -Name $tweak.nombreValor -ErrorAction Stop; $actual = $item.$($tweak.nombreValor); $existe = $true } catch {}
+                
+                Set-ItemProperty -Path $tweak.ruta -Name $tweak.nombreValor -Value $tweak.valorNuevo -Type DWord -Force
+                Add-History -Tipo 'registro' -TweakId $tweak.id -Ruta $tweak.ruta -Nombre $tweak.nombreValor -Existia $existe -ValorAnterior $actual -TipoValor 'DWord'
+                Write-Host "   [OK] Registro modificado." -ForegroundColor Green
+            }
+            # Formato nuevo: cambios en lista
+            elseif ($tweak.PSObject.Properties.Name -contains 'cambios') {
+                foreach ($c in $tweak.cambios) {
+                    if (-not (Test-Path $c.ruta)) { New-Item -Path $c.ruta -Force | Out-Null }
+                    $actual = $null; $existe = $false
+                    try { $item = Get-ItemProperty -Path $c.ruta -Name $c.nombre -ErrorAction Stop; $actual = $item.$($c.nombre); $existe = $true } catch {}
+                    
+                    $tipoVal = if ($c.tipoValor) { $c.tipoValor } else { 'DWord' }
+                    Set-ItemProperty -Path $c.ruta -Name $c.nombre -Value $c.valor -Type $tipoVal -Force
+                    Add-History -Tipo 'registro' -TweakId $tweak.id -Ruta $c.ruta -Nombre $c.nombre -Existia $existe -ValorAnterior $actual -TipoValor $tipoVal
+                    Write-Host "   [OK] $($c.nombre) aplicado." -ForegroundColor Green
+                }
+            }
+        }
+        elseif ($tweak.tipo -eq 'comando') {
+            Invoke-Expression $tweak.comando
+            Add-History -Tipo 'comando' -TweakId $tweak.id -Undo $tweak.comandoOriginal
+            Write-Host "   [OK] Comando ejecutado." -ForegroundColor Green
+        }
+    } catch { Write-Host "   [X] Error: $($_.Exception.Message)" -ForegroundColor Red }
+}
+
+function Show-DryRun {
+    param([string]$Id)
+    $tweak = Get-TweakById -Id $Id
+    if (-not $tweak) { Write-Host "   [!] Tweak no encontrado." -ForegroundColor Red; return }
+    
+    Write-Host "`n   [SIMULACIÓN] $($tweak.nombre)" -ForegroundColor Cyan
+    Write-Host "   $($tweak.descripcion)`n" -ForegroundColor Gray
+    
+    if ($tweak.tipo -eq 'registro') {
+        $cambios = if ($tweak.cambios) { $tweak.cambios } else { @([PSCustomObject]@{ruta=$tweak.ruta; nombre=$tweak.nombreValor; valor=$tweak.valorNuevo}) }
+        foreach ($c in $cambios) {
+            $actual = "No existe"
+            try { $item = Get-ItemProperty -Path $c.ruta -Name $c.nombre -ErrorAction Stop; $actual = $item.$($c.nombre) } catch {}
+            Write-Host "   Ruta   : $($c.ruta)" -ForegroundColor DarkGray
+            Write-Host "   Valor  : $($c.nombre)" -ForegroundColor DarkGray
+            Write-Host "   Actual : $actual" -ForegroundColor Yellow
+            Write-Host "   Nuevo  : $($c.valor)" -ForegroundColor Green
+        }
+    }
+}
+
+function Invoke-Profile {
+    param([string]$NombreArchivo)
+    $perfilPath = Join-Path $scriptDir "profiles\$NombreArchivo.json"
+    if (-not (Test-Path $perfilPath)) { Write-Host "   [!] Perfil no encontrado." -ForegroundColor Red; return }
+    $perfil = Get-Content $perfilPath -Raw | ConvertFrom-Json
+    
+    Write-Host "`n   >>> $($perfil.nombre)" -ForegroundColor Cyan
+    Write-Host "       $($perfil.descripcion)`n" -ForegroundColor Gray
+    
+    if ((Read-Host "   ¿Aplicar perfil completo? (s/n)") -ne "s") { return }
+    
+    Start-Lote
+    foreach ($id in $perfil.tweaks) {
+        $tweak = Get-TweakById -Id $id
+        if (-not $tweak) { continue }
+        Write-Host "   -> $($tweak.nombre)" -ForegroundColor DarkGray
+        
+        if ($tweak.tipo -eq 'registro') {
+            $cambios = if ($tweak.cambios) { $tweak.cambios } else { @([PSCustomObject]@{ruta=$tweak.ruta; nombre=$tweak.nombreValor; valor=$tweak.valorNuevo; tipoValor='DWord'}) }
+            foreach ($c in $cambios) {
+                if (-not (Test-Path $c.ruta)) { New-Item -Path $c.ruta -Force | Out-Null }
+                $actual = $null; $existe = $false
+                try { $item = Get-ItemProperty -Path $c.ruta -Name $c.nombre -ErrorAction Stop; $actual = $item.$($c.nombre); $existe = $true } catch {}
+                $tipoVal = if ($c.tipoValor) { $c.tipoValor } else { 'DWord' }
+                Set-ItemProperty -Path $c.ruta -Name $c.nombre -Value $c.valor -Type $tipoVal -Force
+                Add-History -Tipo 'registro' -TweakId $tweak.id -Ruta $c.ruta -Nombre $c.nombre -Existia $existe -ValorAnterior $actual -TipoValor $tipoVal
+            }
+        } elseif ($tweak.tipo -eq 'comando') {
+            Invoke-Expression $tweak.comando
+            Add-History -Tipo 'comando' -TweakId $tweak.id -Undo $tweak.comandoOriginal
+        }
+    }
+    Write-Host "   [OK] Perfil aplicado con éxito." -ForegroundColor Green
+}
+
+function Invoke-QuickOptimize {
+    Write-Banner
+    Write-Host "   ⚡ --- OPTIMIZACIÓN RÁPIDA --- ⚡`n" -ForegroundColor Green
+    Write-Host "   Aplicando tweaks seguros...`n" -ForegroundColor Gray
+    
+    $tweaksAAplicar = @("disable-telemetry", "disable-cortana", "disable-widgets", "disable-background-apps", "disable-gamedvr", "disable-start-suggestions", "disable-nagle-algorithm", "gpu-scheduling")
+    
+    Start-Lote
+    foreach ($id in $tweaksAAplicar) {
+        $tweak = Get-TweakById -Id $id
+        if ($tweak -and $tweak.tipo -eq 'registro') {
+            foreach ($c in $tweak.cambios) {
+                if (-not (Test-Path $c.ruta)) { New-Item -Path $c.ruta -Force | Out-Null }
+                $actual = $null; $existe = $false
+                try { $item = Get-ItemProperty -Path $c.ruta -Name $c.nombre -ErrorAction Stop; $actual = $item.$($c.nombre); $existe = $true } catch {}
+                Set-ItemProperty -Path $c.ruta -Name $c.nombre -Value $c.valor -Type $c.tipoValor -Force
+                Add-History -Tipo 'registro' -TweakId $tweak.id -Ruta $c.ruta -Nombre $c.nombre -Existia $existe -ValorAnterior $actual -TipoValor $c.tipoValor
+                Write-Host "   -> $($tweak.nombre)" -ForegroundColor DarkGray
+            }
+        } elseif ($tweak -and $tweak.tipo -eq 'comando') {
+            Invoke-Expression $tweak.comando
+            Add-History -Tipo 'comando' -TweakId $tweak.id -Undo $tweak.comandoOriginal
+            Write-Host "   -> $($tweak.nombre)" -ForegroundColor DarkGray
+        }
+    }
+    Write-Host "`n   [OK] Optimización rápida completada." -ForegroundColor Green
+    Read-Host "   Enter para volver"
+}

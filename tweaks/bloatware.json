@@ -1,0 +1,12 @@
+[
+  { "id": "xbox", "nombre": "Xbox y Game Bar", "paquete": "Microsoft.XboxApp" },
+  { "id": "skype", "nombre": "Skype", "paquete": "Microsoft.SkypeApp" },
+  { "id": "news", "nombre": "Noticias (News)", "paquete": "Microsoft.BingNews" },
+  { "id": "weather", "nombre": "El Tiempo (Weather)", "paquete": "Microsoft.BingWeather" },
+  { "id": "solitaire", "nombre": "Solitario (Solitaire)", "paquete": "Microsoft.MicrosoftSolitaireCollection" },
+  { "id": "officehub", "nombre": "Office Hub", "paquete": "Microsoft.MicrosoftOfficeHub" },
+  { "id": "zune", "nombre": "Groove Música", "paquete": "Microsoft.ZuneMusic" },
+  { "id": "video", "nombre": "Películas y TV", "paquete": "Microsoft.ZuneVideo" },
+  { "id": "maps", "nombre": "Mapas", "paquete": "Microsoft.WindowsMaps" },
+  { "id": "gethelp", "nombre": "Obtener Ayuda", "paquete": "Microsoft.GetHelp" }
+]

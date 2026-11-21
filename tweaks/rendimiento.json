@@ -1,0 +1,28 @@
+[
+  {
+    "id": "disable-nagle-algorithm", "nombre": "Reducir Ping (Nagle)", "descripcion": "Mejora respuesta de red.", "riesgo": "bajo", "tipo": "registro",
+    "cambios": [ { "ruta": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters\\Interfaces", "nombre": "TcpAckFrequency", "valor": 1, "tipoValor": "DWord" } ]
+  },
+  {
+    "id": "gpu-scheduling", "nombre": "Aceleración GPU (HAGS)", "descripcion": "Mejora FPS.", "riesgo": "bajo", "tipo": "registro",
+    "cambios": [ { "ruta": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers", "nombre": "HwSchMode", "valor": 2, "tipoValor": "DWord" } ]
+  },
+  {
+    "id": "disable-xbox-gamebar", "nombre": "Desactivar Barra Xbox", "descripcion": "Ahorra recursos.", "riesgo": "bajo", "tipo": "registro",
+    "cambios": [ { "ruta": "HKCU:\\Software\\Microsoft\\GameBar", "nombre": "UseNexusForGameBarEnabled", "valor": 0, "tipoValor": "DWord" } ]
+  },
+  {
+    "id": "disable-network-throttling", "nombre": "Eliminar Límite de Red", "descripcion": "Sin restricción de ancho de banda.", "riesgo": "bajo", "tipo": "registro",
+    "cambios": [ { "ruta": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile", "nombre": "NetworkThrottlingIndex", "valor": 4294967295, "tipoValor": "DWord" } ]
+  },
+  {
+    "id": "disable-usb-selective-suspend", "nombre": "Evitar Suspensión USB", "descripcion": "Menos input lag.", "riesgo": "bajo", "tipo": "comando",
+    "comando": "powercfg -setacvalueindex SCHEME_CURRENT 2a737441-1930-4402-8d77-b2bebba308a3 48e6b7a6-50f5-4782-a5d4-53bb8f07e226 0; powercfg -setactive SCHEME_CURRENT",
+    "comandoOriginal": "powercfg -setacvalueindex SCHEME_CURRENT 2a737441-1930-4402-8d77-b2bebba308a3 48e6b7a6-50f5-4782-a5d4-53bb8f07e226 1; powercfg -setactive SCHEME_CURRENT"
+  },
+  {
+    "id": "optimize-services", "nombre": "Servicios Xbox en Manual", "descripcion": "Ahorra RAM.", "riesgo": "bajo", "tipo": "comando",
+    "comando": "Set-Service -Name 'XblAuthManager', 'XblGameSave', 'XboxNetApiSvc', 'XboxGipSvc' -StartupType Manual -ErrorAction SilentlyContinue",
+    "comandoOriginal": "Set-Service -Name 'XblAuthManager', 'XblGameSave', 'XboxNetApiSvc', 'XboxGipSvc' -StartupType Automatic -ErrorAction SilentlyContinue"
+  }
+]

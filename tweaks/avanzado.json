@@ -1,0 +1,20 @@
+[
+  {
+    "id": "ultimate-performance-plan", "nombre": "⚠️ Plan Máximo Rendimiento", "descripcion": "ADVERTENCIA: Mucho consumo y calor.", "riesgo": "alto", "tipo": "comando",
+    "comando": "powercfg -duplicatescheme e9a42b02-d5df-448d-aa00-03f14749eb61; powercfg -setactive e9a42b02-d5df-448d-aa00-03f14749eb61",
+    "comandoOriginal": "powercfg -setactive 381b4222-f694-41f0-9685-ff5bb260df2e"
+  },
+  {
+    "id": "disable-core-parking", "nombre": "⚠️ Desactivar Core Parking", "descripcion": "ADVERTENCIA: Más calor y consumo.", "riesgo": "alto", "tipo": "comando",
+    "comando": "powercfg -setacvalueindex SCHEME_CURRENT SUB_PROCESSOR CPMINCORES 100; powercfg -setactive SCHEME_CURRENT",
+    "comandoOriginal": "powercfg -setacvalueindex SCHEME_CURRENT SUB_PROCESSOR CPMINCORES 0; powercfg -setactive SCHEME_CURRENT"
+  },
+  {
+    "id": "win32-priority-separation", "nombre": "⚠️ Priorizar Primer Plano", "descripcion": "ADVERTENCIA: Puede causar BSOD.", "riesgo": "alto", "tipo": "registro",
+    "cambios": [ { "ruta": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\PriorityControl", "nombre": "Win32PrioritySeparation", "valor": 40, "tipoValor": "DWord" } ]
+  },
+  {
+    "id": "disable-system-responsiveness", "nombre": "⚠️ Reserva CPU Sistema a 0%", "descripcion": "ADVERTENCIA: Sistema menos fluido.", "riesgo": "alto", "tipo": "registro",
+    "cambios": [ { "ruta": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile", "nombre": "SystemResponsiveness", "valor": 0, "tipoValor": "DWord" } ]
+  }
+]
