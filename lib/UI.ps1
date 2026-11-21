@@ -13,9 +13,10 @@ function Show-MainMenu {
         Write-Banner
         Write-Host "   [1] Aplicar Perfil (Gaming / Oficina)" -ForegroundColor White
         Write-Host "   [2] Tweaks individuales" -ForegroundColor White
-        Write-Host "   [3] Historial y Deshacer" -ForegroundColor White
-        Write-Host "   [4] Actualizaciones de Windows (Pausar/Reanudar)" -ForegroundColor White
-        Write-Host "   [5] Crear Punto de Restauración" -ForegroundColor White
+        Write-Host "   [3] Instalar Aplicaciones (Winget)" -ForegroundColor White
+        Write-Host "   [4] Historial y Deshacer" -ForegroundColor White
+        Write-Host "   [5] Actualizaciones de Windows (Pausar/Reanudar)" -ForegroundColor White
+        Write-Host "   [6] Crear Punto de Restauración" -ForegroundColor White
         Write-Host ""
         Write-Host "   [9] ⚡ OPTIMIZACIÓN RÁPIDA (Recomendado)" -ForegroundColor Green
         Write-Host ""
@@ -26,7 +27,8 @@ function Show-MainMenu {
         switch ($opcion) {
             "1" { Show-ProfilesMenu }
             "2" { Show-TweaksMenu }
-            "3" { 
+            "3" { Invoke-AppInstaller }
+            "4" { 
                 $lotes = Get-Lotes
                 if ($lotes.Count -eq 0) { Write-Host "   [!] No hay historial." -ForegroundColor Yellow }
                 else {
@@ -42,8 +44,8 @@ function Show-MainMenu {
                 }
                 Read-Host "   Enter para continuar" 
             }
-            "4" { Show-UpdateMenu }
-            "5" { New-GonixRestorePoint }
+            "5" { Show-UpdateMenu }
+            "6" { New-GonixRestorePoint }
             "9" { Invoke-QuickOptimize }
             "0" { Write-Host "   Chau, Gon!" -ForegroundColor Cyan; return }
             default { Write-Host "   Opción inválida." -ForegroundColor Red; Start-Sleep 1 }

@@ -1,0 +1,54 @@
+[
+  {
+    "categoria": "Navegadores",
+    "apps": [
+      { "id": "Google.Chrome", "nombre": "Google Chrome" },
+      { "id": "Mozilla.Firefox", "nombre": "Mozilla Firefox" },
+      { "id": "Brave.Brave", "nombre": "Brave Browser" },
+      { "id": "Opera.Opera", "nombre": "Opera" }
+    ]
+  },
+  {
+    "categoria": "Juegos",
+    "apps": [
+      { "id": "Valve.Steam", "nombre": "Steam" },
+      { "id": "EpicGames.EpicGamesLauncher", "nombre": "Epic Games Launcher" },
+      { "id": "GOG.Galaxy", "nombre": "GOG Galaxy" }
+    ]
+  },
+  {
+    "categoria": "Comunicación",
+    "apps": [
+      { "id": "Discord.Discord", "nombre": "Discord" },
+      { "id": "WhatsApp.WhatsApp", "nombre": "WhatsApp" },
+      { "id": "Zoom.Zoom", "nombre": "Zoom" },
+      { "id": "Telegram.TelegramDesktop", "nombre": "Telegram" }
+    ]
+  },
+  {
+    "categoria": "Desarrollo",
+    "apps": [
+      { "id": "Microsoft.VisualStudioCode", "nombre": "Visual Studio Code" },
+      { "id": "Git.Git", "nombre": "Git" },
+      { "id": "Python.Python.3.12", "nombre": "Python 3.12" },
+      { "id": "OpenJS.NodeJS", "nombre": "Node.js" }
+    ]
+  },
+  {
+    "categoria": "Multimedia",
+    "apps": [
+      { "id": "VideoLAN.VLC", "nombre": "VLC Media Player" },
+      { "id": "Spotify.Spotify", "nombre": "Spotify" },
+      { "id": "OBSProject.OBSStudio", "nombre": "OBS Studio" }
+    ]
+  },
+  {
+    "categoria": "Utilidades y Documentos",
+    "apps": [
+      { "id": "7zip.7zip", "nombre": "7-Zip" },
+      { "id": "RARLab.WinRAR", "nombre": "WinRAR" },
+      { "id": "Adobe.Acrobat.Reader.64-bit", "nombre": "Adobe Acrobat Reader" },
+      { "id": "Notepad++.Notepad++", "nombre": "Notepad++" }
+    ]
+  }
+]
