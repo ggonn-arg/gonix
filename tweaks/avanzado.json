@@ -14,17 +14,30 @@
     "cambios": [ { "ruta": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\PriorityControl", "nombre": "Win32PrioritySeparation", "valor": 40, "tipoValor": "DWord" } ]
   },
   {
-    "id": "disable-bitlocker", "nombre": "⚠️ Desactivar BitLocker", "descripcion": "ADVERTENCIA: Elimina la encriptación del disco. Hacelo solo si sabés lo que hacés.", "riesgo": "alto", "tipo": "comando",
+    "id": "disable-bitlocker", "nombre": "⚠️ Desactivar BitLocker", "descripcion": "ADVERTENCIA: Elimina encriptación del disco.", "riesgo": "alto", "tipo": "comando",
     "comando": "Get-BitLockerVolume | Disable-BitLocker",
     "comandoOriginal": "Write-Host 'No se puede reactivar automáticamente. Usá el Panel de Control.'"
   },
   {
-    "id": "disable-windows-ai", "nombre": "⚠️ Desactivar y Eliminar Windows AI", "descripcion": "ADVERTENCIA: Elimina los componentes de inteligencia artificial integrados (Recall, etc.).", "riesgo": "alto", "tipo": "comando",
+    "id": "disable-windows-ai", "nombre": "⚠️ Desactivar y Eliminar Windows AI", "descripcion": "ADVERTENCIA: Elimina componentes de IA (Recall, etc.).", "riesgo": "alto", "tipo": "comando",
     "comando": "Dism /Online /Disable-Feature /FeatureName:Recall /NoRestart",
     "comandoOriginal": "Write-Host 'Para reactivar, usá el Panel de Control de Windows.'"
   },
   {
-    "id": "disable-edge-debloat", "nombre": "⚠️ Debloat de Microsoft Edge", "descripcion": "ADVERTENCIA: Desactiva funciones de segundo plano y telemetría del navegador Edge.", "riesgo": "alto", "tipo": "registro",
+    "id": "disable-edge-debloat", "nombre": "⚠️ Debloat de Microsoft Edge", "descripcion": "ADVERTENCIA: Desactiva funciones de segundo plano de Edge.", "riesgo": "alto", "tipo": "registro",
     "cambios": [ { "ruta": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge", "nombre": "BackgroundModeEnabled", "valor": 0, "tipoValor": "DWord" } ]
+  },
+  {
+    "id": "disable-fso", "nombre": "⚠️ Desactivar Optimizaciones de Pantalla Completa", "descripcion": "Puede mejorar el rendimiento en juegos, pero romper el color en algunos monitores.", "riesgo": "alto", "tipo": "registro",
+    "cambios": [ { "ruta": "HKCU:\\System\\GameConfigStore", "nombre": "GameDVR_FSEBehaviorMode", "valor": 2, "tipoValor": "DWord" } ]
+  },
+  {
+    "id": "uninstall-edge", "nombre": "⚠️ Eliminar Microsoft Edge", "descripcion": "ADVERTENCIA: Elimina Edge del sistema. Algunos componentes de Windows lo necesitan.", "riesgo": "alto", "tipo": "comando",
+    "comando": "Get-AppxPackage *MicrosoftEdge* | Remove-AppxPackage",
+    "comandoOriginal": "Write-Host 'Reinstalar Edge requiere herramientas de terceros.'"
+  },
+  {
+    "id": "set-time-utc", "nombre": "⚠️ Establecer Hora en UTC", "descripcion": "Útil para Dual Boot con Linux. Puede desajustar la hora en Windows.", "riesgo": "alto", "tipo": "registro",
+    "cambios": [ { "ruta": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\TimeZoneInformation", "nombre": "RealTimeIsUniversal", "valor": 1, "tipoValor": "DWord" } ]
   }
 ]

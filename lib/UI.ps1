@@ -58,7 +58,7 @@ function Show-TweaksMenu {
         Write-Banner
         Write-Host "   --- Categorías de Tweaks ---" -ForegroundColor Magenta
         Write-Host "   [1] Privacidad (Quita anuncios y rastreo)" -ForegroundColor White
-        Write-Host "   [2] Sistema y Rendimiento (Velocidad y Red)" -ForegroundColor White
+        Write-Host "   [2] Sistema y Rendimiento (Velocidad, Red y Limpieza)" -ForegroundColor White
         Write-Host "   [3] Desinstalar Apps (Bloatware)" -ForegroundColor White
         Write-Host "   [4] ⚠️ ZONA DE PELIGRO (Modo Avanzado)" -ForegroundColor Red
         Write-Host "   [0] Volver" -ForegroundColor DarkGray
@@ -93,6 +93,8 @@ function Show-PrivacyTweaks {
         Write-Host "   [11] Desactivar Historial de Actividad" -ForegroundColor White
         Write-Host "   [12] Desactivar Rastreo de Ubicación" -ForegroundColor White
         Write-Host "   [13] Desactivar Funciones de Consumidor" -ForegroundColor White
+        Write-Host "   [14] Desactivar Muestras de Defender" -ForegroundColor White
+        Write-Host "   [15] Desactivar Wifi-Sense" -ForegroundColor White
         Write-Host "   [A] APLICAR TODOS LOS DE ESTA LISTA" -ForegroundColor Green
         Write-Host "   [0] Volver" -ForegroundColor DarkGray
         Write-Host ""
@@ -115,6 +117,8 @@ function Show-PrivacyTweaks {
             "11" { Invoke-Tweak -Id "disable-activity-history" }
             "12" { Invoke-Tweak -Id "disable-location-tracking" }
             "13" { Invoke-Tweak -Id "disable-consumer-features" }
+            "14" { Invoke-Tweak -Id "disable-defender-samples" }
+            "15" { Invoke-Tweak -Id "disable-wifi-sense" }
             default { Write-Host "   Opción inválida." -ForegroundColor Red; Start-Sleep 1; continue }
         }
         Read-Host "   Enter para continuar"
@@ -126,22 +130,30 @@ function Show-SystemTweaks {
         Write-Banner
         Write-Host "   --- Sistema y Rendimiento ---" -ForegroundColor Magenta
         Write-Host "   [1] Desactivar Hibernación" -ForegroundColor White
-        Write-Host "   [2] Desactivar GameDVR" -ForegroundColor White
-        Write-Host "   [3] Desactivar Apps en 2do Plano" -ForegroundColor White
-        Write-Host "   [4] Desactivar Animaciones" -ForegroundColor White
-        Write-Host "   [5] Quitar OneDrive del Inicio" -ForegroundColor White
-        Write-Host "   [6] Optimizar Servicios Xbox" -ForegroundColor White
-        Write-Host "   [7] Reducir Ping (Nagle)" -ForegroundColor White
-        Write-Host "   [8] Aceleración GPU (HAGS)" -ForegroundColor White
-        Write-Host "   [9] Desactivar Barra de Juegos Xbox" -ForegroundColor White
-        Write-Host "   [10] Eliminar Límite de Ancho de Banda" -ForegroundColor White
-        Write-Host "   [11] Evitar Suspensión de Puertos USB" -ForegroundColor White
-        Write-Host "   [12] Eliminar Retraso de Arranque" -ForegroundColor White
-        Write-Host "   [13] Configurar DNS Cloudflare" -ForegroundColor White
-        Write-Host "   [14] Habilitar 'Finalizar Tarea' en Clic Derecho" -ForegroundColor White
-        Write-Host "   [15] Desactivar Sensor de Almacenamiento" -ForegroundColor White
-        Write-Host "   [16] Desactivar Teredo (IPv6)" -ForegroundColor White
-        Write-Host "   [17] Efectos Visuales a Máximo Rendimiento" -ForegroundColor White
+        Write-Host "   [2] Activar Hibernación (Notebooks)" -ForegroundColor White
+        Write-Host "   [3] Desactivar GameDVR" -ForegroundColor White
+        Write-Host "   [4] Desactivar Apps en 2do Plano" -ForegroundColor White
+        Write-Host "   [5] Desactivar Animaciones" -ForegroundColor White
+        Write-Host "   [6] Quitar OneDrive del Inicio" -ForegroundColor White
+        Write-Host "   [7] Optimizar Servicios Xbox" -ForegroundColor White
+        Write-Host "   [8] Reducir Ping (Nagle)" -ForegroundColor White
+        Write-Host "   [9] Aceleración GPU (HAGS)" -ForegroundColor White
+        Write-Host "   [10] Desactivar Barra de Juegos Xbox" -ForegroundColor White
+        Write-Host "   [11] Eliminar Límite de Ancho de Banda" -ForegroundColor White
+        Write-Host "   [12] Evitar Suspensión de Puertos USB" -ForegroundColor White
+        Write-Host "   [13] Eliminar Retraso de Arranque" -ForegroundColor White
+        Write-Host "   [14] Configurar DNS Cloudflare" -ForegroundColor White
+        Write-Host "   [15] Finalizar Tarea en Clic Derecho" -ForegroundColor White
+        Write-Host "   [16] Desactivar Sensor de Almacenamiento" -ForegroundColor White
+        Write-Host "   [17] Desactivar Teredo (IPv6)" -ForegroundColor White
+        Write-Host "   [18] Efectos Visuales a Máximo Rendimiento" -ForegroundColor White
+        Write-Host "   [19] Mostrar Extensiones de Archivo" -ForegroundColor White
+        Write-Host "   [20] Desactivar Aceleración del Mouse" -ForegroundColor White
+        Write-Host "   [21] Desactivar Sticky Keys" -ForegroundColor White
+        Write-Host "   [22] Desactivar Servicio DiagTrack" -ForegroundColor White
+        Write-Host "   [23] Poner Servicio de Mapas en Manual" -ForegroundColor White
+        Write-Host "   [24] Limpiar Archivos Temporales" -ForegroundColor White
+        Write-Host "   [25] Ejecutar Liberador de Espacio" -ForegroundColor White
         Write-Host "   [A] APLICAR TODOS LOS DE ESTA LISTA" -ForegroundColor Green
         Write-Host "   [0] Volver" -ForegroundColor DarkGray
         Write-Host ""
@@ -152,22 +164,30 @@ function Show-SystemTweaks {
         
         switch ($op) {
             "1" { Invoke-Tweak -Id "disable-hibernation" }
-            "2" { Invoke-Tweak -Id "disable-gamedvr" }
-            "3" { Invoke-Tweak -Id "disable-background-apps" }
-            "4" { Invoke-Tweak -Id "disable-animations" }
-            "5" { Invoke-Tweak -Id "disable-onedrive-startup" }
-            "6" { Invoke-Tweak -Id "optimize-services" }
-            "7" { Invoke-Tweak -Id "disable-nagle-algorithm" }
-            "8" { Invoke-Tweak -Id "gpu-scheduling" }
-            "9" { Invoke-Tweak -Id "disable-xbox-gamebar" }
-            "10" { Invoke-Tweak -Id "disable-network-throttling" }
-            "11" { Invoke-Tweak -Id "disable-usb-selective-suspend" }
-            "12" { Invoke-Tweak -Id "disable-startup-delay" }
-            "13" { Invoke-Tweak -Id "set-dns-cloudflare" }
-            "14" { Invoke-Tweak -Id "enable-end-task" }
-            "15" { Invoke-Tweak -Id "disable-storage-sense" }
-            "16" { Invoke-Tweak -Id "disable-teredo" }
-            "17" { Invoke-Tweak -Id "set-visual-effects-performance" }
+            "2" { Invoke-Tweak -Id "enable-hibernation-laptops" }
+            "3" { Invoke-Tweak -Id "disable-gamedvr" }
+            "4" { Invoke-Tweak -Id "disable-background-apps" }
+            "5" { Invoke-Tweak -Id "disable-animations" }
+            "6" { Invoke-Tweak -Id "disable-onedrive-startup" }
+            "7" { Invoke-Tweak -Id "optimize-services" }
+            "8" { Invoke-Tweak -Id "disable-nagle-algorithm" }
+            "9" { Invoke-Tweak -Id "gpu-scheduling" }
+            "10" { Invoke-Tweak -Id "disable-xbox-gamebar" }
+            "11" { Invoke-Tweak -Id "disable-network-throttling" }
+            "12" { Invoke-Tweak -Id "disable-usb-selective-suspend" }
+            "13" { Invoke-Tweak -Id "disable-startup-delay" }
+            "14" { Invoke-Tweak -Id "set-dns-cloudflare" }
+            "15" { Invoke-Tweak -Id "enable-end-task" }
+            "16" { Invoke-Tweak -Id "disable-storage-sense" }
+            "17" { Invoke-Tweak -Id "disable-teredo" }
+            "18" { Invoke-Tweak -Id "set-visual-effects-performance" }
+            "19" { Invoke-Tweak -Id "show-file-extensions" }
+            "20" { Invoke-Tweak -Id "disable-mouse-acceleration" }
+            "21" { Invoke-Tweak -Id "disable-sticky-keys" }
+            "22" { Invoke-Tweak -Id "disable-diagtrack" }
+            "23" { Invoke-Tweak -Id "disable-maps-broker" }
+            "24" { Invoke-Tweak -Id "clean-temp-files" }
+            "25" { Invoke-Tweak -Id "run-disk-cleanup" }
             default { Write-Host "   Opción inválida." -ForegroundColor Red; Start-Sleep 1; continue }
         }
         Read-Host "   Enter para continuar"
@@ -189,6 +209,9 @@ function Show-AdvancedTweaks {
         Write-Host "   [5] Desactivar BitLocker" -ForegroundColor White
         Write-Host "   [6] Desactivar y Eliminar Windows AI" -ForegroundColor White
         Write-Host "   [7] Debloat de Microsoft Edge" -ForegroundColor White
+        Write-Host "   [8] Desactivar Optimizaciones de Pantalla Completa" -ForegroundColor White
+        Write-Host "   [9] Eliminar Microsoft Edge" -ForegroundColor White
+        Write-Host "   [10] Establecer Hora en UTC" -ForegroundColor White
         Write-Host "   [0] Volver" -ForegroundColor DarkGray
         Write-Host ""
         $op = Read-Host "   Elegí un tweak (o 0 para volver)"
@@ -212,6 +235,9 @@ function Show-AdvancedTweaks {
             "5" { Invoke-Tweak -Id "disable-bitlocker" }
             "6" { Invoke-Tweak -Id "disable-windows-ai" }
             "7" { Invoke-Tweak -Id "disable-edge-debloat" }
+            "8" { Invoke-Tweak -Id "disable-fso" }
+            "9" { Invoke-Tweak -Id "uninstall-edge" }
+            "10" { Invoke-Tweak -Id "set-time-utc" }
             default { Write-Host "   Opción inválida." -ForegroundColor Red; Start-Sleep 1; continue }
         }
         Read-Host "   Enter para continuar"
@@ -233,7 +259,6 @@ function Show-ProfilesMenu {
             "1" { Invoke-Profile -NombreArchivo "gaming" }
             default { Write-Host "   Opción inválida." -ForegroundColor Red; Start-Sleep 1; continue }
         }
-        Write-Host ""
-        Read-Host "   Presioná Enter para continuar"
+        Read-Host "   Enter para continuar"
     }
 }

@@ -48,15 +48,23 @@
     "cambios": [ { "ruta": "HKCU:\\Software\\Microsoft\\Siuf\\Rules", "nombre": "NumberOfSIUFInPeriod", "valor": 0, "tipoValor": "DWord" } ]
   },
   {
-    "id": "disable-activity-history", "nombre": "Desactivar Historial de Actividad", "descripcion": "Evita que Windows registre las apps y archivos que abrís.", "riesgo": "bajo", "tipo": "registro",
+    "id": "disable-activity-history", "nombre": "Historial de Actividad", "descripcion": "Evita que registre apps y archivos abiertos.", "riesgo": "bajo", "tipo": "registro",
     "cambios": [ { "ruta": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\System", "nombre": "EnableActivityFeed", "valor": 0, "tipoValor": "DWord" } ]
   },
   {
-    "id": "disable-location-tracking", "nombre": "Desactivar Rastreo de Ubicación", "descripcion": "Evita que las apps accedan a tu ubicación GPS.", "riesgo": "bajo", "tipo": "registro",
+    "id": "disable-location-tracking", "nombre": "Rastreo de Ubicación", "descripcion": "Evita acceso al GPS.", "riesgo": "bajo", "tipo": "registro",
     "cambios": [ { "ruta": "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\location", "nombre": "Value", "valor": "Deny", "tipoValor": "String" } ]
   },
   {
-    "id": "disable-consumer-features", "nombre": "Desactivar Funciones de Consumidor", "descripcion": "Quita sugerencias de apps y juegos de la Microsoft Store.", "riesgo": "bajo", "tipo": "registro",
+    "id": "disable-consumer-features", "nombre": "Funciones de Consumidor", "descripcion": "Quita sugerencias de Store.", "riesgo": "bajo", "tipo": "registro",
     "cambios": [ { "ruta": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager", "nombre": "SilentInstalledAppsEnabled", "valor": 0, "tipoValor": "DWord" } ]
+  },
+  {
+    "id": "disable-defender-samples", "nombre": "Desactivar Muestras de Defender", "descripcion": "No envía archivos sospechosos a Microsoft.", "riesgo": "bajo", "tipo": "registro",
+    "cambios": [ { "ruta": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows Defender\\Spynet", "nombre": "SubmitSamplesConsent", "valor": 2, "tipoValor": "DWord" } ]
+  },
+  {
+    "id": "disable-wifi-sense", "nombre": "Desactivar Wifi-Sense", "descripcion": "Evita compartir contraseñas de WiFi.", "riesgo": "bajo", "tipo": "registro",
+    "cambios": [ { "ruta": "HKLM:\\SOFTWARE\\Microsoft\\WcmSvc\\wifinetworkmanager\\config", "nombre": "AutoConnectAllowedOEM", "valor": 0, "tipoValor": "DWord" } ]
   }
 ]
