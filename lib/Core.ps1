@@ -212,31 +212,71 @@ function Invoke-Profile {
 
 function Invoke-QuickOptimize {
     Write-Banner
-    Write-Host "   ⚡ --- OPTIMIZACIÓN RÁPIDA --- ⚡`n" -ForegroundColor Green
-    Write-Host "   Aplicando tweaks seguros...`n" -ForegroundColor Gray
+    Write-Host "   ⚡ --- OPTIMIZACIÓN RÁPIDA --- ⚡" -ForegroundColor Green
+    Write-Host ""
+    Write-Host "   Esta opción aplicará automáticamente los tweaks más seguros y efectivos:" -ForegroundColor Gray
+    Write-Host ""
+    Write-Host "   1. Desactivar Telemetría" -ForegroundColor White
+    Write-Host "   2. Desactivar Cortana y Widgets" -ForegroundColor White
+    Write-Host "   3. Desactivar Apps en 2do Plano" -ForegroundColor White
+    Write-Host "   4. Desactivar GameDVR (Gaming)" -ForegroundColor White
+    Write-Host "   5. Quitar Anuncios del Menú Inicio" -ForegroundColor White
+    Write-Host "   6. Aplicar mejoras de red (Nagle) y GPU (HAGS)" -ForegroundColor White
+    Write-Host "   7. Efectos Visuales a Máximo Rendimiento" -ForegroundColor White
+    Write-Host ""
     
-    $tweaksAAplicar = @("disable-telemetry", "disable-cortana", "disable-widgets", "disable-background-apps", "disable-gamedvr", "disable-start-suggestions", "disable-nagle-algorithm", "gpu-scheduling")
-    
+    $conf = Read-Host "   ¿Aplicar estas optimizaciones ahora? (s/n)"
+    if ($conf -ne "s") {
+        Write-Host "   Cancelado." -ForegroundColor Yellow
+        Start-Sleep 1
+        return
+    }
+
+    Write-Host ""
+    Write-Host "   Aplicando optimizaciones..." -ForegroundColor Magenta
+
+    $tweaksAAplicar = @(
+        "disable-telemetry",
+        "disable-cortana",
+        "disable-widgets",
+        "disable-background-apps",
+        "disable-gamedvr",
+        "disable-start-suggestions",
+        "disable-nagle-algorithm",
+        "gpu-scheduling",
+        "set-visual-effects-performance"
+    )
+
     Start-Lote
+
     foreach ($id in $tweaksAAplicar) {
         $tweak = Get-TweakById -Id $id
-        if ($tweak -and $tweak.tipo -eq 'registro') {
-            foreach ($c in $tweak.cambios) {
-                if (-not (Test-Path $c.ruta)) { New-Item -Path $c.ruta -Force | Out-Null }
-                $actual = $null; $existe = $false
-                try { $item = Get-ItemProperty -Path $c.ruta -Name $c.nombre -ErrorAction Stop; $actual = $item.$($c.nombre); $existe = $true } catch {}
-                Set-ItemProperty -Path $c.ruta -Name $c.nombre -Value $c.valor -Type $c.tipoValor -Force
-                Add-History -Tipo 'registro' -TweakId $tweak.id -Ruta $c.ruta -Nombre $c.nombre -Existia $existe -ValorAnterior $actual -TipoValor $c.tipoValor
-                Write-Host "   -> $($tweak.nombre)" -ForegroundColor DarkGray
-            }
-        } elseif ($tweak -and $tweak.tipo -eq 'comando') {
-            Invoke-Expression $tweak.comando
-            Add-History -Tipo 'comando' -TweakId $tweak.id -Undo $tweak.comandoOriginal
+        if ($tweak) {
             Write-Host "   -> $($tweak.nombre)" -ForegroundColor DarkGray
+            try {
+                if ($tweak.tipo -eq 'registro') {
+                    $cambios = if ($tweak.cambios) { $tweak.cambios } else { @([PSCustomObject]@{ruta=$tweak.ruta; nombre=$tweak.nombreValor; valor=$tweak.valorNuevo; tipoValor='DWord'}) }
+                    foreach ($c in $cambios) {
+                        if (-not (Test-Path $c.ruta)) { New-Item -Path $c.ruta -Force | Out-Null }
+                        $actual = $null; $existe = $false
+                        try { $item = Get-ItemProperty -Path $c.ruta -Name $c.nombre -ErrorAction Stop; $actual = $item.$($c.nombre); $existe = $true } catch {}
+                        $tipoVal = if ($c.tipoValor) { $c.tipoValor } else { 'DWord' }
+                        Set-ItemProperty -Path $c.ruta -Name $c.nombre -Value $c.valor -Type $tipoVal -Force
+                        Add-History -Tipo 'registro' -TweakId $tweak.id -Ruta $c.ruta -Nombre $c.nombre -Existia $existe -ValorAnterior $actual -TipoValor $tipoVal
+                    }
+                }
+                elseif ($tweak.tipo -eq 'comando') {
+                    Invoke-Expression $tweak.comando
+                    Add-History -Tipo 'comando' -TweakId $tweak.id -Undo $tweak.comandoOriginal
+                }
+            } catch {}
         }
     }
-    Write-Host "`n   [OK] Optimización rápida completada." -ForegroundColor Green
-    Read-Host "   Enter para volver"
+
+    Write-Host ""
+    Write-Host "   [OK] ¡Optimización rápida completada!" -ForegroundColor Green
+    Write-Host "   (Se recomienda reiniciar para aplicar todos los cambios)." -ForegroundColor Yellow
+    Read-Host "   Enter para volver al menú"
 }
 function Invoke-AllTweaks {
     param([string]$Categoria)

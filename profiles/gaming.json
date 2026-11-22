@@ -1,8 +1,7 @@
 {
-  "nombre": "Perfil Gaming Extremo (Máximo FPS)",
-  "descripcion": "Optimiza el sistema para jugar: máximo rendimiento, sin telemetría, red optimizada y CPU al 100%.",
+  "nombre": "Perfil Gaming Extremo (Máximo FPS y Cero Lag)",
+  "descripcion": "Optimiza el sistema para jugar: sin telemetría, red optimizada, GPU al máximo y sin apps de fondo. (No incluye tweaks de riesgo).",
   "tweaks": [
-    "ultimate-performance-plan",
     "disable-telemetry",
     "disable-cortana",
     "disable-widgets",
@@ -12,10 +11,7 @@
     "gpu-scheduling",
     "disable-nagle-algorithm",
     "disable-network-throttling",
-    "disable-system-responsiveness",
-    "disable-core-parking",
     "disable-usb-selective-suspend",
-    "win32-priority-separation",
     "optimize-services",
     "disable-advertising-id",
     "disable-tailored-experiences",

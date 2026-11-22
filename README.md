@@ -1,60 +1,75 @@
-# Gonix v0.2
+ 🚀 Gonix - El Optimizador Definitivo para Windows 11
 
-Optimizador de Windows 11 en PowerShell, con historial y deshacer.
+**Gonix** es una herramienta de código abierto, rápida y segura para optimizar Windows 11. Aplica tweaks de privacidad, mejora el rendimiento, limpia el sistema y instala tus aplicaciones favoritas, todo desde una interfaz de consola intuitiva y sin necesidad de instalar nada.
 
-## Cómo abrirlo
+[![Version](https://img.shields.io/badge/version-0.1-blue.svg)]()
+[![PowerShell](https://img.shields.io/badge/PowerShell-5.1+-blue.svg)]()
+[![License](https://img.shields.io/badge/license-MIT-green.svg)]()
 
-- Doble clic en `Gonix.bat` (pide administrador solo), o
-- PowerShell como administrador:
+---
+
+## ⚡ Instalación (1 sola línea)
+
+Abrí **PowerShell como Administrador** y pegá el siguiente comando:
 
 ```powershell
-Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
-cd "C:\ruta\a\Gonix"
-.\Gonix.ps1
-```
+irm https://raw.githubusercontent.com/ggonn-arg/gonix/main/Lanzador.ps1 | iex
+Gonix no se instala en tu disco. Se ejecuta de forma segura desde la nube y no deja rastro.
 
-## Cómo se usa un menú
+✨ Características Principales
+🎮 Perfiles de Optimización
+Aplica configuraciones probadas con un solo clic:
 
-En cada menú de tweaks (Privacidad, Sistema y rendimiento, Zona de peligro):
+Gaming Extremo: Máximo rendimiento para juegos (FPS, red y GPU).
 
-| Entrada | Qué hace |
-|---|---|
-| `1,3,5` o `2-4` | Aplica esos tweaks |
-| `A` | Aplica TODOS los tweaks de ESE menú (omite los ya aplicados) |
-| `S` | Simula: muestra valor actual y valor nuevo, sin tocar nada |
-| `0` | Volver |
+Oficina / Notebook: Privacidad sin gastar batería.
 
-Marcas: `[x]` ya aplicado, `[ ]` sin aplicar, `[?]` no se puede comprobar.
+Privacidad Total: Bloquea toda la telemetría y rastreo de Microsoft.
 
-## Deshacer
+🛡️ Privacidad y Sistema
++50 Tweaks individuales: Desactiva Cortana, Copilot, Widgets, anuncios, telemetría y más.
 
-Todo lo que aplica Gonix se guarda en `historial.json`, agrupado por operación.
-En **Historial y deshacer** podés revertir la última operación (`U`) o todo (`T`).
-Lo único que no se puede deshacer es desinstalar apps (se reinstalan desde la Store).
+Zona de Peligro: Para usuarios avanzados (Plan de Máximo Rendimiento, Core Parking).
 
-## Agregar un tweak nuevo
+Historial y Deshacer: Todos los cambios se guardan en un historial. Si no te gusta el resultado, podés revertir todo con un clic.
 
-Solo editá el JSON de la categoría (`tweaks\privacidad.json`, `rendimiento.json` o
-`avanzado.json`). El menú se arma solo. Ejemplo de tweak de registro:
+📦 Gestor de Aplicaciones (Winget)
+Instala automáticamente Navegadores (Chrome, Firefox, Brave).
 
-```json
-{
-  "id": "mi-tweak",
-  "nombre": "Nombre que se ve en el menú",
-  "descripcion": "Qué hace y qué se pierde.",
-  "riesgo": "bajo",
-  "rapida": false,
-  "tipo": "registro",
-  "cambios": [
-    { "ruta": "HKCU:\\Software\\Ejemplo", "nombre": "Valor", "valor": 1, "tipoValor": "DWord" }
-  ]
-}
-```
+Juegos (Steam, Epic Games, Battle.net).
 
-Tipos disponibles: `registro`, `servicio`, `powercfg`, `plan-energia`, `dns`, `comando`.
-Riesgo: `bajo`, `medio`, `alto` (los de riesgo alto van en `avanzado.json` y nunca
-entran en perfiles ni en la optimización rápida).
+Desarrollo (VS Code, Git, Python).
 
-## Perfiles
+Multimedia (VLC, Spotify, OBS Studio).
 
-Archivos en `profiles\`: una lista de ids en `"tweaks"` y/o categorías enteras en `"categorias"`.
+Utilidades (7-Zip, WinRAR, CPU-Z).
+
+🧹 Limpieza y Reparación
+Desinstalador de Bloatware (Apps preinstaladas de Windows).
+
+Reparación de archivos del sistema (SFC y DISM).
+
+Reparación de red (Flush DNS, Winsock).
+
+Pausar/Reanudar Windows Update.
+
+Crear Puntos de Restauración.
+
+🎨 Interfaz Visual
+Gonix cuenta con una interfaz de consola moderna, con información en tiempo real de tu procesador y memoria RAM, y un sistema de navegación por menús con colores.
+
+text
+   ██████╗  ██████╗ ███╗   ██╗██╗██╗  ██╗
+  ██╔════╝ ██╔═══██╗████╗  ██║██║╚██╗██╔╝
+  ██║  ███╗██║   ██║██╔██╗ ██║██║ ╚███╔╝ 
+  ██║   ██║██║   ██║██║╚██╗██║██║ ██╔██╗ 
+  ╚██████╔╝╚██████╔╝██║ ╚████║██║██╔╝ ██╗
+   ╚═════╝  ╚═════╝ ╚═╝  ╚═══╝╚═╝╚═╝  ╚═╝
+        [ Optimizador de Windows 11 ]  v0.1
+⚠️ Descargo de Responsabilidad
+Gonix modifica el registro y la configuración de Windows. Aunque todos los perfiles principales son 100% seguros y reversibles, los tweaks de la "Zona de Peligro" son bajo tu propio riesgo. Siempre se recomienda crear un Punto de Restauración (opción incluida en el menú).
+
+👨‍💻 Autor
+Creado con pasión por Gonzalo (Gon).
+
+GitHub: @ggonn-arg
