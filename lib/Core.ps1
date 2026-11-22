@@ -189,26 +189,28 @@ function Invoke-AllTweaks {
 }
 function Invoke-BloatwareRemoval {
     while ($true) {
-        $bloatPath = Join-Path $scriptDir "tweaks\bloatware.json"
-        
-        if (-not (Test-Path $bloatPath)) {
-            Write-Host "   [!] No se encontró el archivo de bloatware." -ForegroundColor Red
-            return
-        }
-
-        # Leemos el JSON y lo forzamos a ser una lista de objetos
-        $rawJson = Get-Content $bloatPath -Raw -Encoding UTF8
-        $apps = @($rawJson | ConvertFrom-Json)
+        # Lista de apps escrita directamente en el código (adiós problemas de JSON)
+        $apps = @(
+            [PSCustomObject]@{ nombre = "Xbox y Game Bar"; paquete = "Microsoft.XboxApp" }
+            [PSCustomObject]@{ nombre = "Skype"; paquete = "Microsoft.SkypeApp" }
+            [PSCustomObject]@{ nombre = "Noticias (News)"; paquete = "Microsoft.BingNews" }
+            [PSCustomObject]@{ nombre = "El Tiempo (Weather)"; paquete = "Microsoft.BingWeather" }
+            [PSCustomObject]@{ nombre = "Solitario (Solitaire)"; paquete = "Microsoft.MicrosoftSolitaireCollection" }
+            [PSCustomObject]@{ nombre = "Office Hub"; paquete = "Microsoft.MicrosoftOfficeHub" }
+            [PSCustomObject]@{ nombre = "Groove Música"; paquete = "Microsoft.ZuneMusic" }
+            [PSCustomObject]@{ nombre = "Películas y TV"; paquete = "Microsoft.ZuneVideo" }
+            [PSCustomObject]@{ nombre = "Mapas"; paquete = "Microsoft.WindowsMaps" }
+            [PSCustomObject]@{ nombre = "Obtener Ayuda"; paquete = "Microsoft.GetHelp" }
+        )
 
         Write-Banner
         Write-Host "   --- Desinstalador de Apps Preinstaladas ---" -ForegroundColor Magenta
         Write-Host "   (Seleccioná las apps que querés ELIMINAR)" -ForegroundColor DarkGray
         Write-Host ""
 
-        # ACÁ ESTÁ LA MAGIA: Un bucle for que separa cada app en su propia línea
+        # Al estar en el código, el bucle siempre va a separar cada app en su línea
         for ($i = 0; $i -lt $apps.Count; $i++) {
-            $nombreApp = $apps[$i].nombre
-            Write-Host "   [$($i + 1)] $nombreApp" -ForegroundColor White
+            Write-Host "   [$($i + 1)] $($apps[$i].nombre)" -ForegroundColor White
         }
         
         Write-Host ""
