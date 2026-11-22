@@ -76,8 +76,6 @@ function Get-Lotes {
     }
     return @($res | Sort-Object -Property Fecha -Descending)
 }
-
-# Revierte todos los cambios de un lote (en orden inverso)
 function Undo-Lote {
     param([string]$Lote)
     $todas = @(Read-History)

@@ -64,20 +64,25 @@ function Show-MainMenu {
             "1" { Show-ProfilesMenu }
             "2" { Show-TweaksMenu }
             "3" { Invoke-AppInstaller }
-            "4" { 
-                $lotes = Get-Lotes
-                if ($lotes.Count -eq 0) { Write-Host "   [!] No hay historial." -ForegroundColor Yellow }
-                else {
-                    Write-Host "`n   --- Historial de cambios ---" -ForegroundColor Magenta
-                    for ($i=0; $i -lt $lotes.Count; $i++) {
-                        Write-Host "   [$($i+1)] $($lotes[$i].Fecha) - $($lotes[$i].Cambios) cambios" -ForegroundColor White
-                        Write-Host "       $($lotes[$i].Nombres)" -ForegroundColor DarkGray
+                        "4" { 
+                try {
+                    $lotes = Get-Lotes
+                    if ($lotes.Count -eq 0) { Write-Host "   [!] No hay historial." -ForegroundColor Yellow }
+                    else {
+                        Write-Host "`n   --- Historial de cambios ---" -ForegroundColor Magenta
+                        for ($i=0; $i -lt $lotes.Count; $i++) {
+                            Write-Host "   [$($i+1)] $($lotes[$i].Fecha) - $($lotes[$i].Cambios) cambios" -ForegroundColor White
+                            Write-Host "       $($lotes[$i].Nombres)" -ForegroundColor DarkGray
+                        }
+                        $sel = Read-Host "`n   Elegí el lote a deshacer (0 para volver)"
+                        if ($sel -match '^\d+$' -and $sel -gt 0 -and $sel -le $lotes.Count) {
+                            Undo-Lote -Lote $lotes[$sel - 1].Lote
+                        }
                     }
-                    $sel = Read-Host "`n   Elegí el lote a deshacer (0 para volver)"
-                    if ($sel -match '^\d+$' -and $sel -gt 0 -and $sel -le $lotes.Count) {
-                        Undo-Lote -Lote $lotes[$sel - 1].Lote
-                    }
+                } catch {
+                    Write-Host "   [X] Error al leer el historial: $($_.Exception.Message)" -ForegroundColor Red
                 }
+                Write-Host ""
                 Read-Host "   Enter para continuar" 
             }
             "5" { Show-UpdateMenu }

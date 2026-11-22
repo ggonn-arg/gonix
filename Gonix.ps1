@@ -24,7 +24,10 @@ if (-not $esAdmin) {
 
 # --- Cargar módulos ---
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$script:GonixRoot = $scriptDir
+
 . "$scriptDir\lib\Helpers.ps1"
+. "$scriptDir\lib\Backup.ps1"  # <-- ESTA LÍNEA ES CLAVE
 . "$scriptDir\lib\UI.ps1"
 . "$scriptDir\lib\Core.ps1"
 
