@@ -42,10 +42,13 @@ function Show-MainMenu {
         Write-Host "Historial y Deshacer" -ForegroundColor White
         
         Write-Host "   [5] " -ForegroundColor Cyan -NoNewline
-        Write-Host "Actualizaciones de Windows (Pausar/Reanudar)" -ForegroundColor White
+        Write-Host "Actualizaciones de Windows" -ForegroundColor White
         
         Write-Host "   [6] " -ForegroundColor Cyan -NoNewline
         Write-Host "Crear Punto de Restauración" -ForegroundColor White
+
+        Write-Host "   [7] " -ForegroundColor Cyan -NoNewline
+        Write-Host "Reparación y Mantenimiento (SFC, DISM, Red)" -ForegroundColor White
         
         Write-Host ""
         Write-Host "   [9] " -ForegroundColor Green -NoNewline
@@ -79,6 +82,7 @@ function Show-MainMenu {
             }
             "5" { Show-UpdateMenu }
             "6" { New-GonixRestorePoint }
+            "7" { Invoke-RepairMenu }
             "9" { Invoke-QuickOptimize }
             "0" { Write-Host "   Chau, Gon!" -ForegroundColor Cyan; return }
             default { Write-Host "   Opción inválida." -ForegroundColor Red; Start-Sleep 1 }

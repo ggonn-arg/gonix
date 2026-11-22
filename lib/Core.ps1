@@ -444,4 +444,60 @@ function Invoke-AppInstaller {
         }
     }
 }
+function Invoke-RepairMenu {
+    while ($true) {
+        Write-Banner
+        Write-Host "   --- Reparación y Mantenimiento ---" -ForegroundColor Magenta
+        Write-Host "   [1] Escanear y Reparar Archivos del Sistema (SFC)" -ForegroundColor White
+        Write-Host "   [2] Reparar Imagen de Windows (DISM)" -ForegroundColor White
+        Write-Host "   [3] Reparar Red (Flush DNS, Reset Winsock, Release/Renew IP)" -ForegroundColor White
+        Write-Host "   [4] Reiniciar Windows Update y reparar componentes" -ForegroundColor White
+        Write-Host "   [0] Volver al menú principal" -ForegroundColor DarkGray
+        Write-Host ""
+        $op = Read-Host "   Elegí una opción"
+
+        if ($op -eq "0") { return }
+
+        switch ($op) {
+            "1" {
+                Write-Host "`n   Ejecutando SFC (System File Checker)..." -ForegroundColor Yellow
+                Write-Host "   Esto puede tardar varios minutos. No cierres la ventana." -ForegroundColor DarkGray
+                sfc /scannow
+                Write-Host "`n   [OK] Escaneo finalizado." -ForegroundColor Green
+            }
+            "2" {
+                Write-Host "`n   Ejecutando DISM (Deployment Image Servicing and Management)..." -ForegroundColor Yellow
+                Write-Host "   Esto puede tardar varios minutos." -ForegroundColor DarkGray
+                DISM /Online /Cleanup-Image /RestoreHealth
+                Write-Host "`n   [OK] Reparación de imagen finalizada." -ForegroundColor Green
+            }
+            "3" {
+                Write-Host "`n   Reparando configuración de red..." -ForegroundColor Yellow
+                ipconfig /flushdns
+                ipconfig /release
+                ipconfig /renew
+                netsh winsock reset
+                netsh int ip reset
+                Write-Host "`n   [OK] Red reparada. Se recomienda reiniciar." -ForegroundColor Green
+            }
+            "4" {
+                Write-Host "`n   Reiniciando servicios de Windows Update..." -ForegroundColor Yellow
+                net stop wuauserv
+                net stop cryptSvc
+                net stop bits
+                net stop msiserver
+                ren C:\Windows\SoftwareDistribution SoftwareDistribution.old
+                ren C:\Windows\System32\catroot2 catroot2.old
+                net start wuauserv
+                net start cryptSvc
+                net start bits
+                net start msiserver
+                Write-Host "`n   [OK] Servicios reiniciados." -ForegroundColor Green
+            }
+            default { Write-Host "   Opción inválida." -ForegroundColor Red; Start-Sleep 1; continue }
+        }
+        Write-Host ""
+        Read-Host "   Presioná Enter para continuar"
+    }
+}
     
