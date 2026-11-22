@@ -104,15 +104,14 @@ function Invoke-Profile {
     Write-Host "   Este perfil va a aplicar los siguientes cambios:" -ForegroundColor Yellow
     Write-Host ""
 
-    # Contador para que la lista se vea ordenada
+    # Lista numerada forzada
     $contador = 1
     foreach ($id in $perfil.tweaks) {
         $tweakInfo = Get-TweakById -Id $id
         if ($tweakInfo) {
-            # Usamos Write-Host con un salto de línea explícito al final
             Write-Host "   $contador. $($tweakInfo.nombre)" -ForegroundColor White
         } else {
-            Write-Host "   $contador. $id (No encontrado)" -ForegroundColor DarkGray
+            Write-Host "   $contador. $id (ID no encontrado)" -ForegroundColor DarkGray
         }
         $contador++
     }
@@ -131,7 +130,6 @@ function Invoke-Profile {
     foreach ($id in $perfil.tweaks) {
         $tweak = Get-TweakById -Id $id
         if (-not $tweak) { continue }
-        Write-Host "   -> Aplicando $($tweak.nombre)..." -ForegroundColor DarkGray
         
         if ($tweak.tipo -eq 'registro') {
             $cambios = if ($tweak.cambios) { $tweak.cambios } else { @([PSCustomObject]@{ruta=$tweak.ruta; nombre=$tweak.nombreValor; valor=$tweak.valorNuevo; tipoValor='DWord'}) }
@@ -147,6 +145,7 @@ function Invoke-Profile {
             Invoke-Expression $tweak.comando
             Add-History -Tipo 'comando' -TweakId $tweak.id -Undo $tweak.comandoOriginal
         }
+        Write-Host "   [OK] $($tweak.nombre) aplicado." -ForegroundColor Green
     }
     
     Write-Host ""
