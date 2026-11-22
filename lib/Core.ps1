@@ -352,11 +352,16 @@ function Invoke-AppInstaller {
 
     while ($true) {
         Write-Banner
-        Write-Host "   --- Instalador de Aplicaciones (Winget) ---" -ForegroundColor Magenta
+        Write-Host "   =========================================" -ForegroundColor Cyan
+        Write-Host "        INSTALADOR DE APLICACIONES (WINGET)    " -ForegroundColor Cyan
+        Write-Host "   =========================================" -ForegroundColor Cyan
+        Write-Host ""
+        
         for ($i = 0; $i -lt $categorias.Count; $i++) {
             Write-Host "   [$($i+1)] $($categorias[$i].categoria)" -ForegroundColor White
         }
-        Write-Host "   [0] Volver" -ForegroundColor DarkGray
+        
+        Write-Host "   [0] Volver al menú principal" -ForegroundColor DarkGray
         Write-Host ""
         $opCat = Read-Host "   Elegí una categoría"
 
@@ -365,48 +370,59 @@ function Invoke-AppInstaller {
         $idxCat = [int]$opCat - 1
         if ($idxCat -ge 0 -and $idxCat -lt $categorias.Count) {
             $cat = $categorias[$idxCat]
-            Write-Banner
-            Write-Host "   --- $($cat.categoria) ---" -ForegroundColor Magenta
-            for ($j = 0; $j -lt $cat.apps.Count; $j++) {
-                Write-Host "   [$($j+1)] $($cat.apps[$j].nombre)" -ForegroundColor White
-            }
-            Write-Host "   [T] Instalar TODAS las de esta categoría" -ForegroundColor Green
-            Write-Host "   [0] Volver" -ForegroundColor DarkGray
-            Write-Host ""
-            $opApp = Read-Host "   Elegí qué instalar (ej: 1,3)"
+            
+            while ($true) {
+                Write-Banner
+                Write-Host "   --- $($cat.categoria) ---" -ForegroundColor Magenta
+                Write-Host "   (Elegí los números separados por coma. Ej: 1,3,5)" -ForegroundColor DarkGray
+                Write-Host ""
+                
+                for ($j = 0; $j -lt $cat.apps.Count; $j++) {
+                    Write-Host "   [$($j+1)] $($cat.apps[$j].nombre)" -ForegroundColor White
+                }
+                
+                Write-Host "   [T] Instalar TODAS las de esta categoría" -ForegroundColor Green
+                Write-Host "   [0] Volver a las categorías" -ForegroundColor DarkGray
+                Write-Host ""
+                $opApp = Read-Host "   Elegí qué instalar"
 
-            if ($opApp -eq "0") { continue }
+                if ($opApp -eq "0") { break } # Rompe este while y vuelve a las categorías
 
-            $aInstalar = @()
-            if ($opApp -match "^[Tt]$") {
-                $aInstalar = $cat.apps
-            } else {
-                foreach ($p in ($opApp -split ",")) {
-                    $n = 0
-                    if ([int]::TryParse($p.Trim(), [ref]$n) -and $n -gt 0 -and $n -le $cat.apps.Count) {
-                        $aInstalar += $cat.apps[$n - 1]
+                $aInstalar = @()
+                if ($opApp -match "^[Tt]$") {
+                    $aInstalar = $cat.apps
+                } else {
+                    foreach ($p in ($opApp -split ",")) {
+                        $n = 0
+                        if ([int]::TryParse($p.Trim(), [ref]$n) -and $n -gt 0 -and $n -le $cat.apps.Count) {
+                            $aInstalar += $cat.apps[$n - 1]
+                        }
                     }
                 }
-            }
 
-            if ($aInstalar.Count -eq 0) {
-                Write-Host "   [!] Selección inválida." -ForegroundColor Red
-                Start-Sleep 1
-                continue
-            }
-
-            Write-Host "`n   Instalando apps. Esto puede tardar..." -ForegroundColor Yellow
-            foreach ($app in $aInstalar) {
-                Write-Host "   -> Instalando $($app.nombre)..." -ForegroundColor DarkGray
-                try {
-                    winget install --id $($app.id) -e --silent --accept-package-agreements --accept-source-agreements | Out-Null
-                    Write-Host "      [OK] Instalada." -ForegroundColor Green
-                } catch {
-                    Write-Host "      [X] Error al instalar $($app.nombre)." -ForegroundColor Red
+                if ($aInstalar.Count -eq 0) {
+                    Write-Host "   [!] Selección inválida." -ForegroundColor Red
+                    Start-Sleep 1
+                    continue
                 }
+
+                Write-Host "`n   Instalando apps con Winget..." -ForegroundColor Yellow
+                Start-Lote # (Opcional, por si querés registrar qué instalaste)
+                
+                foreach ($app in $aInstalar) {
+                    Write-Host "   -> Instalando $($app.nombre)..." -ForegroundColor DarkGray
+                    try {
+                        # El comando de winget para instalar en silencio
+                        winget install --id $($app.id) -e --silent --accept-package-agreements --accept-source-agreements | Out-Null
+                        Write-Host "      [OK] $($app.nombre) instalada." -ForegroundColor Green
+                    } catch {
+                        Write-Host "      [X] Error al instalar $($app.nombre)." -ForegroundColor Red
+                    }
+                }
+                
+                Write-Host "`n   [OK] Proceso finalizado." -ForegroundColor Green
+                Read-Host "   Enter para continuar"
             }
-            Write-Host "`n   [OK] Proceso finalizado." -ForegroundColor Green
-            Read-Host "   Enter para continuar"
         } else {
             Write-Host "   [!] Categoría inválida." -ForegroundColor Red
             Start-Sleep 1
