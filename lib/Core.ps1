@@ -196,16 +196,19 @@ function Invoke-BloatwareRemoval {
             return
         }
 
-        $apps = @(Get-Content $bloatPath -Raw | ConvertFrom-Json)
+        # Leemos el JSON y lo forzamos a ser una lista de objetos
+        $rawJson = Get-Content $bloatPath -Raw -Encoding UTF8
+        $apps = @($rawJson | ConvertFrom-Json)
 
         Write-Banner
         Write-Host "   --- Desinstalador de Apps Preinstaladas ---" -ForegroundColor Magenta
         Write-Host "   (Seleccioná las apps que querés ELIMINAR)" -ForegroundColor DarkGray
         Write-Host ""
 
-        # Este bucle es el que arregla el problema: imprime una app por línea
+        # ACÁ ESTÁ LA MAGIA: Un bucle for que separa cada app en su propia línea
         for ($i = 0; $i -lt $apps.Count; $i++) {
-            Write-Host "   [$($i + 1)] $($apps[$i].nombre)" -ForegroundColor White
+            $nombreApp = $apps[$i].nombre
+            Write-Host "   [$($i + 1)] $nombreApp" -ForegroundColor White
         }
         
         Write-Host ""
@@ -223,10 +226,8 @@ function Invoke-BloatwareRemoval {
 
         $indicesAEliminar = @()
         if ($seleccion -match "^[Tt]$") {
-            # Si elige T, carga todos los índices de la lista
             0..($apps.Count - 1) | ForEach-Object { $indicesAEliminar += $_ }
         } else {
-            # Si elige números, los separa por coma
             $partes = $seleccion -split ","
             foreach ($parte in $partes) {
                 $num = 0
