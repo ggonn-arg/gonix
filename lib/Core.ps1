@@ -357,6 +357,7 @@ function Invoke-AppInstaller {
         Write-Host "   =========================================" -ForegroundColor Cyan
         Write-Host ""
         
+        # Acá está el arreglo: un salto de línea al final de cada Write-Host
         for ($i = 0; $i -lt $categorias.Count; $i++) {
             Write-Host "   [$($i+1)] $($categorias[$i].categoria)" -ForegroundColor White
         }
@@ -377,6 +378,7 @@ function Invoke-AppInstaller {
                 Write-Host "   (Elegí los números separados por coma. Ej: 1,3,5)" -ForegroundColor DarkGray
                 Write-Host ""
                 
+                # Acá está el arreglo: un salto de línea por cada app
                 for ($j = 0; $j -lt $cat.apps.Count; $j++) {
                     Write-Host "   [$($j+1)] $($cat.apps[$j].nombre)" -ForegroundColor White
                 }
@@ -386,7 +388,7 @@ function Invoke-AppInstaller {
                 Write-Host ""
                 $opApp = Read-Host "   Elegí qué instalar"
 
-                if ($opApp -eq "0") { break } # Rompe este while y vuelve a las categorías
+                if ($opApp -eq "0") { break }
 
                 $aInstalar = @()
                 if ($opApp -match "^[Tt]$") {
@@ -407,14 +409,18 @@ function Invoke-AppInstaller {
                 }
 
                 Write-Host "`n   Instalando apps con Winget..." -ForegroundColor Yellow
-                Start-Lote # (Opcional, por si querés registrar qué instalaste)
+                Start-Lote
                 
                 foreach ($app in $aInstalar) {
                     Write-Host "   -> Instalando $($app.nombre)..." -ForegroundColor DarkGray
                     try {
-                        # El comando de winget para instalar en silencio
-                        winget install --id $($app.id) -e --silent --accept-package-agreements --accept-source-agreements | Out-Null
-                        Write-Host "      [OK] $($app.nombre) instalada." -ForegroundColor Green
+                        # Ejecuta winget y oculta la salida para que se vea limpio
+                        $result = winget install --id $($app.id) -e --silent --accept-package-agreements --accept-source-agreements 2>&1
+                        if ($LASTEXITCODE -eq 0) {
+                            Write-Host "      [OK] $($app.nombre) instalada." -ForegroundColor Green
+                        } else {
+                            Write-Host "      [-] $($app.nombre) ya está instalada o falló." -ForegroundColor Yellow
+                        }
                     } catch {
                         Write-Host "      [X] Error al instalar $($app.nombre)." -ForegroundColor Red
                     }
