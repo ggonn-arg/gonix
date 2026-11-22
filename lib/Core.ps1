@@ -350,6 +350,7 @@ function Invoke-AppInstaller {
     }
     $categorias = @(Get-Content $appsPath -Raw | ConvertFrom-Json)
 
+    # Bucle principal: Menú de Categorías
     while ($true) {
         Write-Banner
         Write-Host "   =========================================" -ForegroundColor Cyan
@@ -357,11 +358,12 @@ function Invoke-AppInstaller {
         Write-Host "   =========================================" -ForegroundColor Cyan
         Write-Host ""
         
-        # Acá está el arreglo: un salto de línea al final de cada Write-Host
+        # Mostrar las categorías UNA por UNA
         for ($i = 0; $i -lt $categorias.Count; $i++) {
             Write-Host "   [$($i+1)] $($categorias[$i].categoria)" -ForegroundColor White
         }
         
+        Write-Host ""
         Write-Host "   [0] Volver al menú principal" -ForegroundColor DarkGray
         Write-Host ""
         $opCat = Read-Host "   Elegí una categoría"
@@ -372,24 +374,27 @@ function Invoke-AppInstaller {
         if ($idxCat -ge 0 -and $idxCat -lt $categorias.Count) {
             $cat = $categorias[$idxCat]
             
+            # Bucle interno: Menú de Apps de la categoría elegida
             while ($true) {
                 Write-Banner
                 Write-Host "   --- $($cat.categoria) ---" -ForegroundColor Magenta
                 Write-Host "   (Elegí los números separados por coma. Ej: 1,3,5)" -ForegroundColor DarkGray
                 Write-Host ""
                 
-                # Acá está el arreglo: un salto de línea por cada app
+                # Mostrar las apps de ESTA categoría (una por una)
                 for ($j = 0; $j -lt $cat.apps.Count; $j++) {
                     Write-Host "   [$($j+1)] $($cat.apps[$j].nombre)" -ForegroundColor White
                 }
                 
+                Write-Host ""
                 Write-Host "   [T] Instalar TODAS las de esta categoría" -ForegroundColor Green
                 Write-Host "   [0] Volver a las categorías" -ForegroundColor DarkGray
                 Write-Host ""
                 $opApp = Read-Host "   Elegí qué instalar"
 
-                if ($opApp -eq "0") { break }
+                if ($opApp -eq "0") { break } # Sale del bucle de apps y vuelve a categorías
 
+                # Lógica de selección de apps
                 $aInstalar = @()
                 if ($opApp -match "^[Tt]$") {
                     $aInstalar = $cat.apps
@@ -409,12 +414,10 @@ function Invoke-AppInstaller {
                 }
 
                 Write-Host "`n   Instalando apps con Winget..." -ForegroundColor Yellow
-                Start-Lote
                 
                 foreach ($app in $aInstalar) {
                     Write-Host "   -> Instalando $($app.nombre)..." -ForegroundColor DarkGray
                     try {
-                        # Ejecuta winget y oculta la salida para que se vea limpio
                         $result = winget install --id $($app.id) -e --silent --accept-package-agreements --accept-source-agreements 2>&1
                         if ($LASTEXITCODE -eq 0) {
                             Write-Host "      [OK] $($app.nombre) instalada." -ForegroundColor Green
