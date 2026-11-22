@@ -4,36 +4,86 @@
     "apps": [
       { "id": "Google.Chrome", "nombre": "Google Chrome" },
       { "id": "Mozilla.Firefox", "nombre": "Mozilla Firefox" },
-      { "id": "Brave.Brave", "nombre": "Brave Browser" }
+      { "id": "Brave.Brave", "nombre": "Brave Browser" },
+      { "id": "Opera.Opera", "nombre": "Opera" },
+      { "id": "Opera.OperaGX", "nombre": "Opera GX (Gamers)" },
+      { "id": "Vivaldi.Vivaldi", "nombre": "Vivaldi" }
     ]
   },
   {
     "categoria": "2. Juegos y Launchers",
     "apps": [
       { "id": "Valve.Steam", "nombre": "Steam" },
-      { "id": "EpicGames.EpicGamesLauncher", "nombre": "Epic Games" }
+      { "id": "EpicGames.EpicGamesLauncher", "nombre": "Epic Games Launcher" },
+      { "id": "GOG.Galaxy", "nombre": "GOG Galaxy" },
+      { "id": "Ubisoft.Connect", "nombre": "Ubisoft Connect" },
+      { "id": "ElectronicArts.EADesktop", "nombre": "EA App" },
+      { "id": "Blizzard.BattleNet", "nombre": "Battle.net (Blizzard)" },
+      { "id": "Playnite.Playnite", "nombre": "Playnite (Launcher universal)" }
     ]
   },
   {
-    "categoria": "3. Comunicación",
+    "categoria": "3. Comunicación y Redes",
     "apps": [
       { "id": "Discord.Discord", "nombre": "Discord" },
-      { "id": "WhatsApp.WhatsApp", "nombre": "WhatsApp" }
+      { "id": "WhatsApp.WhatsApp", "nombre": "WhatsApp" },
+      { "id": "Zoom.Zoom", "nombre": "Zoom" },
+      { "id": "Telegram.TelegramDesktop", "nombre": "Telegram" },
+      { "id": "SlackTechnologies.Slack", "nombre": "Slack" },
+      { "id": "Microsoft.Teams", "nombre": "Microsoft Teams" },
+      { "id": "Skype.Skype", "nombre": "Skype" }
     ]
   },
   {
-    "categoria": "4. Desarrolladores",
+    "categoria": "4. Desarrollo y Programación",
     "apps": [
-      { "id": "Microsoft.VisualStudioCode", "nombre": "VS Code" },
-      { "id": "Git.Git", "nombre": "Git" }
+      { "id": "Microsoft.VisualStudioCode", "nombre": "Visual Studio Code" },
+      { "id": "Git.Git", "nombre": "Git" },
+      { "id": "Python.Python.3.12", "nombre": "Python 3.12" },
+      { "id": "OpenJS.NodeJS", "nombre": "Node.js" },
+      { "id": "Docker.DockerDesktop", "nombre": "Docker Desktop" },
+      { "id": "Postman.Postman", "nombre": "Postman" },
+      { "id": "Microsoft.VisualStudio.2022.Community", "nombre": "Visual Studio 2022" },
+      { "id": "GitHub.GitHubDesktop", "nombre": "GitHub Desktop" },
+      { "id": "JetBrains.Toolbox", "nombre": "JetBrains Toolbox" }
     ]
   },
   {
-    "categoria": "5. Utilidades",
+    "categoria": "5. Multimedia (Audio, Video, Diseño)",
+    "apps": [
+      { "id": "VideoLAN.VLC", "nombre": "VLC Media Player" },
+      { "id": "Spotify.Spotify", "nombre": "Spotify" },
+      { "id": "OBSProject.OBSStudio", "nombre": "OBS Studio" },
+      { "id": "Audacity.Audacity", "nombre": "Audacity" },
+      { "id": "GIMP.GIMP", "nombre": "GIMP (Edición de imágenes)" },
+      { "id": "Inkscape.Inkscape", "nombre": "Inkscape (Vectores)" },
+      { "id": "KDE.Kdenlive", "nombre": "Kdenlive (Edición de video)" },
+      { "id": "DaVinciResolve.DaVinciResolve", "nombre": "DaVinci Resolve" }
+    ]
+  },
+  {
+    "categoria": "6. Utilidades, Documentos y Sistema",
     "apps": [
       { "id": "7zip.7zip", "nombre": "7-Zip" },
       { "id": "RARLab.WinRAR", "nombre": "WinRAR" },
-      { "id": "VideoLAN.VLC", "nombre": "VLC" }
+      { "id": "Notepad++.Notepad++", "nombre": "Notepad++" },
+      { "id": "LibreOffice.LibreOffice", "nombre": "LibreOffice" },
+      { "id": "TheDocumentFoundation.LibreOffice", "nombre": "LibreOffice (Alternativa)" },
+      { "id": "Adobe.Acrobat.Reader.64-bit", "nombre": "Adobe Acrobat Reader" },
+      { "id": "CPUID.CPU-Z", "nombre": "CPU-Z" },
+      { "id": "TechPowerUp.GPU-Z", "nombre": "GPU-Z" },
+      { "id": "CrystalDewWorld.CrystalDiskInfo", "nombre": "CrystalDiskInfo" },
+      { "id": "qBittorrent.qBittorrent", "nombre": "qBittorrent" }
+    ]
+  },
+  {
+    "categoria": "7. Productividad y Oficina",
+    "apps": [
+      { "id": "Microsoft.Office", "nombre": "Microsoft Office" },
+      { "id": "Notion.Notion", "nombre": "Notion" },
+      { "id": "Obsidian.Obsidian", "nombre": "Obsidian" },
+      { "id": "Trello.Trello", "nombre": "Trello" },
+      { "id": "Evernote.Evernote", "nombre": "Evernote" }
     ]
   }
 ]
