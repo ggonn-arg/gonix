@@ -1,54 +1,39 @@
 [
   {
-    "categoria": "Navegadores Web",
+    "categoria": "1. Navegadores Web",
     "apps": [
       { "id": "Google.Chrome", "nombre": "Google Chrome" },
       { "id": "Mozilla.Firefox", "nombre": "Mozilla Firefox" },
-      { "id": "Brave.Brave", "nombre": "Brave Browser" },
-      { "id": "Opera.Opera", "nombre": "Opera" }
+      { "id": "Brave.Brave", "nombre": "Brave Browser" }
     ]
   },
   {
-    "categoria": "Juegos y Launchers",
+    "categoria": "2. Juegos y Launchers",
     "apps": [
       { "id": "Valve.Steam", "nombre": "Steam" },
-      { "id": "EpicGames.EpicGamesLauncher", "nombre": "Epic Games Launcher" },
-      { "id": "GOG.Galaxy", "nombre": "GOG Galaxy" }
+      { "id": "EpicGames.EpicGamesLauncher", "nombre": "Epic Games" }
     ]
   },
   {
-    "categoria": "Comunicación y Redes",
+    "categoria": "3. Comunicación",
     "apps": [
       { "id": "Discord.Discord", "nombre": "Discord" },
-      { "id": "WhatsApp.WhatsApp", "nombre": "WhatsApp" },
-      { "id": "Zoom.Zoom", "nombre": "Zoom" },
-      { "id": "Telegram.TelegramDesktop", "nombre": "Telegram" }
+      { "id": "WhatsApp.WhatsApp", "nombre": "WhatsApp" }
     ]
   },
   {
-    "categoria": "Desarrolladores",
+    "categoria": "4. Desarrolladores",
     "apps": [
-      { "id": "Microsoft.VisualStudioCode", "nombre": "Visual Studio Code" },
-      { "id": "Git.Git", "nombre": "Git" },
-      { "id": "Python.Python.3.12", "nombre": "Python 3.12" },
-      { "id": "OpenJS.NodeJS", "nombre": "Node.js" }
+      { "id": "Microsoft.VisualStudioCode", "nombre": "VS Code" },
+      { "id": "Git.Git", "nombre": "Git" }
     ]
   },
   {
-    "categoria": "Multimedia (Audio/Video)",
-    "apps": [
-      { "id": "VideoLAN.VLC", "nombre": "VLC Media Player" },
-      { "id": "Spotify.Spotify", "nombre": "Spotify" },
-      { "id": "OBSProject.OBSStudio", "nombre": "OBS Studio" }
-    ]
-  },
-  {
-    "categoria": "Utilidades y Documentos",
+    "categoria": "5. Utilidades",
     "apps": [
       { "id": "7zip.7zip", "nombre": "7-Zip" },
       { "id": "RARLab.WinRAR", "nombre": "WinRAR" },
-      { "id": "Adobe.Acrobat.Reader.64-bit", "nombre": "Adobe Acrobat Reader" },
-      { "id": "Notepad++.Notepad++", "nombre": "Notepad++" }
+      { "id": "VideoLAN.VLC", "nombre": "VLC" }
     ]
   }
 ]
