@@ -190,37 +190,43 @@ function Invoke-AllTweaks {
 function Invoke-BloatwareRemoval {
     while ($true) {
         $bloatPath = Join-Path $scriptDir "tweaks\bloatware.json"
-        if (-not (Test-Path $bloatPath)) { 
+        
+        if (-not (Test-Path $bloatPath)) {
             Write-Host "   [!] No se encontró el archivo de bloatware." -ForegroundColor Red
-            return 
+            return
         }
+
         $apps = @(Get-Content $bloatPath -Raw | ConvertFrom-Json)
 
         Write-Banner
         Write-Host "   --- Desinstalador de Apps Preinstaladas ---" -ForegroundColor Magenta
         Write-Host "   (Seleccioná las apps que querés ELIMINAR)" -ForegroundColor DarkGray
         Write-Host ""
-        for ($i = 0; $i -lt $apps.Count; $i++) { 
-            Write-Host "   [$($i+1)] $($apps[$i].nombre)" -ForegroundColor White 
+
+        # Este bucle es el que arregla el problema: imprime una app por línea
+        for ($i = 0; $i -lt $apps.Count; $i++) {
+            Write-Host "   [$($i + 1)] $($apps[$i].nombre)" -ForegroundColor White
         }
         
-        Write-Host "`n   Escribí los números separados por coma (ej: 1,3,5) o 'T' para todas." -ForegroundColor Cyan
+        Write-Host ""
+        Write-Host "   Escribí los números separados por coma (ej: 1,3,5)." -ForegroundColor Cyan
+        Write-Host "   O escribí [T] para eliminar TODAS las de esta lista." -ForegroundColor Green
         Write-Host "   Presioná '0' o Enter para volver." -ForegroundColor DarkGray
         Write-Host ""
         $seleccion = Read-Host "   Tu elección"
 
-        # Si el usuario presiona Enter sin escribir nada, o escribe 0, volvemos.
-        if ([string]::IsNullOrWhiteSpace($seleccion) -or $seleccion.Trim() -eq "0") { 
-            Write-Host "   Volviendo al menú de tweaks..." -ForegroundColor Yellow
+        if ([string]::IsNullOrWhiteSpace($seleccion) -or $seleccion -eq "0") {
+            Write-Host "   Volviendo al menú anterior..." -ForegroundColor Yellow
             Start-Sleep -Milliseconds 500
             return 
         }
 
-        # Si el usuario escribe una letra que no sea T, o un número inválido, avisamos y redibujamos.
         $indicesAEliminar = @()
         if ($seleccion -match "^[Tt]$") {
+            # Si elige T, carga todos los índices de la lista
             0..($apps.Count - 1) | ForEach-Object { $indicesAEliminar += $_ }
         } else {
+            # Si elige números, los separa por coma
             $partes = $seleccion -split ","
             foreach ($parte in $partes) {
                 $num = 0
@@ -233,9 +239,9 @@ function Invoke-BloatwareRemoval {
         }
 
         if ($indicesAEliminar.Count -eq 0) {
-            Write-Host "   [!] Opción no válida. Escribí números (ej: 1,2) o 'T'." -ForegroundColor Red
-            Start-Sleep 1.5
-            continue # Vuelve a dibujar la lista
+            Write-Host "   [!] No se seleccionó ninguna app válida." -ForegroundColor Red
+            Start-Sleep 1
+            continue
         }
 
         Write-Host ""
@@ -248,7 +254,7 @@ function Invoke-BloatwareRemoval {
         if ($conf -ne "s") {
             Write-Host "   Cancelado." -ForegroundColor Yellow
             Start-Sleep 1
-            continue # Vuelve a dibujar la lista
+            continue
         }
 
         Write-Host ""
@@ -268,15 +274,14 @@ function Invoke-BloatwareRemoval {
                     Write-Host "      [X] Error al eliminar $($app.nombre)." -ForegroundColor Red
                 }
             } else {
-                Write-Host "      [-] $($app.nombre) no está instalada en este sistema." -ForegroundColor Yellow
+                Write-Host "      [-] $($app.nombre) no está instalada." -ForegroundColor Yellow
             }
         }
 
         Write-Host ""
         Write-Host "   [OK] Proceso de limpieza finalizado." -ForegroundColor Green
-        Write-Host "   (Presioná Enter para actualizar la lista de apps)" -ForegroundColor DarkGray
+        Write-Host "   (Presioná Enter para actualizar la lista)" -ForegroundColor DarkGray
         Read-Host
-        # El bucle while vuelve a empezar automáticamente acá.
     }
 }
 function New-GonixRestorePoint {
