@@ -1,9 +1,8 @@
 {
-  "nombre": "Oficina / Uso diario",
-  "descripcion": "Windows más limpio y privado sin tocar rendimiento ni energía. Ideal para notebooks y PCs de trabajo o de casa.",
+  "nombre": "Perfil Oficina / Notebook",
+  "descripcion": "Windows más limpio y privado sin tocar el rendimiento ni el consumo de batería. Ideal para trabajar.",
   "tweaks": [
     "disable-telemetry",
-    "disable-diagtrack",
     "disable-feedback",
     "disable-advertising-id",
     "disable-tailored-experiences",
@@ -11,6 +10,7 @@
     "disable-windows-search-bing",
     "disable-widgets",
     "disable-activity-history",
-    "disable-startup-delay"
+    "enable-hibernation-laptops",
+    "show-file-extensions"
   ]
 }

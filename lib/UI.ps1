@@ -284,16 +284,19 @@ function Show-AdvancedTweaks {
 function Show-ProfilesMenu {
     while ($true) {
         Write-Banner
-        Write-Host "   --- Perfiles disponibles ---" -ForegroundColor Magenta
-        Write-Host "   [1] Perfil Gaming Extremo (Máximo FPS y Cero Lag)" -ForegroundColor White
+        Write-Host "   --- Perfiles de Configuración ---" -ForegroundColor Magenta
+        Write-Host "   [1] Gaming Extremo (Máximo FPS y Cero Lag)" -ForegroundColor White
+        Write-Host "   [2] Oficina / Notebook (Privacidad sin gastar batería)" -ForegroundColor White
+        Write-Host "   [3] Privacidad Total (Bloqueo máximo)" -ForegroundColor White
         Write-Host "   [0] Volver al menú principal" -ForegroundColor DarkGray
         Write-Host ""
         $op = Read-Host "   Elegí un perfil"
 
-        if ($op -eq "0") { return }
-
         switch ($op) {
             "1" { Invoke-Profile -NombreArchivo "gaming" }
+            "2" { Invoke-Profile -NombreArchivo "oficina" }
+            "3" { Invoke-Profile -NombreArchivo "privacidad-total" }
+            "0" { return }
             default { Write-Host "   Opción inválida." -ForegroundColor Red; Start-Sleep 1; continue }
         }
         Read-Host "   Enter para continuar"

@@ -1,6 +1,6 @@
 {
-  "nombre": "Perfil Gaming Extremo (Máximo FPS y Cero Lag)",
-  "descripcion": "Aplica la configuración más agresiva para gaming: Plan de energía máximo, sin telemetría, red optimizada, GPU al máximo y CPU sin reposo.",
+  "nombre": "Perfil Gaming Extremo (Máximo FPS)",
+  "descripcion": "Optimiza el sistema para jugar: máximo rendimiento, sin telemetría, red optimizada y CPU al 100%.",
   "tweaks": [
     "ultimate-performance-plan",
     "disable-telemetry",
@@ -18,6 +18,8 @@
     "win32-priority-separation",
     "optimize-services",
     "disable-advertising-id",
-    "disable-tailored-experiences"
+    "disable-tailored-experiences",
+    "set-visual-effects-performance",
+    "disable-mouse-acceleration"
   ]
 }

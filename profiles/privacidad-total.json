@@ -1,5 +1,22 @@
 {
-  "nombre": "Privacidad total",
-  "descripcion": "Aplica TODOS los tweaks de la categoría Privacidad (incluye Copilot, Recall, voz en línea y Cortana).",
-  "categorias": [ "privacidad" ]
+  "nombre": "Perfil Privacidad Total",
+  "descripcion": "Aplica TODOS los tweaks de privacidad posibles. Bloquea telemetría, voz, ubicación y rastreo de Microsoft.",
+  "tweaks": [
+    "disable-telemetry",
+    "disable-cortana",
+    "disable-start-suggestions",
+    "disable-widgets",
+    "disable-windows-search-bing",
+    "disable-background-apps",
+    "disable-copilot",
+    "disable-advertising-id",
+    "disable-tailored-experiences",
+    "disable-online-speech-privacy",
+    "disable-feedback",
+    "disable-activity-history",
+    "disable-location-tracking",
+    "disable-consumer-features",
+    "disable-defender-samples",
+    "disable-wifi-sense"
+  ]
 }

@@ -87,19 +87,48 @@ function Show-DryRun {
 function Invoke-Profile {
     param([string]$NombreArchivo)
     $perfilPath = Join-Path $scriptDir "profiles\$NombreArchivo.json"
-    if (-not (Test-Path $perfilPath)) { Write-Host "   [!] Perfil no encontrado." -ForegroundColor Red; return }
+    
+    if (-not (Test-Path $perfilPath)) {
+        Write-Host "   [!] Perfil no encontrado." -ForegroundColor Red
+        return
+    }
+    
     $perfil = Get-Content $perfilPath -Raw | ConvertFrom-Json
     
-    Write-Host "`n   >>> $($perfil.nombre)" -ForegroundColor Cyan
-    Write-Host "       $($perfil.descripcion)`n" -ForegroundColor Gray
+    Write-Banner
+    Write-Host "   ========================================================" -ForegroundColor Cyan
+    Write-Host "     PERFIL: $($perfil.nombre)" -ForegroundColor White
+    Write-Host "   ========================================================" -ForegroundColor Cyan
+    Write-Host "   $($perfil.descripcion)" -ForegroundColor Gray
+    Write-Host ""
+    Write-Host "   Este perfil va a aplicar los siguientes cambios:" -ForegroundColor Yellow
+    Write-Host ""
+
+    # Bucle para listar todos los tweaks antes de aplicar
+    foreach ($id in $perfil.tweaks) {
+        $tweakInfo = Get-TweakById -Id $id
+        if ($tweakInfo) {
+            Write-Host "   - $($tweakInfo.nombre)" -ForegroundColor White
+        } else {
+            Write-Host "   - $id (No encontrado)" -ForegroundColor DarkGray
+        }
+    }
+
+    Write-Host ""
+    $conf = Read-Host "   ¿Querés aplicar TODOS estos cambios ahora? (s/n)"
+    if ($conf -ne "s") {
+        Write-Host "   Cancelado." -ForegroundColor Yellow
+        return
+    }
     
-    if ((Read-Host "   ¿Aplicar perfil completo? (s/n)") -ne "s") { return }
+    Write-Host ""
+    Write-Host "   Aplicando cambios..." -ForegroundColor Magenta
     
     Start-Lote
     foreach ($id in $perfil.tweaks) {
         $tweak = Get-TweakById -Id $id
         if (-not $tweak) { continue }
-        Write-Host "   -> $($tweak.nombre)" -ForegroundColor DarkGray
+        Write-Host "   -> Aplicando $($tweak.nombre)..." -ForegroundColor DarkGray
         
         if ($tweak.tipo -eq 'registro') {
             $cambios = if ($tweak.cambios) { $tweak.cambios } else { @([PSCustomObject]@{ruta=$tweak.ruta; nombre=$tweak.nombreValor; valor=$tweak.valorNuevo; tipoValor='DWord'}) }
@@ -116,7 +145,10 @@ function Invoke-Profile {
             Add-History -Tipo 'comando' -TweakId $tweak.id -Undo $tweak.comandoOriginal
         }
     }
+    
+    Write-Host ""
     Write-Host "   [OK] Perfil aplicado con éxito." -ForegroundColor Green
+    Write-Host "   (Recordá reiniciar para que todo tome efecto)." -ForegroundColor Yellow
 }
 
 function Invoke-QuickOptimize {
