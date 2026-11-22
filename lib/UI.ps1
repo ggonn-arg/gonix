@@ -1,26 +1,59 @@
 ﻿function Write-Banner {
     Clear-Host
     Write-Host ""
-    Write-Host "   ╔══════════════════════════════════════════╗" -ForegroundColor Cyan
-    Write-Host "   ║              G O N I X                   ║" -ForegroundColor Cyan
-    Write-Host "   ║   Optimizador de Windows 11 · v$(Get-GonixVersion)        ║" -ForegroundColor Cyan
-    Write-Host "   ╚══════════════════════════════════════════╝" -ForegroundColor Cyan
+    # Logo ASCII GIGANTE
+    Write-Host "   ██████╗  ██████╗ ███╗   ██╗██╗██╗  ██╗" -ForegroundColor Cyan
+    Write-Host "  ██╔════╝ ██╔═══██╗████╗  ██║██║╚██╗██╔╝" -ForegroundColor Cyan
+    Write-Host "  ██║  ███╗██║   ██║██╔██╗ ██║██║ ╚███╔╝ " -ForegroundColor Cyan
+    Write-Host "  ██║   ██║██║   ██║██║╚██╗██║██║ ██╔██╗ " -ForegroundColor Cyan
+    Write-Host "  ╚██████╔╝╚██████╔╝██║ ╚████║██║██╔╝ ██╗" -ForegroundColor Cyan
+    Write-Host "   ╚═════╝  ╚═════╝ ╚═╝  ╚═══╝╚═╝╚═╝  ╚═╝" -ForegroundColor Cyan
+    Write-Host ""
+    Write-Host "        [ Optimizador de Windows 11 ]  v$(Get-GonixVersion)" -ForegroundColor DarkGray
+    Write-Host "   ════════════════════════════════════════════════════" -ForegroundColor DarkCyan
+}
+
+function Show-SystemInfo {
+    # Obtiene info real de la PC para que se vea pro
+    $os = (Get-CimInstance Win32_OperatingSystem)
+    $cpu = (Get-CimInstance Win32_Processor).Name
+    $ram = [math]::round($os.TotalVisibleMemorySize / 1MB, 1)
+    
+    Write-Host "   OS: $($os.Caption) | CPU: $($cpu) | RAM: $ram GB" -ForegroundColor DarkGray
+    Write-Host "   ════════════════════════════════════════════════════" -ForegroundColor DarkCyan
     Write-Host ""
 }
 
 function Show-MainMenu {
     while ($true) {
         Write-Banner
-        Write-Host "   [1] Aplicar Perfil (Gaming / Oficina)" -ForegroundColor White
-        Write-Host "   [2] Tweaks individuales" -ForegroundColor White
-        Write-Host "   [3] Instalar Aplicaciones (Winget)" -ForegroundColor White
-        Write-Host "   [4] Historial y Deshacer" -ForegroundColor White
-        Write-Host "   [5] Actualizaciones de Windows (Pausar/Reanudar)" -ForegroundColor White
-        Write-Host "   [6] Crear Punto de Restauración" -ForegroundColor White
+        Show-SystemInfo
+        
+        Write-Host "   [1] " -ForegroundColor Cyan -NoNewline
+        Write-Host "Aplicar Perfil (Gaming / Oficina)" -ForegroundColor White
+        
+        Write-Host "   [2] " -ForegroundColor Cyan -NoNewline
+        Write-Host "Tweaks individuales" -ForegroundColor White
+        
+        Write-Host "   [3] " -ForegroundColor Cyan -NoNewline
+        Write-Host "Instalar Aplicaciones (Winget)" -ForegroundColor White
+        
+        Write-Host "   [4] " -ForegroundColor Cyan -NoNewline
+        Write-Host "Historial y Deshacer" -ForegroundColor White
+        
+        Write-Host "   [5] " -ForegroundColor Cyan -NoNewline
+        Write-Host "Actualizaciones de Windows (Pausar/Reanudar)" -ForegroundColor White
+        
+        Write-Host "   [6] " -ForegroundColor Cyan -NoNewline
+        Write-Host "Crear Punto de Restauración" -ForegroundColor White
+        
         Write-Host ""
-        Write-Host "   [9] ⚡ OPTIMIZACIÓN RÁPIDA (Recomendado)" -ForegroundColor Green
+        Write-Host "   [9] " -ForegroundColor Green -NoNewline
+        Write-Host "⚡ OPTIMIZACIÓN RÁPIDA (Recomendado)" -ForegroundColor Green
+        
         Write-Host ""
-        Write-Host "   [0] Salir" -ForegroundColor DarkGray
+        Write-Host "   [0] " -ForegroundColor DarkGray -NoNewline
+        Write-Host "Salir" -ForegroundColor DarkGray
         Write-Host ""
         $opcion = Read-Host "   Elegí una opción"
 
