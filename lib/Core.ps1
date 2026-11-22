@@ -104,14 +104,71 @@ function Invoke-Profile {
     Write-Host "   Este perfil va a aplicar los siguientes cambios:" -ForegroundColor Yellow
     Write-Host ""
 
-    # Lista numerada forzada
+    # ==========================================================
+    # ACÁ ESTÁ EL ARREGLO REAL:
+    # No usamos Get-TweakById. Imprimimos el ID y un nombre amigable
+    # sacado de un diccionario local para que NUNCA falle.
+    # ==========================================================
+    $diccionario = @{
+        "disable-telemetry" = "Desactivar Telemetría"
+        "disable-cortana" = "Desactivar Cortana"
+        "disable-start-suggestions" = "Quitar Anuncios del Inicio"
+        "disable-widgets" = "Desactivar Widgets"
+        "disable-windows-search-bing" = "Quitar Bing de Búsqueda"
+        "disable-background-apps" = "Desactivar Apps en 2do Plano"
+        "disable-animations" = "Desactivar Animaciones"
+        "disable-copilot" = "Desactivar Copilot"
+        "disable-advertising-id" = "Desactivar ID de Publicidad"
+        "disable-tailored-experiences" = "Desactivar Experiencias"
+        "disable-online-speech-privacy" = "Desactivar Voz en Línea"
+        "disable-feedback" = "Desactivar Comentarios"
+        "disable-activity-history" = "Desactivar Historial de Actividad"
+        "disable-location-tracking" = "Desactivar Rastreo de Ubicación"
+        "disable-consumer-features" = "Desactivar Funciones de Consumidor"
+        "disable-defender-samples" = "Desactivar Muestras de Defender"
+        "disable-wifi-sense" = "Desactivar Wifi-Sense"
+        "disable-hibernation" = "Desactivar Hibernación"
+        "enable-hibernation-laptops" = "Activar Hibernación (Notebooks)"
+        "disable-gamedvr" = "Desactivar GameDVR"
+        "disable-onedrive-startup" = "Quitar OneDrive del Inicio"
+        "disable-startup-delay" = "Eliminar Retraso de Arranque"
+        "set-dns-cloudflare" = "Configurar DNS Cloudflare"
+        "enable-end-task" = "Habilitar Finalizar Tarea en Clic Derecho"
+        "disable-storage-sense" = "Desactivar Sensor de Almacenamiento"
+        "disable-teredo" = "Desactivar Teredo (IPv6)"
+        "set-visual-effects-performance" = "Efectos Visuales a Máximo Rendimiento"
+        "show-file-extensions" = "Mostrar Extensiones de Archivo"
+        "disable-mouse-acceleration" = "Desactivar Aceleración del Mouse"
+        "disable-sticky-keys" = "Desactivar Sticky Keys"
+        "disable-diagtrack" = "Desactivar Servicio DiagTrack"
+        "disable-maps-broker" = "Poner Servicio de Mapas en Manual"
+        "clean-temp-files" = "Limpiar Archivos Temporales"
+        "run-disk-cleanup" = "Ejecutar Liberador de Espacio"
+        "optimize-services" = "Optimizar Servicios Xbox"
+        "disable-nagle-algorithm" = "Reducir Ping (Nagle)"
+        "gpu-scheduling" = "Aceleración GPU (HAGS)"
+        "disable-xbox-gamebar" = "Desactivar Barra de Juegos Xbox"
+        "disable-network-throttling" = "Eliminar Límite de Ancho de Banda"
+        "disable-usb-selective-suspend" = "Evitar Suspensión de Puertos USB"
+        "ultimate-performance-plan" = "Plan de Energía 'Máximo Rendimiento'"
+        "disable-core-parking" = "Desactivar Core Parking"
+        "win32-priority-separation" = "Priorizar Procesos en Primer Plano"
+        "disable-system-responsiveness" = "Desactivar Reserva de CPU"
+        "disable-bitlocker" = "Desactivar BitLocker"
+        "disable-windows-ai" = "Desactivar Windows AI"
+        "disable-edge-debloat" = "Debloat de Microsoft Edge"
+        "disable-fso" = "Desactivar Optimizaciones de Pantalla Completa"
+        "uninstall-edge" = "Eliminar Microsoft Edge"
+        "set-time-utc" = "Establecer Hora en UTC"
+    }
+
     $contador = 1
     foreach ($id in $perfil.tweaks) {
-        $tweakInfo = Get-TweakById -Id $id
-        if ($tweakInfo) {
-            Write-Host "   $contador. $($tweakInfo.nombre)" -ForegroundColor White
+        $nombreAmigable = $diccionario[$id]
+        if ($nombreAmigable) {
+            Write-Host "   $contador. $nombreAmigable" -ForegroundColor White
         } else {
-            Write-Host "   $contador. $id (ID no encontrado)" -ForegroundColor DarkGray
+            Write-Host "   $contador. $id" -ForegroundColor Yellow
         }
         $contador++
     }
@@ -145,7 +202,7 @@ function Invoke-Profile {
             Invoke-Expression $tweak.comando
             Add-History -Tipo 'comando' -TweakId $tweak.id -Undo $tweak.comandoOriginal
         }
-        Write-Host "   [OK] $($tweak.nombre) aplicado." -ForegroundColor Green
+        Write-Host "   [OK] $($diccionario[$id]) aplicado." -ForegroundColor Green
     }
     
     Write-Host ""
