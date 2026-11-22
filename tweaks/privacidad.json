@@ -46,5 +46,17 @@
   {
     "id": "disable-feedback", "nombre": "Desactivar Comentarios", "descripcion": "No pide opiniones.", "riesgo": "bajo", "tipo": "registro",
     "cambios": [ { "ruta": "HKCU:\\Software\\Microsoft\\Siuf\\Rules", "nombre": "NumberOfSIUFInPeriod", "valor": 0, "tipoValor": "DWord" } ]
+  },
+  {
+    "id": "disable-activity-history", "nombre": "Desactivar Historial de Actividad", "descripcion": "Evita que Windows registre las apps y archivos que abrís.", "riesgo": "bajo", "tipo": "registro",
+    "cambios": [ { "ruta": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\System", "nombre": "EnableActivityFeed", "valor": 0, "tipoValor": "DWord" } ]
+  },
+  {
+    "id": "disable-location-tracking", "nombre": "Desactivar Rastreo de Ubicación", "descripcion": "Evita que las apps accedan a tu ubicación GPS.", "riesgo": "bajo", "tipo": "registro",
+    "cambios": [ { "ruta": "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\location", "nombre": "Value", "valor": "Deny", "tipoValor": "String" } ]
+  },
+  {
+    "id": "disable-consumer-features", "nombre": "Desactivar Funciones de Consumidor", "descripcion": "Quita sugerencias de apps y juegos de la Microsoft Store.", "riesgo": "bajo", "tipo": "registro",
+    "cambios": [ { "ruta": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager", "nombre": "SilentInstalledAppsEnabled", "valor": 0, "tipoValor": "DWord" } ]
   }
 ]

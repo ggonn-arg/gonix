@@ -20,5 +20,22 @@
     "id": "set-dns-cloudflare", "nombre": "DNS Cloudflare", "descripcion": "DNS rápido y privado.", "riesgo": "bajo", "tipo": "comando",
     "comando": "Get-DnsClientServerAddress -AddressFamily IPv4 | ForEach-Object { Set-DnsClientServerAddress -InterfaceIndex $_.InterfaceIndex -ServerAddresses ('1.1.1.1','1.0.0.1') }",
     "comandoOriginal": "Set-DnsClientServerAddress -InterfaceIndex (Get-DnsClientServerAddress -AddressFamily IPv4).InterfaceIndex -ResetServerAddresses"
+  },
+  {
+    "id": "enable-end-task", "nombre": "Habilitar 'Finalizar Tarea' en Clic Derecho", "descripcion": "Permite cerrar apps colgadas desde la barra de tareas sin usar el Administrador de tareas.", "riesgo": "bajo", "tipo": "registro",
+    "cambios": [ { "ruta": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced\\TaskbarDeveloperSettings", "nombre": "TaskbarEndTask", "valor": 1, "tipoValor": "DWord" } ]
+  },
+  {
+    "id": "disable-storage-sense", "nombre": "Desactivar Sensor de Almacenamiento", "descripcion": "Evita que Windows borre archivos temporales automáticamente.", "riesgo": "bajo", "tipo": "registro",
+    "cambios": [ { "ruta": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\StorageSense\\Parameters\\StoragePolicy", "nombre": "01", "valor": 0, "tipoValor": "DWord" } ]
+  },
+  {
+    "id": "disable-teredo", "nombre": "Desactivar Teredo (IPv6)", "descripcion": "Desactiva el túnel IPv6 que a veces causa problemas de conexión en juegos.", "riesgo": "bajo", "tipo": "comando",
+    "comando": "netsh interface teredo set state disabled",
+    "comandoOriginal": "netsh interface teredo set state type=default"
+  },
+  {
+    "id": "set-visual-effects-performance", "nombre": "Efectos Visuales a Máximo Rendimiento", "descripcion": "Desactiva todas las sombras y animaciones para priorizar la velocidad.", "riesgo": "bajo", "tipo": "registro",
+    "cambios": [ { "ruta": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\VisualEffects", "nombre": "VisualFXSetting", "valor": 2, "tipoValor": "DWord" } ]
   }
 ]

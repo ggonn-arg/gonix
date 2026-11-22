@@ -88,19 +88,18 @@ function Show-PrivacyTweaks {
         Write-Host "   [6] Desactivar Copilot" -ForegroundColor White
         Write-Host "   [7] Desactivar ID de Publicidad" -ForegroundColor White
         Write-Host "   [8] Desactivar Experiencias Personalizadas" -ForegroundColor White
-        Write-Host "   [9] Desactivar Reconocimiento de Voz en Línea" -ForegroundColor White
-        Write-Host "   [10] Desactivar Solicitudes de Comentarios" -ForegroundColor White
+        Write-Host "   [9] Desactivar Voz en Línea" -ForegroundColor White
+        Write-Host "   [10] Desactivar Comentarios" -ForegroundColor White
+        Write-Host "   [11] Desactivar Historial de Actividad" -ForegroundColor White
+        Write-Host "   [12] Desactivar Rastreo de Ubicación" -ForegroundColor White
+        Write-Host "   [13] Desactivar Funciones de Consumidor" -ForegroundColor White
         Write-Host "   [A] APLICAR TODOS LOS DE ESTA LISTA" -ForegroundColor Green
         Write-Host "   [0] Volver" -ForegroundColor DarkGray
         Write-Host ""
         $op = Read-Host "   Elegí un tweak"
         
         if ($op -eq "0") { return }
-        if ($op -match "^[Aa]$") { 
-            Invoke-AllTweaks -Categoria "privacidad"
-            Read-Host "   Enter para continuar"
-            continue
-        }
+        if ($op -match "^[Aa]$") { Invoke-AllTweaks -Categoria "privacidad"; Read-Host "   Enter para continuar"; continue }
         
         switch ($op) {
             "1" { Invoke-Tweak -Id "disable-telemetry" }
@@ -113,10 +112,12 @@ function Show-PrivacyTweaks {
             "8" { Invoke-Tweak -Id "disable-tailored-experiences" }
             "9" { Invoke-Tweak -Id "disable-online-speech-privacy" }
             "10" { Invoke-Tweak -Id "disable-feedback" }
+            "11" { Invoke-Tweak -Id "disable-activity-history" }
+            "12" { Invoke-Tweak -Id "disable-location-tracking" }
+            "13" { Invoke-Tweak -Id "disable-consumer-features" }
             default { Write-Host "   Opción inválida." -ForegroundColor Red; Start-Sleep 1; continue }
         }
-        Write-Host ""
-        Read-Host "   Presioná Enter para continuar"
+        Read-Host "   Enter para continuar"
     }
 }
 
@@ -124,30 +125,30 @@ function Show-SystemTweaks {
     while ($true) {
         Write-Banner
         Write-Host "   --- Sistema y Rendimiento ---" -ForegroundColor Magenta
-        Write-Host "   [1] Desactivar Hibernación (Libera GB)" -ForegroundColor White
-        Write-Host "   [2] Desactivar GameDVR (Evita caídas de FPS)" -ForegroundColor White
-        Write-Host "   [3] Desactivar Apps en 2do Plano (Ahorra RAM)" -ForegroundColor White
-        Write-Host "   [4] Desactivar Animaciones (Windows más rápido)" -ForegroundColor White
+        Write-Host "   [1] Desactivar Hibernación" -ForegroundColor White
+        Write-Host "   [2] Desactivar GameDVR" -ForegroundColor White
+        Write-Host "   [3] Desactivar Apps en 2do Plano" -ForegroundColor White
+        Write-Host "   [4] Desactivar Animaciones" -ForegroundColor White
         Write-Host "   [5] Quitar OneDrive del Inicio" -ForegroundColor White
-        Write-Host "   [6] Optimizar Servicios Xbox (Poner en manual)" -ForegroundColor White
-        Write-Host "   [7] Reducir Ping (Desactivar algoritmo Nagle)" -ForegroundColor White
-        Write-Host "   [8] Aceleración GPU (HAGS para más FPS)" -ForegroundColor White
+        Write-Host "   [6] Optimizar Servicios Xbox" -ForegroundColor White
+        Write-Host "   [7] Reducir Ping (Nagle)" -ForegroundColor White
+        Write-Host "   [8] Aceleración GPU (HAGS)" -ForegroundColor White
         Write-Host "   [9] Desactivar Barra de Juegos Xbox" -ForegroundColor White
         Write-Host "   [10] Eliminar Límite de Ancho de Banda" -ForegroundColor White
-        Write-Host "   [11] Evitar Suspensión de Puertos USB (Menos lag)" -ForegroundColor White
+        Write-Host "   [11] Evitar Suspensión de Puertos USB" -ForegroundColor White
         Write-Host "   [12] Eliminar Retraso de Arranque" -ForegroundColor White
-        Write-Host "   [13] Configurar DNS de Cloudflare (1.1.1.1)" -ForegroundColor White
+        Write-Host "   [13] Configurar DNS Cloudflare" -ForegroundColor White
+        Write-Host "   [14] Habilitar 'Finalizar Tarea' en Clic Derecho" -ForegroundColor White
+        Write-Host "   [15] Desactivar Sensor de Almacenamiento" -ForegroundColor White
+        Write-Host "   [16] Desactivar Teredo (IPv6)" -ForegroundColor White
+        Write-Host "   [17] Efectos Visuales a Máximo Rendimiento" -ForegroundColor White
         Write-Host "   [A] APLICAR TODOS LOS DE ESTA LISTA" -ForegroundColor Green
         Write-Host "   [0] Volver" -ForegroundColor DarkGray
         Write-Host ""
         $op = Read-Host "   Elegí un tweak"
         
         if ($op -eq "0") { return }
-        if ($op -match "^[Aa]$") { 
-            Invoke-AllTweaks -Categoria "sistema"
-            Read-Host "   Enter para continuar"
-            continue
-        }
+        if ($op -match "^[Aa]$") { Invoke-AllTweaks -Categoria "sistema"; Read-Host "   Enter para continuar"; continue }
         
         switch ($op) {
             "1" { Invoke-Tweak -Id "disable-hibernation" }
@@ -163,10 +164,13 @@ function Show-SystemTweaks {
             "11" { Invoke-Tweak -Id "disable-usb-selective-suspend" }
             "12" { Invoke-Tweak -Id "disable-startup-delay" }
             "13" { Invoke-Tweak -Id "set-dns-cloudflare" }
+            "14" { Invoke-Tweak -Id "enable-end-task" }
+            "15" { Invoke-Tweak -Id "disable-storage-sense" }
+            "16" { Invoke-Tweak -Id "disable-teredo" }
+            "17" { Invoke-Tweak -Id "set-visual-effects-performance" }
             default { Write-Host "   Opción inválida." -ForegroundColor Red; Start-Sleep 1; continue }
         }
-        Write-Host ""
-        Read-Host "   Presioná Enter para continuar"
+        Read-Host "   Enter para continuar"
     }
 }
 
@@ -182,6 +186,9 @@ function Show-AdvancedTweaks {
         Write-Host "   [2] Desactivar Core Parking (CPU al 100%)" -ForegroundColor White
         Write-Host "   [3] Priorizar Procesos en Primer Plano" -ForegroundColor White
         Write-Host "   [4] Desactivar Reserva de CPU del Sistema" -ForegroundColor White
+        Write-Host "   [5] Desactivar BitLocker" -ForegroundColor White
+        Write-Host "   [6] Desactivar y Eliminar Windows AI" -ForegroundColor White
+        Write-Host "   [7] Debloat de Microsoft Edge" -ForegroundColor White
         Write-Host "   [0] Volver" -ForegroundColor DarkGray
         Write-Host ""
         $op = Read-Host "   Elegí un tweak (o 0 para volver)"
@@ -202,10 +209,12 @@ function Show-AdvancedTweaks {
             "2" { Invoke-Tweak -Id "disable-core-parking" }
             "3" { Invoke-Tweak -Id "win32-priority-separation" }
             "4" { Invoke-Tweak -Id "disable-system-responsiveness" }
+            "5" { Invoke-Tweak -Id "disable-bitlocker" }
+            "6" { Invoke-Tweak -Id "disable-windows-ai" }
+            "7" { Invoke-Tweak -Id "disable-edge-debloat" }
             default { Write-Host "   Opción inválida." -ForegroundColor Red; Start-Sleep 1; continue }
         }
-        Write-Host ""
-        Read-Host "   Presioná Enter para continuar"
+        Read-Host "   Enter para continuar"
     }
 }
 
