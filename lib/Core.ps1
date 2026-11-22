@@ -104,14 +104,17 @@ function Invoke-Profile {
     Write-Host "   Este perfil va a aplicar los siguientes cambios:" -ForegroundColor Yellow
     Write-Host ""
 
-    # Bucle para listar todos los tweaks antes de aplicar
+    # Contador para que la lista se vea ordenada
+    $contador = 1
     foreach ($id in $perfil.tweaks) {
         $tweakInfo = Get-TweakById -Id $id
         if ($tweakInfo) {
-            Write-Host "   - $($tweakInfo.nombre)" -ForegroundColor White
+            # Usamos Write-Host con un salto de línea explícito al final
+            Write-Host "   $contador. $($tweakInfo.nombre)" -ForegroundColor White
         } else {
-            Write-Host "   - $id (No encontrado)" -ForegroundColor DarkGray
+            Write-Host "   $contador. $id (No encontrado)" -ForegroundColor DarkGray
         }
+        $contador++
     }
 
     Write-Host ""
