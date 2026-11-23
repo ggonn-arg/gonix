@@ -10,6 +10,7 @@ Describe 'Gonix suite' {
         . (Join-Path $script:root 'lib\Helpers.ps1')
         . (Join-Path $script:root 'lib\Backup.ps1')
         . (Join-Path $script:root 'lib\Core.ps1')
+        . (Join-Path $script:root 'lib\Mantenimiento.ps1')
         . (Join-Path $script:root 'lib\UI.ps1')
 
         $script:testKey = 'HKCU:\Software\GonixPester'
@@ -338,6 +339,199 @@ Describe 'Historial de tweaks de registro' {
     }
 }
 
+Describe 'Administracion de aplicaciones con WinGet' {
+    It 'no actualiza aplicaciones si el usuario cancela' {
+        Mock Confirm-Gonix { return $false }
+        Mock winget.exe { $global:LASTEXITCODE = 0 }
+        Mock Write-Warn {}
+
+        Invoke-AppUpdates
+
+        Should -Invoke winget.exe -Times 0 -Exactly
+    }
+
+    It 'actualiza todas las aplicaciones solo tras confirmar' {
+        Mock Confirm-Gonix { return $true }
+        Mock winget.exe { $global:LASTEXITCODE = 0 }
+        Mock Write-Ok {}
+        Mock Wait-Enter {}
+
+        Invoke-AppUpdates
+
+        Should -Invoke winget.exe -Times 1 -Exactly -ParameterFilter {
+            $args -contains 'upgrade' -and $args -contains '--all'
+        }
+    }
+
+    It 'mantiene accesible la guia de recuperacion cuando WinGet no esta instalado' {
+        $script:appMenuChoices = @(
+            [string]((Read-JsonArray (Join-Path $script:root 'tweaks\apps.json')).Count + 5)
+            '0'
+        )
+        $script:appMenuChoiceIndex = 0
+        Mock Get-Command { return $null } -ParameterFilter { $Name -eq 'winget.exe' }
+        Mock Read-Host {
+            $answer = $script:appMenuChoices[$script:appMenuChoiceIndex]
+            $script:appMenuChoiceIndex++
+            return $answer
+        }
+        Mock Write-Banner {}
+        Mock Write-Host {}
+        Mock Write-MenuItem {}
+        Mock Write-Fail {}
+        Mock Write-Info {}
+        Mock Confirm-Gonix { return $false }
+        Mock Wait-Enter {}
+
+        Show-AppInstaller
+
+        Should -Invoke Confirm-Gonix -Times 1 -Exactly
+    }
+}
+
+Describe 'Reversion de cambios de red' {
+    It 'restaura los DNS de adaptadores ya modificados si otro adaptador falla' {
+        $script:dnsSetCalls = New-Object System.Collections.ArrayList
+        Mock Get-NetAdapter {
+            @(
+                [pscustomobject]@{ Status = 'Up'; Name = 'Ethernet'; ifIndex = 1 }
+                [pscustomobject]@{ Status = 'Up'; Name = 'Wi-Fi'; ifIndex = 2 }
+            )
+        }
+        Mock Get-DnsClientServerAddress {
+            $servers = if ($InterfaceIndex -eq 1) { @('192.168.1.1') } else { @() }
+            [pscustomobject]@{ ServerAddresses = $servers }
+        }
+        Mock Set-DnsClientServerAddress {
+            [void]$script:dnsSetCalls.Add([pscustomobject]@{
+                InterfaceIndex = $InterfaceIndex
+                InterfaceAlias = $InterfaceAlias
+                ServerAddresses = @($ServerAddresses)
+                Reset = [bool]$ResetServerAddresses
+            })
+            if ($InterfaceIndex -eq 2 -and $ServerAddresses -contains '1.1.1.1') {
+                throw 'Fallo simulado en el segundo adaptador.'
+            }
+        }
+        Mock Clear-DnsClientCache {}
+        Mock Write-Log {}
+
+        Start-Lote
+        $tweak = [pscustomobject]@{
+            id = 'set-dns-cloudflare'
+            nombre = 'DNS de Cloudflare'
+            tipo = 'accion'
+            accion = 'dns-cloudflare'
+        }
+        $result = Invoke-TweakApply -Tweak $tweak
+
+        $result.Estado | Should -Be 'error'
+        $result.Mensaje | Should -Match 'Fallo simulado en el segundo adaptador'
+        @($script:dnsSetCalls).Count | Should -Be 4
+        $script:dnsSetCalls[2].InterfaceAlias | Should -Be 'Wi-Fi'
+        $script:dnsSetCalls[2].Reset | Should -BeTrue
+        $script:dnsSetCalls[3].InterfaceAlias | Should -Be 'Ethernet'
+        $script:dnsSetCalls[3].ServerAddresses | Should -Contain '192.168.1.1'
+        $script:Pendientes.Count | Should -Be 0
+    }
+}
+
+Describe 'Administracion de funciones opcionales de Windows' {
+    BeforeEach {
+        Mock Test-Admin { return $true }
+    }
+
+    It 'se puede abrir desde el menu de mantenimiento' {
+        $script:maintenanceChoices = @('7', '0')
+        $script:maintenanceChoiceIndex = 0
+        Mock Read-Host {
+            $answer = $script:maintenanceChoices[$script:maintenanceChoiceIndex]
+            $script:maintenanceChoiceIndex++
+            return $answer
+        }
+        Mock Write-Banner {}
+        Mock Write-Host {}
+        Mock Write-MenuItem {}
+        Mock Write-Warn {}
+        Mock Show-OptionalFeatureManager {}
+        Mock Wait-Enter {}
+
+        Show-MaintenanceMenu
+
+        Should -Invoke Show-OptionalFeatureManager -Times 1 -Exactly
+    }
+
+    It 'no cambia una función si el usuario cancela' {
+        Mock Get-WindowsOptionalFeature { [pscustomobject]@{ State = 'Disabled' } }
+        Mock Confirm-Gonix { return $false }
+        Mock Enable-WindowsOptionalFeature {}
+        Mock Write-Warn {}
+
+        $result = Invoke-GonixOptionalFeatureChange -FeatureName 'TestFeature' -Nombre 'Función de prueba'
+
+        $result.Changed | Should -BeFalse
+        Should -Invoke Enable-WindowsOptionalFeature -Times 0 -Exactly
+    }
+
+    It 'guarda el estado anterior en el historial al habilitar una función' {
+        Mock Get-WindowsOptionalFeature { [pscustomobject]@{ State = 'Disabled' } }
+        Mock Confirm-Gonix { return $true }
+        Mock Enable-WindowsOptionalFeature { [pscustomobject]@{ RestartNeeded = $true } }
+        Mock Save-History {}
+        Mock Write-Log {}
+        Mock Write-Ok {}
+        Mock Write-Warn {}
+
+        Start-Lote
+        $result = Invoke-GonixOptionalFeatureChange -FeatureName 'TestFeature' -Nombre 'Función de prueba'
+
+        $result.Changed | Should -BeTrue
+        $result.RestartNeeded | Should -BeTrue
+        $script:Pendientes.Count | Should -Be 1
+        $script:Pendientes[0].Tipo | Should -Be 'windows-feature'
+        $script:Pendientes[0].EstadoAnterior | Should -Be 'Disabled'
+        Should -Invoke Enable-WindowsOptionalFeature -Times 1 -Exactly -ParameterFilter {
+            $FeatureName -eq 'TestFeature' -and $NoRestart -and $All
+        }
+    }
+
+    It 'intenta revertir el cambio si no puede guardar el historial' {
+        Mock Get-WindowsOptionalFeature { [pscustomobject]@{ State = 'Disabled' } }
+        Mock Confirm-Gonix { return $true }
+        Mock Enable-WindowsOptionalFeature { [pscustomobject]@{ RestartNeeded = $false } }
+        Mock Disable-WindowsOptionalFeature { [pscustomobject]@{ RestartNeeded = $false } }
+        Mock Save-History { throw 'Disco no disponible.' }
+        Mock Write-Log {}
+
+        Start-Lote
+        { Invoke-GonixOptionalFeatureChange -FeatureName 'TestFeature' -Nombre 'Función de prueba' } |
+            Should -Throw
+
+        Should -Invoke Enable-WindowsOptionalFeature -Times 1 -Exactly
+        Should -Invoke Disable-WindowsOptionalFeature -Times 1 -Exactly -ParameterFilter {
+            $FeatureName -eq 'TestFeature' -and $NoRestart
+        }
+        $script:Pendientes.Count | Should -Be 0
+    }
+
+    It 'restaura el estado anterior de una función desde el historial' {
+        Mock Get-WindowsOptionalFeature { [pscustomobject]@{ State = 'Enabled' } }
+        Mock Disable-WindowsOptionalFeature { [pscustomobject]@{ RestartNeeded = $false } }
+        Mock Write-Log {}
+
+        $entry = [pscustomobject]@{
+            Tipo = 'windows-feature'
+            FeatureName = 'TestFeature'
+            EstadoAnterior = 'Disabled'
+        }
+        Invoke-HistoryUndoEntry -Entrada $entry
+
+        Should -Invoke Disable-WindowsOptionalFeature -Times 1 -Exactly -ParameterFilter {
+            $FeatureName -eq 'TestFeature' -and $NoRestart
+        }
+    }
+}
+
 Describe 'Seguridad basica del proyecto' {
     It 'el lanzador resuelve main a un SHA y descarga el ZIP de ese commit' {
         $launcher = Get-Content -LiteralPath (Join-Path $script:root 'Lanzador.ps1') -Raw -Encoding UTF8
@@ -438,6 +632,22 @@ Describe 'Seguridad basica del proyecto' {
             }
         }
         @($invalid).Count | Should -Be 0
+    }
+
+    It 'el perfil Recomendado solo incluye ajustes de riesgo bajo' {
+        $catalog = @{}
+        Get-ChildItem -LiteralPath (Join-Path $script:root 'tweaks') -Filter *.json |
+            Where-Object { $_.Name -notin @('apps.json','bloatware.json') } |
+            ForEach-Object {
+                $items = Get-Content -LiteralPath $_.FullName -Raw -Encoding UTF8 | ConvertFrom-Json
+                foreach ($item in $items) { $catalog[$item.id] = $item }
+            }
+        $profile = Read-JsonObject (Join-Path $script:root 'profiles\recomendado.json')
+
+        foreach ($id in @($profile.tweaks)) {
+            $catalog.ContainsKey($id) | Should -BeTrue
+            $catalog[$id].riesgo | Should -Be 'bajo'
+        }
     }
 
     It 'el perfil Gaming incluye ajustes de FPS, latencia y energía' {

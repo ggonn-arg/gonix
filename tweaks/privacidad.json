@@ -2,10 +2,10 @@
   {
     "id": "disable-telemetry",
     "nombre": "Reducir la telemetría",
-    "descripcion": "Baja el envío de datos de diagnóstico al mínimo permitido. En Windows Home/Pro el mínimo es 'Requerido'; solo Enterprise permite apagarla del todo.",
+    "descripcion": "Solicita el nivel Requerido de datos de diagnóstico; no apaga la telemetría por completo. El nivel apagado solo está disponible en Enterprise, Education y Server, y esto no controla los datos de otras aplicaciones.",
     "categoria": "privacidad", "riesgo": "bajo", "requiere": null, "tipo": "registro",
     "cambios": [
-      { "ruta": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection", "nombre": "AllowTelemetry", "valor": 0, "tipoValor": "DWord" }
+      { "ruta": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection", "nombre": "AllowTelemetry", "valor": 1, "tipoValor": "DWord" }
     ]
   },
   {
@@ -123,10 +123,10 @@
   {
     "id": "disable-location-tracking",
     "nombre": "Bloquear acceso a la ubicación",
-    "descripcion": "Ninguna app puede leer tu ubicación. Dejan de funcionar el clima automático, los mapas, 'Buscar mi dispositivo' y la zona horaria automática.",
+    "descripcion": "Aplica la política de Windows para impedir que las apps usen la ubicación. Puede desactivar el clima automático, los mapas, 'Buscar mi dispositivo' y la zona horaria automática.",
     "categoria": "privacidad", "riesgo": "medio", "requiere": null, "tipo": "registro",
     "cambios": [
-      { "ruta": "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\location", "nombre": "Value", "valor": "Deny", "tipoValor": "String" }
+      { "ruta": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\LocationAndSensors", "nombre": "DisableLocation", "valor": 1, "tipoValor": "DWord" }
     ]
   },
   {

@@ -74,8 +74,8 @@
   {
     "id": "set-dns-cloudflare",
     "nombre": "DNS de Cloudflare (1.1.1.1)",
-    "descripcion": "Cambia el DNS de tus adaptadores de red físicos activos. Se guarda el DNS anterior para poder restaurarlo.",
-    "categoria": "sistema", "riesgo": "bajo", "requiere": null, "tipo": "accion", "accion": "dns-cloudflare"
+    "descripcion": "Cambia el DNS IPv4 de tus adaptadores físicos activos a Cloudflare. No garantiza menor ping y puede interferir con DNS corporativo o VPN. Se guarda el DNS anterior para revertirlo.",
+    "categoria": "sistema", "riesgo": "medio", "requiere": null, "tipo": "accion", "accion": "dns-cloudflare"
   },
   {
     "id": "enable-end-task",

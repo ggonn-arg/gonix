@@ -87,10 +87,10 @@ Podés descargar el ZIP desde GitHub, revisar los scripts y después ejecutar `G
 | **Elegir ajustes manualmente** | 40 ajustes en 4 categorías: Privacidad, Sistema, Rendimiento y Zona de peligro. Cada uno muestra si ya está aplicado y su nivel de riesgo. |
 | **Ver recomendaciones para juegos** | Recomienda qué probar según la GPU y la configuración actual, explicando el motivo y los riesgos; no aplica cambios ni mide FPS. |
 | **Apps preinstaladas** | Desinstala 17 apps de Windows que quizás no uses (Skype, Noticias, Clipchamp, etc.). |
-| **Administrar aplicaciones** | Instala 55 programas con winget y administra de forma reversible el inicio de sesión de tu usuario (Registro Run y carpeta Inicio); no desinstala esas apps. |
+| **Administrar aplicaciones** | Instala 55 programas, lista las aplicaciones instaladas, busca y actualiza apps con WinGet, refresca sus fuentes y ofrece ayuda para recuperar App Installer. También administra de forma reversible el inicio de sesión de tu usuario (Registro Run y carpeta Inicio); no desinstala esas apps. |
 | **Ver historial y deshacer cambios** | Revierte los cambios de cualquier operación anterior. |
 | **Configurar actualizaciones de Windows** | Pausa las actualizaciones por 7, 14 o 35 días, o las reanuda. |
-| **Limpiar y reparar Windows** | Temporales y papelera, SFC, DISM y reparación de red y de Windows Update. |
+| **Limpiar y reparar Windows** | Temporales y papelera, SFC, DISM, reparación de red y de Windows Update; también permite administrar algunas funciones opcionales de Windows cuando el equipo las admite. |
 | **Crear un punto de restauración** | Crea un punto de restauración de Windows antes de cambiar nada. |
 
 ### Cómo se usan los menús

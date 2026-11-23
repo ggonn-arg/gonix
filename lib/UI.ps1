@@ -151,7 +151,7 @@ function Show-ApplicationsMenu {
         Write-Banner
         Write-Host '   --- Aplicaciones ---' -ForegroundColor Magenta
         Write-Host ''
-        Write-MenuItem '1' 'Instalar programas'
+        Write-MenuItem '1' 'Programas y actualizaciones'
         Write-MenuItem '2' 'Administrar programas al iniciar'
         Write-MenuItem '0' 'Volver' 'DarkGray'
         Write-Host ''

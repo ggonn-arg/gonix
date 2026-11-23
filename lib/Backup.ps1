@@ -148,6 +148,9 @@ function Invoke-HistoryUndoEntry {
             Move-Item -LiteralPath $Entrada.ArchivoDeshabilitado `
                 -Destination $Entrada.ArchivoOriginal -ErrorAction Stop
         }
+        'windows-feature' {
+            Restore-GonixOptionalFeatureState -FeatureName $Entrada.FeatureName -State $Entrada.EstadoAnterior
+        }
         default { throw 'Entrada de historial inválida (sin tipo).' }
     }
 }

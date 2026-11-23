@@ -528,13 +528,40 @@ $script:Acciones = @{
             $ads = @(Get-NetAdapter -Physical -ErrorAction SilentlyContinue | Where-Object { $_.Status -eq 'Up' })
             if ($ads.Count -eq 0) { throw 'No hay adaptadores de red físicos activos.' }
             $guardado = @()
-            foreach ($a in $ads) {
-                $prev = @((Get-DnsClientServerAddress -InterfaceIndex $a.ifIndex -AddressFamily IPv4).ServerAddresses)
-                Set-DnsClientServerAddress -InterfaceIndex $a.ifIndex -ServerAddresses @('1.1.1.1', '1.0.0.1') -ErrorAction Stop
-                $guardado += @{ Alias = $a.Name; Anterior = $prev }
+            try {
+                foreach ($a in $ads) {
+                    $prev = @((Get-DnsClientServerAddress -InterfaceIndex $a.ifIndex -AddressFamily IPv4).ServerAddresses)
+                    $guardado += @{ Alias = $a.Name; Anterior = $prev }
+                    Set-DnsClientServerAddress -InterfaceIndex $a.ifIndex -ServerAddresses @('1.1.1.1', '1.0.0.1') -ErrorAction Stop
+                }
+                Clear-DnsClientCache -ErrorAction Stop
+                return @{ Adaptadores = $guardado }
             }
-            Clear-DnsClientCache
-            return @{ Adaptadores = $guardado }
+            catch {
+                $errorAplicacion = $_.Exception.Message
+                $erroresRestauracion = @()
+                for ($i = $guardado.Count - 1; $i -ge 0; $i--) {
+                    $adaptador = $guardado[$i]
+                    try {
+                        if ($adaptador.Anterior.Count -gt 0) {
+                            Set-DnsClientServerAddress -InterfaceAlias $adaptador.Alias -ServerAddresses $adaptador.Anterior -ErrorAction Stop
+                        }
+                        else {
+                            Set-DnsClientServerAddress -InterfaceAlias $adaptador.Alias -ResetServerAddresses -ErrorAction Stop
+                        }
+                    }
+                    catch {
+                        $erroresRestauracion += "$($adaptador.Alias): $($_.Exception.Message)"
+                    }
+                }
+                try { Clear-DnsClientCache -ErrorAction Stop }
+                catch { $erroresRestauracion += "Caché DNS: $($_.Exception.Message)" }
+
+                if ($erroresRestauracion.Count -gt 0) {
+                    throw "No se pudo aplicar DNS ($errorAplicacion) y falló parte de la restauración: $($erroresRestauracion -join '; ')"
+                }
+                throw $errorAplicacion
+            }
         }
         Undo  = {
             param($d)
