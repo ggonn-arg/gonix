@@ -1,4 +1,4 @@
-# ============================================================
+﻿# ============================================================
 #  Backup.ps1 - Historial, deshacer y punto de restauración
 # ============================================================
 #  Cada cambio se guarda en %ProgramData%\Gonix\historial.json con lo
