@@ -113,6 +113,7 @@ function Get-GamingDiagnostic {
             default { 'No determinado' }
         }
     } else { 'No determinado' }
+    $esPortatil = $equipo -and [int]$equipo.PCSystemType -eq 2
 
     $windows = 'No disponible'
     if ($os) { $windows = '{0} (compilación {1})' -f $os.Caption, $os.BuildNumber }
@@ -160,6 +161,7 @@ function Get-GamingDiagnostic {
         CPU = $cpu
         RAMGB = $ramGB
         TipoEquipo = $tipoEquipo
+        EsPortatil = [bool]$esPortatil
         GPU = $gpus
         ModoJuego = $gameMode
         CapturaJuego = $gameDvrState
@@ -167,6 +169,87 @@ function Get-GamingDiagnostic {
         PlanEnergia = $planEnergia
         Errores = @($errores.ToArray())
     }
+}
+
+function Get-GamingRecommendations {
+    param([Parameter(Mandatory = $true)]$Diagnostico)
+
+    $recomendaciones = New-Object System.Collections.ArrayList
+    if ($Diagnostico.ModoJuego -ne 'Activado') {
+        [void]$recomendaciones.Add([pscustomobject]@{
+            Nivel = 'BAJO'
+            Titulo = 'Activar Modo Juego'
+            Motivo = 'Windows puede priorizar el juego y reducir algunas tareas de fondo.'
+            Advertencia = 'No garantiza más FPS. En este equipo el estado figura como: ' + $Diagnostico.ModoJuego
+        })
+    }
+
+    if ($Diagnostico.CapturaJuego -eq 'Grabación en segundo plano activada') {
+        [void]$recomendaciones.Add([pscustomobject]@{
+            Nivel = 'BAJO'
+            Titulo = 'Desactivar GameDVR solo si no usás clips automáticos'
+            Motivo = 'La captura constante puede usar recursos mientras jugás.'
+            Advertencia = 'Se pierde la grabación en segundo plano; la Game Bar puede seguir abierta.'
+        })
+    }
+
+    $gpuCompatibleHags = $false
+    foreach ($gpu in @($Diagnostico.GPU)) {
+        if ($gpu.Nombre -match '(?i)\b(GTX\s*(10\d{2}|16\d{2})|RTX\s*\d{4}|RX\s*(5\d{3}|6\d{3}|7\d{3}|9\d{3}))\b') {
+            $gpuCompatibleHags = $true
+        }
+    }
+    if ($gpuCompatibleHags -and $Diagnostico.HAGS -ne 'Activada') {
+        [void]$recomendaciones.Add([pscustomobject]@{
+            Nivel = 'MEDIO'
+            Titulo = 'Probar HAGS de a un cambio'
+            Motivo = 'La GPU detectada está dentro de la compatibilidad indicada por Gonix.'
+            Advertencia = 'Puede mejorar o empeorar la fluidez; requiere reiniciar. Compará el mismo juego y revertí si empeora.'
+        })
+    }
+    elseif (-not $gpuCompatibleHags -and @($Diagnostico.GPU).Count -gt 0) {
+        [void]$recomendaciones.Add([pscustomobject]@{
+            Nivel = 'PRECAUCIÓN'
+            Titulo = 'No recomiendo cambiar HAGS en esta GPU'
+            Motivo = 'El modelo detectado no coincide con los requisitos de compatibilidad que documenta este tweak.'
+            Advertencia = "Estado actual: $($Diagnostico.HAGS). No lo cambies solo por buscar más FPS."
+        })
+    }
+
+    $planMaximo = $Diagnostico.PlanEnergia -match '(?i)(ultimate performance|máximo rendimiento|maximo rendimiento)'
+    if ($Diagnostico.EsPortatil) {
+        [void]$recomendaciones.Add([pscustomobject]@{
+            Nivel = 'ALTO'
+            Titulo = 'Energía: usar el perfil Gaming solo conectado a corriente'
+            Motivo = 'En notebooks, el modo de máximo rendimiento puede elevar temperatura y consumo.'
+            Advertencia = 'No lo recomiendo con batería; si se calienta, volvé al plan anterior.'
+        })
+    }
+    elseif ($Diagnostico.TipoEquipo -in @('Escritorio', 'Workstation') -and -not $planMaximo -and $Diagnostico.PlanEnergia -ne 'No disponible') {
+        [void]$recomendaciones.Add([pscustomobject]@{
+            Nivel = 'ALTO'
+            Titulo = 'Probar máximo rendimiento solo si el juego está limitado por CPU'
+            Motivo = 'Puede evitar algunos límites de ahorro de energía en equipos de escritorio.'
+            Advertencia = 'Aumenta calor y consumo y puede no cambiar los FPS. Gonix pide ACEPTO y ofrece un punto de restauración.'
+        })
+    }
+    elseif ($planMaximo) {
+        [void]$recomendaciones.Add([pscustomobject]@{
+            Nivel = 'INFO'
+            Titulo = 'El plan Máximo rendimiento ya está activo'
+            Motivo = 'No hace falta volver a aplicarlo.'
+            Advertencia = 'Vigilá las temperaturas; más consumo no significa automáticamente más FPS.'
+        })
+    }
+
+    [void]$recomendaciones.Add([pscustomobject]@{
+        Nivel = 'INFO'
+        Titulo = 'No aplicar tweaks de latencia a ciegas'
+        Motivo = 'Nagle solo afecta conexiones TCP; la mayoría de los juegos online usan UDP. Ninguno cambia los FPS ni la distancia al servidor.'
+        Advertencia = 'Probá ajustes de red solo si medís un problema concreto y podés comparar antes y después.'
+    })
+
+    return @($recomendaciones.ToArray())
 }
 
 function Get-TweaksByCategory {

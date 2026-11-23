@@ -30,51 +30,43 @@ function Show-GamingAdvisor {
     $diagnostico = Get-GamingDiagnostic
 
     Write-Banner
-    Write-Host '   --- Asistente Gaming: diagnóstico ---' -ForegroundColor Magenta
-    Write-Info 'Solo lectura: esta pantalla no cambia la configuración.'
+    Write-Host '   --- Asistente Gaming: recomendaciones ---' -ForegroundColor Magenta
+    Write-Info 'Solo lectura: no cambia la configuración ni mide FPS.'
     Write-Host ''
-    Write-Host "   Windows: $($diagnostico.Windows)" -ForegroundColor White
-    Write-Host "   Equipo: $($diagnostico.TipoEquipo)" -ForegroundColor White
-    Write-Host "   CPU: $($diagnostico.CPU)" -ForegroundColor White
-    $ram = if ($null -ne $diagnostico.RAMGB) { "$($diagnostico.RAMGB) GB" } else { 'No disponible' }
-    Write-Host "   RAM: $ram" -ForegroundColor White
-    if ($diagnostico.GPU.Count -eq 0) {
-        Write-Host '   GPU: No detectada' -ForegroundColor Yellow
-    } else {
-        foreach ($gpu in $diagnostico.GPU) {
-            $driver = if ($gpu.Driver) { " (driver $($gpu.Driver))" } else { '' }
-            Write-Host "   GPU: $($gpu.Nombre)$driver" -ForegroundColor White
-        }
-    }
-
-    Write-Host ''
-    Write-Host '   Estado de juego y energía' -ForegroundColor Cyan
+    $gpuNames = @($diagnostico.GPU | ForEach-Object { $_.Nombre } | Where-Object { $_ })
+    $gpuResumen = if ($gpuNames.Count -gt 0) { $gpuNames -join ', ' } else { 'No detectada' }
+    Write-Host "   Equipo: $($diagnostico.TipoEquipo) | GPU: $gpuResumen" -ForegroundColor White
     Write-Host "   Modo Juego: $($diagnostico.ModoJuego)" -ForegroundColor White
     Write-Host "   Captura GameDVR: $($diagnostico.CapturaJuego)" -ForegroundColor White
     Write-Host "   HAGS: $($diagnostico.HAGS)" -ForegroundColor White
     Write-Host "   Plan de energía: $($diagnostico.PlanEnergia)" -ForegroundColor White
 
     Write-Host ''
-    Write-Host '   Recomendaciones' -ForegroundColor Cyan
-    if ($diagnostico.TipoEquipo -eq 'Portátil') {
-        Write-Warn 'En una notebook, conectala a la corriente antes de probar rendimiento; el perfil Gaming puede aumentar consumo y temperatura.'
+    $recomendaciones = @(Get-GamingRecommendations -Diagnostico $diagnostico)
+    foreach ($recomendacion in $recomendaciones) {
+        $color = switch ($recomendacion.Nivel) {
+            'BAJO' { 'Green' }
+            'MEDIO' { 'Yellow' }
+            'ALTO' { 'Red' }
+            'PRECAUCIÓN' { 'Yellow' }
+            default { 'Cyan' }
+        }
+        Write-Host ('   [{0}] {1}' -f $recomendacion.Nivel, $recomendacion.Titulo) -ForegroundColor $color
+        Write-Info "Por qué: $($recomendacion.Motivo)"
+        if ($recomendacion.Nivel -in @('MEDIO', 'ALTO', 'PRECAUCIÓN')) {
+            Write-Warn "Ojo: $($recomendacion.Advertencia)"
+        } else {
+            Write-Info "Nota: $($recomendacion.Advertencia)"
+        }
+        Write-Host ''
     }
-    if ($diagnostico.ModoJuego -ne 'Activado') {
-        Write-Info 'El Modo Juego no figura activado; el perfil Gaming de Gonix puede habilitarlo.'
-    }
-    if ($diagnostico.CapturaJuego -eq 'Grabación en segundo plano activada') {
-        Write-Info 'Si no usás clips automáticos, desactivar GameDVR puede liberar recursos; perderías la grabación en segundo plano.'
-    }
-    Write-Info 'HAGS y los ajustes de energía pueden variar según GPU, drivers y temperatura; probalos de a uno.'
-    Write-Info 'Compará el mismo juego y la misma escena antes y después; registrá FPS promedio y 1% lows.'
 
     foreach ($errorDiagnostico in $diagnostico.Errores) {
         Write-Warn "No se pudo leer un dato: $errorDiagnostico"
     }
 
-    Write-Host ''
-    Write-Warn 'Este diagnóstico no mide FPS ni garantiza mejoras: solo informa hardware y configuración actual.'
-    Write-Host ''
+    Write-Info 'Para probar una sola opción, usá Tweaks individuales; el perfil Gaming aplica el conjunto completo.'
+    Write-Info 'Compará el mismo juego y escena antes y después, con FPS promedio y 1% lows.'
     Wait-Enter
 }
 

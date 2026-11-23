@@ -392,6 +392,46 @@ Describe 'Seguridad basica del proyecto' {
         Should -Invoke Set-RegValue -Times 0 -Exactly
     }
 
+    It 'advierte sobre HAGS en una GPU no compatible y recomienda Modo Juego si no está activo' {
+        $diagnostico = [pscustomobject]@{
+            ModoJuego = 'Configuración mixta'
+            CapturaJuego = 'Grabación en segundo plano desactivada'
+            GPU = @([pscustomobject]@{ Nombre = 'Radeon RX 570 Series' })
+            HAGS = 'Activada'
+            TipoEquipo = 'Escritorio'
+            EsPortatil = $false
+            PlanEnergia = 'Power Scheme GUID: test (Ultimate Performance)'
+        }
+
+        $recomendaciones = @(Get-GamingRecommendations -Diagnostico $diagnostico)
+
+        @($recomendaciones | Where-Object { $_.Titulo -eq 'Activar Modo Juego' }).Count | Should -Be 1
+        $hags = @($recomendaciones | Where-Object { $_.Titulo -match 'HAGS' })
+        $hags.Count | Should -Be 1
+        $hags[0].Nivel | Should -Match '^PRECAUCI'
+        @($recomendaciones | Where-Object { $_.Titulo -match 'Máximo rendimiento' }).Count | Should -Be 0
+    }
+
+    It 'marca HAGS como riesgo medio y energía como alto en notebooks' {
+        $diagnostico = [pscustomobject]@{
+            ModoJuego = 'Activado'
+            CapturaJuego = 'Grabación en segundo plano desactivada'
+            GPU = @([pscustomobject]@{ Nombre = 'NVIDIA GeForce GTX 1660 Ti' })
+            HAGS = 'Desactivada'
+            TipoEquipo = 'Portátil'
+            EsPortatil = $true
+            PlanEnergia = 'Power Scheme GUID: test (Balanced)'
+        }
+
+        $recomendaciones = @(Get-GamingRecommendations -Diagnostico $diagnostico)
+
+        $hags = @($recomendaciones | Where-Object { $_.Titulo -match 'HAGS' })
+        $hags[0].Nivel | Should -Be 'MEDIO'
+        $energia = @($recomendaciones | Where-Object { $_.Titulo -match 'Energ' })
+        $energia[0].Nivel | Should -Be 'ALTO'
+        $energia[0].Advertencia | Should -Match 'No lo recomiendo con bater'
+    }
+
     It 'Read-JsonArray carga los objetos individuales en Windows PowerShell' {
         foreach ($categoria in @('privacidad','sistema','rendimiento','avanzado')) {
             $items = @(Read-JsonArray (Join-Path $script:GonixRoot "tweaks\$categoria.json"))
