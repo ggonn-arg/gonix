@@ -90,6 +90,7 @@ function Show-MainMenu {
         Write-MenuItem '7' 'Limpiar y reparar Windows'
         Write-MenuItem '8' 'Crear un punto de restauración'
         Write-Host ''
+        Write-MenuItem 'K' 'Apoyar Gonix (voluntario)' 'DarkGray'
         Write-MenuItem '0' 'Salir' 'DarkGray'
         Write-Host ''
         $op = Read-Host '   Elegí una opción'
@@ -102,10 +103,47 @@ function Show-MainMenu {
             '6' { Show-UpdateMenu }
             '7' { Show-MaintenanceMenu }
             '8' { Show-RestorePointMenu }
+            'k' { Show-GonixSupport }
             '0' { Write-Host '   ¡Chau, Gon!' -ForegroundColor Cyan; return }
             default { Write-Warn 'Opción inválida.'; Start-Sleep 1 }
         }
     }
+}
+
+function Show-GonixSupport {
+    while ($true) {
+        Write-Banner
+        Write-Host '   --- Apoyar Gonix ---' -ForegroundColor Magenta
+        Write-Info 'El apoyo es voluntario; Gonix sigue siendo gratis y no mide el uso.'
+        Write-Host ''
+        Write-MenuItem '1' 'Ko-fi'
+        Write-MenuItem '2' 'Ceneka'
+        Write-MenuItem '0' 'Volver' 'DarkGray'
+        Write-Host ''
+        $op = Read-Host '   Elegí dónde apoyar'
+        switch ($op) {
+            '1' { Open-GonixSupportLink -Plataforma 'Ko-fi' -Url 'https://ko-fi.com/gonix' }
+            '2' { Open-GonixSupportLink -Plataforma 'Ceneka' -Url 'https://ceneka.net/gonnsttar' }
+            '0' { return }
+            default { Write-Warn 'Opción inválida.'; Start-Sleep 1 }
+        }
+    }
+}
+
+function Open-GonixSupportLink {
+    param([string]$Plataforma, [string]$Url)
+
+    try {
+        Start-Process -FilePath $Url -ErrorAction Stop
+        Write-Info "$Plataforma se abrió en el navegador."
+    }
+    catch {
+        Write-Fail "No se pudo abrir ${Plataforma}: $($_.Exception.Message)"
+        Write-Info "Podés abrir este enlace manualmente: $Url"
+        Write-Log "APOYO ${Plataforma}: $($_.Exception.Message)"
+    }
+    Write-Host ''
+    Wait-Enter
 }
 
 function Show-ApplicationsMenu {

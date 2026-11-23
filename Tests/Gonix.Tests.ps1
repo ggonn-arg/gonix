@@ -10,6 +10,7 @@ Describe 'Gonix suite' {
         . (Join-Path $script:root 'lib\Helpers.ps1')
         . (Join-Path $script:root 'lib\Backup.ps1')
         . (Join-Path $script:root 'lib\Core.ps1')
+        . (Join-Path $script:root 'lib\UI.ps1')
 
         $script:testKey = 'HKCU:\Software\GonixPester'
         if (Test-Path -LiteralPath $script:testKey) {
@@ -374,6 +375,7 @@ Describe 'Seguridad basica del proyecto' {
         $ui | Should -Match 'function Show-GamingAdvisor'
         $ui | Should -Match 'function Show-ApplicationsMenu'
         $ui | Should -Match 'function Show-StartupMenu'
+        $ui | Should -Match 'function Show-GonixSupport'
         $ui | Should -Match 'Asistente Gaming'
         $ui | Should -Match 'OPTIMIZAR'
         $ui | Should -Match 'APLICACIONES'
@@ -382,9 +384,39 @@ Describe 'Seguridad basica del proyecto' {
         $ui | Should -Not -Match '\$script:InfoSistema'
         $ui | Should -Not -Match "Write-MenuItem '9'"
         $ui | Should -Match 'Get-TweaksByCategory'
-        $mainMenu = [regex]::Match($ui, '(?s)function Show-MainMenu \{(.*?)function Show-ApplicationsMenu').Groups[1].Value
+        $mainMenu = [regex]::Match($ui, '(?s)function Show-MainMenu \{(.*?)function Show-GonixSupport').Groups[1].Value
         $menuNumbers = [regex]::Matches($mainMenu, "Write-MenuItem '(\d)'") | ForEach-Object { $_.Groups[1].Value }
         ($menuNumbers -join ',') | Should -Be '1,2,3,4,5,6,7,8,0'
+        $mainMenu | Should -Match "Write-MenuItem 'K' 'Apoyar Gonix \(voluntario\)'"
+        $mainMenu | Should -Match "'k' \{ Show-GonixSupport \}"
+    }
+
+    It 'ofrece ambos enlaces y solo los abre cuando se eligen' {
+        $script:supportSelections = @('1', '2', '0')
+        $script:supportSelectionIndex = 0
+        $script:openedSupportUrls = New-Object System.Collections.ArrayList
+        Mock Read-Host {
+            $answer = $script:supportSelections[$script:supportSelectionIndex]
+            $script:supportSelectionIndex++
+            return $answer
+        }
+        Mock Write-Banner {}
+        Mock Write-Host {}
+        Mock Start-Process { [void]$script:openedSupportUrls.Add($FilePath) }
+        Mock Wait-Enter {}
+
+        Show-GonixSupport
+
+        @($script:openedSupportUrls).Count | Should -Be 2
+        $script:openedSupportUrls[0] | Should -Be 'https://ko-fi.com/gonix'
+        $script:openedSupportUrls[1] | Should -Be 'https://ceneka.net/gonnsttar'
+        Should -Invoke Start-Process -Times 2 -Exactly
+    }
+
+    It 'publica la plataforma de apoyo en GitHub Sponsors' {
+        $funding = Get-Content -LiteralPath (Join-Path $script:root '.github\FUNDING.yml') -Raw -Encoding UTF8
+        $funding | Should -Match '(?m)^ko_fi:\s*gonix\s*$'
+        $funding | Should -Match '(?m)^\s+-\s+https://ceneka\.net/gonnsttar\s*$'
     }
 
     It 'todos los perfiles apuntan a tweaks existentes' {

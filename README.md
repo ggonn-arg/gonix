@@ -7,6 +7,8 @@
 ![Windows](https://img.shields.io/badge/Windows-11-0078D4.svg)
 ![Licencia](https://img.shields.io/badge/licencia-MIT-green.svg)
 
+¿Te sirve Gonix? Podés apoyar su desarrollo de forma voluntaria en [Ko-fi](https://ko-fi.com/gonix) o [Ceneka](https://ceneka.net/gonnsttar). Gonix seguirá siendo gratis; los enlaces se abren solo si los elegís y no miden cuántas veces usás la app.
+
 ```text
    ██████╗  ██████╗ ███╗   ██╗██╗██╗  ██╗
   ██╔════╝ ██╔═══██╗████╗  ██║██║╚██╗██╔╝
@@ -21,6 +23,7 @@
 
 ## Índice
 
+- [Apoyar Gonix](#apoyar-gonix)
 - [Instalación](#instalación)
 - [Qué podés hacer](#qué-podés-hacer)
 - [Perfiles](#perfiles)
@@ -30,6 +33,14 @@
 - [Agregar tus propios tweaks](#agregar-tus-propios-tweaks)
 - [Estructura del proyecto](#estructura-del-proyecto)
 - [Aviso legal](#aviso-legal)
+
+---
+
+## Apoyar Gonix
+
+Si Gonix te resulta útil, podés [apoyarlo en Ko-fi](https://ko-fi.com/gonix) o [Ceneka](https://ceneka.net/gonnsttar). No hace falta pagar para usar ninguna función: el apoyo es voluntario y no agrega anuncios ni medición de uso.
+
+También podés encontrar el botón **Sponsor** en GitHub.
 
 ---
 
