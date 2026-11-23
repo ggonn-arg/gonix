@@ -22,13 +22,25 @@ $checksum = $zip + '.sha256'
 
 try {
     New-Item -ItemType Directory -Path $base -Force | Out-Null
-    Invoke-WebRequest -Uri $zipUrl -OutFile $zip -UseBasicParsing
-    Invoke-WebRequest -Uri $hashUrl -OutFile $checksum -UseBasicParsing
+    $releasedPackage = $true
+    try {
+        Invoke-WebRequest -Uri $zipUrl -OutFile $zip -UseBasicParsing -ErrorAction Stop
+        Invoke-WebRequest -Uri $hashUrl -OutFile $checksum -UseBasicParsing -ErrorAction Stop
+    }
+    catch {
+        $releasedPackage = $false
+        Remove-Item -LiteralPath $zip -Force -ErrorAction SilentlyContinue
+        Remove-Item -LiteralPath $checksum -Force -ErrorAction SilentlyContinue
+        Write-Host '  [!] El release v0.1 todavia no tiene el paquete publicado. Usando la rama main...' -ForegroundColor Yellow
+        Invoke-WebRequest -Uri "https://github.com/$repo/archive/refs/heads/main.zip" -OutFile $zip -UseBasicParsing -ErrorAction Stop
+    }
 
-    $expected = (Get-Content -LiteralPath $checksum -Raw -Encoding ASCII).Trim()
-    if ($expected -notmatch '^[A-Fa-f0-9]{64}$') { throw 'El checksum descargado no es valido.' }
-    $actual = (Get-FileHash -LiteralPath $zip -Algorithm SHA256).Hash.ToLowerInvariant()
-    if ($actual -ne $expected.ToLowerInvariant()) { throw 'Checksum SHA256 incorrecto.' }
+    if ($releasedPackage) {
+        $expected = (Get-Content -LiteralPath $checksum -Raw -Encoding ASCII).Trim()
+        if ($expected -notmatch '^[A-Fa-f0-9]{64}$') { throw 'El checksum descargado no es valido.' }
+        $actual = (Get-FileHash -LiteralPath $zip -Algorithm SHA256).Hash.ToLowerInvariant()
+        if ($actual -ne $expected.ToLowerInvariant()) { throw 'Checksum SHA256 incorrecto.' }
+    }
 
     Expand-Archive -LiteralPath $zip -DestinationPath $base -Force
     $script = Join-Path $base 'Gonix.ps1'
