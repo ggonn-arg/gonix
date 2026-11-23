@@ -77,6 +77,98 @@ function Initialize-Gonix {
 
 function Get-TweakById { param([string]$Id) return $script:TweakIndex[$Id] }
 
+function Get-GamingDiagnostic {
+    $errores = New-Object System.Collections.ArrayList
+    $os = $null
+    $procesadores = @()
+    $equipo = $null
+    $adaptadoresVideo = @()
+
+    try { $os = Get-CimInstance -ClassName Win32_OperatingSystem -ErrorAction Stop | Select-Object -First 1 }
+    catch { [void]$errores.Add("Windows: $($_.Exception.Message)") }
+    try { $procesadores = @(Get-CimInstance -ClassName Win32_Processor -ErrorAction Stop) }
+    catch { [void]$errores.Add("CPU: $($_.Exception.Message)") }
+    try { $equipo = Get-CimInstance -ClassName Win32_ComputerSystem -ErrorAction Stop | Select-Object -First 1 }
+    catch { [void]$errores.Add("Equipo y memoria: $($_.Exception.Message)") }
+    try { $adaptadoresVideo = @(Get-CimInstance -ClassName Win32_VideoController -ErrorAction Stop | Where-Object { $_.Name }) }
+    catch { [void]$errores.Add("GPU: $($_.Exception.Message)") }
+
+    $nombresCpu = @($procesadores | ForEach-Object { $_.Name } | Where-Object { $_ } | Select-Object -Unique)
+    $cpu = if ($nombresCpu.Count -gt 0) { $nombresCpu -join ', ' } else { 'No disponible' }
+    if ($procesadores.Count -gt 0) {
+        $nucleos = ($procesadores | Measure-Object -Property NumberOfCores -Sum).Sum
+        $hilos = ($procesadores | Measure-Object -Property NumberOfLogicalProcessors -Sum).Sum
+        $cpu += " ($nucleos núcleos / $hilos hilos)"
+    }
+
+    $ramGB = $null
+    if ($equipo -and $equipo.TotalPhysicalMemory) {
+        $ramGB = [math]::Round($equipo.TotalPhysicalMemory / 1GB, 1)
+    }
+    $tipoEquipo = if ($equipo) {
+        switch ([int]$equipo.PCSystemType) {
+            1 { 'Escritorio' }
+            2 { 'Portátil' }
+            3 { 'Workstation' }
+            default { 'No determinado' }
+        }
+    } else { 'No determinado' }
+
+    $windows = 'No disponible'
+    if ($os) { $windows = '{0} (compilación {1})' -f $os.Caption, $os.BuildNumber }
+    $gpus = @($adaptadoresVideo | ForEach-Object {
+        [pscustomobject]@{ Nombre = $_.Name; Driver = $_.DriverVersion }
+    })
+
+    $gameBarPath = 'HKCU:\Software\Microsoft\GameBar'
+    $gameModeAllowed = Get-RegState $gameBarPath 'AllowAutoGameMode'
+    $gameModeEnabled = Get-RegState $gameBarPath 'AutoGameModeEnabled'
+    if ($gameModeAllowed.Existe -and $gameModeEnabled.Existe) {
+        if ([int]$gameModeAllowed.Valor -eq 1 -and [int]$gameModeEnabled.Valor -eq 1) { $gameMode = 'Activado' }
+        elseif ([int]$gameModeAllowed.Valor -eq 0 -and [int]$gameModeEnabled.Valor -eq 0) { $gameMode = 'Desactivado' }
+        else { $gameMode = 'Configuración mixta' }
+    } else { $gameMode = 'No determinado (Windows puede usar su valor predeterminado)' }
+
+    $gameDvr = Get-RegState 'HKCU:\System\GameConfigStore' 'GameDVR_Enabled'
+    $capture = Get-RegState 'HKCU:\Software\Microsoft\Windows\CurrentVersion\GameDVR' 'AppCaptureEnabled'
+    if ($gameDvr.Existe -and $capture.Existe) {
+        if ([int]$gameDvr.Valor -eq 0 -and [int]$capture.Valor -eq 0) { $gameDvrState = 'Grabación en segundo plano desactivada' }
+        elseif ([int]$gameDvr.Valor -eq 1 -and [int]$capture.Valor -eq 1) { $gameDvrState = 'Grabación en segundo plano activada' }
+        else { $gameDvrState = 'Configuración mixta' }
+    } else { $gameDvrState = 'No determinado' }
+
+    $hagsState = Get-RegState 'HKLM:\SYSTEM\CurrentControlSet\Control\GraphicsDrivers' 'HwSchMode'
+    if (-not $hagsState.Existe) { $hags = 'No configurada / valor predeterminado de Windows' }
+    else {
+        switch ([int]$hagsState.Valor) {
+            2 { $hags = 'Activada' }
+            1 { $hags = 'Desactivada' }
+            default { $hags = "Valor $($hagsState.Valor)" }
+        }
+    }
+
+    $planEnergia = 'No disponible'
+    try {
+        $salidaPlan = & powercfg.exe /getactivescheme 2>&1
+        if ($LASTEXITCODE -eq 0 -and $salidaPlan) { $planEnergia = ($salidaPlan | Out-String).Trim() }
+        else { [void]$errores.Add("Plan de energía: powercfg devolvió el código $LASTEXITCODE.") }
+    }
+    catch { [void]$errores.Add("Plan de energía: $($_.Exception.Message)") }
+
+    return [pscustomobject]@{
+        Windows = $windows
+        CPU = $cpu
+        RAMGB = $ramGB
+        TipoEquipo = $tipoEquipo
+        GPU = $gpus
+        ModoJuego = $gameMode
+        CapturaJuego = $gameDvrState
+        HAGS = $hags
+        PlanEnergia = $planEnergia
+        Errores = @($errores.ToArray())
+    }
+}
+
 function Get-TweaksByCategory {
     param([string]$Categoria)
     return @($script:Tweaks | Where-Object { $_.categoria -eq $Categoria })

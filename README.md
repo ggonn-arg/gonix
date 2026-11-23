@@ -73,6 +73,7 @@ Podés descargar el ZIP desde GitHub, revisar los scripts y después ejecutar `G
 | Menú | Para qué sirve |
 |---|---|
 | **Perfiles** | Aplica un conjunto de ajustes con un solo paso (Recomendado, Gaming, Oficina, Notebook, Privacidad total). Antes de aplicar te muestra la lista. |
+| **Asistente Gaming** | Diagnóstico de solo lectura de CPU, GPU, RAM, Windows, energía y algunos ajustes de juego; no aplica cambios ni mide FPS. |
 | **Tweaks individuales** | 40 ajustes en 4 categorías: Privacidad, Sistema, Rendimiento y Zona de peligro. Cada uno muestra si ya está aplicado y su nivel de riesgo. |
 | **Apps preinstaladas** | Desinstala 17 apps de Windows que quizás no uses (Skype, Noticias, Clipchamp, etc.). |
 | **Instalar aplicaciones** | 55 programas populares en 7 categorías, instalados con winget. |
@@ -110,6 +111,8 @@ Podés descargar el ZIP desde GitHub, revisar los scripts y después ejecutar `G
 | **Privacidad total** | Máxima privacidad | Todos los tweaks de privacidad, incluidos ubicación y muestras de Defender. Algunas funciones online dejan de funcionar. |
 
 El perfil Gaming no promete una cantidad fija de FPS: el resultado depende del hardware, los controladores, las temperaturas y cada juego. Incluye opciones de efecto variable y alto consumo/calor; Gonix pide escribir `ACEPTO` y ofrece crear un punto de restauración antes de aplicarlas. La Game Bar sigue disponible, aunque se desactiva la grabación en segundo plano.
+
+El **Asistente Gaming** muestra un diagnóstico de solo lectura para orientar las pruebas. No cambia el equipo ni mide FPS; compará la misma escena antes y después y anotá FPS promedio y 1% lows.
 
 Los tweaks que ya están aplicados se omiten solos.
 

@@ -311,6 +311,8 @@ Describe 'Seguridad basica del proyecto' {
         $ui | Should -Match 'Optimizador de Windows 11'
         $ui | Should -Match 'function Show-MainMenu'
         $ui | Should -Match 'function Show-TweaksMenu'
+        $ui | Should -Match 'function Show-GamingAdvisor'
+        $ui | Should -Match 'Asistente Gaming'
         $ui | Should -Match 'Get-TweaksByCategory'
     }
 
@@ -343,6 +345,51 @@ Describe 'Seguridad basica del proyecto' {
         $profile.tweaks | Should -Contain 'gpu-scheduling'
         $profile.tweaks | Should -Contain 'ultimate-performance-plan'
         $profile.tweaks | Should -Contain 'disable-core-parking'
+    }
+
+    It 'el diagnóstico Gaming informa el equipo sin modificarlo' {
+        Mock Get-CimInstance {
+            switch ($ClassName) {
+                'Win32_OperatingSystem' {
+                    [pscustomobject]@{ Caption = 'Windows 11 Pro'; BuildNumber = '26100' }
+                }
+                'Win32_Processor' {
+                    [pscustomobject]@{ Name = 'CPU de prueba'; NumberOfCores = 8; NumberOfLogicalProcessors = 16 }
+                }
+                'Win32_ComputerSystem' {
+                    [pscustomobject]@{ PCSystemType = 1; TotalPhysicalMemory = 16GB }
+                }
+                'Win32_VideoController' {
+                    [pscustomobject]@{ Name = 'GPU de prueba'; DriverVersion = '1.2.3' }
+                }
+            }
+        }
+        Mock Get-RegState {
+            param([string]$Ruta, [string]$Nombre)
+            $valor = switch ($Nombre) {
+                'AllowAutoGameMode' { 1 }
+                'AutoGameModeEnabled' { 1 }
+                'GameDVR_Enabled' { 0 }
+                'AppCaptureEnabled' { 0 }
+                'HwSchMode' { 2 }
+                default { $null }
+            }
+            [pscustomobject]@{ Existe = ($null -ne $valor); Valor = $valor }
+        }
+        Mock powercfg.exe { $global:LASTEXITCODE = 0; 'Power Scheme GUID: test (Balanced)' }
+        Mock Set-RegValue {}
+
+        $report = Get-GamingDiagnostic
+
+        $report.Windows | Should -Match '^Windows 11 Pro .+ 26100\)$'
+        $report.CPU | Should -Match '^CPU de prueba \(8 .+ / 16 hilos\)$'
+        $report.RAMGB | Should -Be 16
+        $report.GPU[0].Nombre | Should -Be 'GPU de prueba'
+        $report.ModoJuego | Should -Be 'Activado'
+        $report.CapturaJuego | Should -Match '^Grabaci.n en segundo plano desactivada$'
+        $report.HAGS | Should -Be 'Activada'
+        $report.PlanEnergia | Should -Match 'Balanced'
+        Should -Invoke Set-RegValue -Times 0 -Exactly
     }
 
     It 'Read-JsonArray carga los objetos individuales en Windows PowerShell' {
