@@ -155,6 +155,41 @@ Describe 'Historial de tweaks de registro' {
         @((Read-History) | Where-Object { $_.TweakId -eq 'test-other' }).Count | Should -Be 1
     }
 
+    It 'deshace solo la aplicacion mas reciente si dos lotes ocurren en el mismo segundo' {
+        Set-ItemProperty -LiteralPath $script:testKey -Name 'RapidToggleValue' -Value 5 -Type DWord
+        $tweak = [pscustomobject]@{
+            id = 'test-rapid-toggle'
+            tipo = 'registro'
+            cambios = @([pscustomobject]@{
+                ruta = $script:testKey
+                nombre = 'RapidToggleValue'
+                valor = 1
+                tipoValor = 'DWord'
+            })
+        }
+        Mock Get-Date { [datetime]'2026-11-23T17:00:00' }
+
+        Start-Lote
+        $primerLote = $script:LoteActual
+        (Invoke-TweakApply -Tweak $tweak).Estado | Should -Be 'ok'
+        Save-History
+
+        Set-ItemProperty -LiteralPath $script:testKey -Name 'RapidToggleValue' -Value 9 -Type DWord
+        Start-Lote
+        $segundoLote = $script:LoteActual
+        $segundoLote | Should -Not -Be $primerLote
+        (Invoke-TweakApply -Tweak $tweak).Estado | Should -Be 'ok'
+        Save-History
+
+        $result = Undo-Tweak -TweakId $tweak.id
+
+        $result.Total | Should -Be 1
+        (Get-ItemPropertyValue -LiteralPath $script:testKey -Name 'RapidToggleValue') | Should -Be 9
+        $remaining = @(Read-History | Where-Object { $_.TweakId -eq $tweak.id })
+        $remaining.Count | Should -Be 1
+        $remaining[0].Lote | Should -Be $primerLote
+    }
+
     It 'elimina al desactivar un valor que no existia antes' {
         $tweak = [pscustomobject]@{
             id = 'test-toggle-remove'

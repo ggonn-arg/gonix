@@ -14,7 +14,7 @@ $script:Pendientes = New-Object System.Collections.ArrayList
 function Get-HistoryPath { Join-Path (Get-DataDir) 'historial.json' }
 
 function Start-Lote {
-    $script:LoteActual = (Get-Date).ToString('yyyyMMdd-HHmmss')
+    $script:LoteActual = [guid]::NewGuid().ToString('N')
     $script:Pendientes.Clear()
 }
 
@@ -127,12 +127,15 @@ function Undo-Tweak {
     param([string]$TweakId)
 
     $todas = @(Read-History)
-    $candidatos = @($todas | Where-Object { $_.TweakId -eq $TweakId })
-    if ($candidatos.Count -eq 0) {
+    $ultimoCandidato = $null
+    foreach ($entrada in $todas) {
+        if ($entrada.TweakId -eq $TweakId) { $ultimoCandidato = $entrada }
+    }
+    if (-not $ultimoCandidato) {
         return [pscustomobject]@{ Ok = 0; Fallos = 0; Total = 0 }
     }
 
-    $lote = [string](($candidatos | Sort-Object -Property Lote -Descending | Select-Object -First 1).Lote)
+    $lote = [string]$ultimoCandidato.Lote
     $indices = New-Object System.Collections.Generic.List[int]
     for ($i = 0; $i -lt $todas.Count; $i++) {
         if ($todas[$i].TweakId -eq $TweakId -and [string]$todas[$i].Lote -eq $lote) {
