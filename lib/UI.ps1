@@ -18,12 +18,9 @@ function Write-Banner {
 }
 
 function Show-SystemInfo {
-    Write-Host "   $($script:InfoSistema)" -ForegroundColor DarkGray
     if ($script:BuildWindows -gt 0 -and $script:BuildWindows -lt 22000) {
         Write-Host '   Aviso: Gonix está pensado para Windows 11; algunos tweaks pueden no tener efecto.' -ForegroundColor Yellow
     }
-    Write-Host '   ════════════════════════════════════════════════════' -ForegroundColor DarkCyan
-    Write-Host ''
 }
 
 function Show-GamingAdvisor {
@@ -77,14 +74,21 @@ function Show-MainMenu {
     while ($true) {
         Write-Banner
         Show-SystemInfo
-        Write-MenuItem '1' 'Perfiles (Recomendado, Gaming, Oficina, Notebook, Privacidad)'
-        Write-MenuItem '2' 'Tweaks individuales'
-        Write-MenuItem '3' 'Instalar aplicaciones (winget)'
-        Write-MenuItem '4' 'Historial y deshacer'
-        Write-MenuItem '5' 'Windows Update'
-        Write-MenuItem '6' 'Limpieza y reparación'
-        Write-MenuItem '7' 'Crear punto de restauración'
-        Write-MenuItem '8' 'Asistente Gaming (diagnóstico sin cambios)'
+        Write-Host '   ¿Qué querés hacer?' -ForegroundColor White
+        Write-Host ''
+        Write-Host '   OPTIMIZAR' -ForegroundColor DarkCyan
+        Write-MenuItem '1' 'Aplicar un perfil (Gaming, Recomendado y más)'
+        Write-MenuItem '2' 'Elegir ajustes manualmente'
+        Write-MenuItem '8' 'Ver recomendaciones para juegos'
+        Write-Host ''
+        Write-Host '   APLICACIONES' -ForegroundColor DarkCyan
+        Write-MenuItem '3' 'Instalar programas'
+        Write-Host ''
+        Write-Host '   MANTENIMIENTO' -ForegroundColor DarkCyan
+        Write-MenuItem '4' 'Ver historial y deshacer cambios'
+        Write-MenuItem '5' 'Configurar actualizaciones de Windows'
+        Write-MenuItem '6' 'Limpiar y reparar Windows'
+        Write-MenuItem '7' 'Crear un punto de restauración'
         Write-Host ''
         Write-MenuItem '0' 'Salir' 'DarkGray'
         Write-Host ''

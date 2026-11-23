@@ -313,6 +313,11 @@ Describe 'Seguridad basica del proyecto' {
         $ui | Should -Match 'function Show-TweaksMenu'
         $ui | Should -Match 'function Show-GamingAdvisor'
         $ui | Should -Match 'Asistente Gaming'
+        $ui | Should -Match 'OPTIMIZAR'
+        $ui | Should -Match 'APLICACIONES'
+        $ui | Should -Match 'MANTENIMIENTO'
+        $ui | Should -Match 'Elegir ajustes manualmente'
+        $ui | Should -Not -Match '\$script:InfoSistema'
         $ui | Should -Not -Match "Write-MenuItem '9'"
         $ui | Should -Match 'Get-TweaksByCategory'
     }

@@ -72,15 +72,15 @@ Podés descargar el ZIP desde GitHub, revisar los scripts y después ejecutar `G
 
 | Menú | Para qué sirve |
 |---|---|
-| **Perfiles** | Aplica un conjunto de ajustes con un solo paso (Recomendado, Gaming, Oficina, Notebook, Privacidad total). Antes de aplicar te muestra la lista. |
-| **Asistente Gaming** | Recomienda qué probar según la GPU y la configuración actual, explicando el motivo y los riesgos; no aplica cambios ni mide FPS. |
-| **Tweaks individuales** | 40 ajustes en 4 categorías: Privacidad, Sistema, Rendimiento y Zona de peligro. Cada uno muestra si ya está aplicado y su nivel de riesgo. |
+| **Aplicar un perfil** | Aplica un conjunto de ajustes con un solo paso (Recomendado, Gaming, Oficina, Notebook, Privacidad total). Antes de aplicar te muestra la lista. |
+| **Elegir ajustes manualmente** | 40 ajustes en 4 categorías: Privacidad, Sistema, Rendimiento y Zona de peligro. Cada uno muestra si ya está aplicado y su nivel de riesgo. |
+| **Ver recomendaciones para juegos** | Recomienda qué probar según la GPU y la configuración actual, explicando el motivo y los riesgos; no aplica cambios ni mide FPS. |
 | **Apps preinstaladas** | Desinstala 17 apps de Windows que quizás no uses (Skype, Noticias, Clipchamp, etc.). |
-| **Instalar aplicaciones** | 55 programas populares en 7 categorías, instalados con winget. |
-| **Historial y deshacer** | Revierte los cambios de cualquier operación anterior. |
-| **Windows Update** | Pausa las actualizaciones por 7, 14 o 35 días, o las reanuda. |
-| **Limpieza y reparación** | Temporales y papelera, SFC, DISM y reparación de red y de Windows Update. |
-| **Punto de restauración** | Crea un punto de restauración de Windows antes de cambiar nada. |
+| **Instalar programas** | 55 programas populares en 7 categorías, instalados con winget. |
+| **Ver historial y deshacer cambios** | Revierte los cambios de cualquier operación anterior. |
+| **Configurar actualizaciones de Windows** | Pausa las actualizaciones por 7, 14 o 35 días, o las reanuda. |
+| **Limpiar y reparar Windows** | Temporales y papelera, SFC, DISM y reparación de red y de Windows Update. |
+| **Crear un punto de restauración** | Crea un punto de restauración de Windows antes de cambiar nada. |
 
 ### Cómo se usan los menús
 
