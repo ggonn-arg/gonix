@@ -2,7 +2,7 @@
 
 **Gonix** es una herramienta de código abierto, rápida y segura para optimizar Windows 11. Aplica tweaks de privacidad, mejora el rendimiento, limpia el sistema y instala tus aplicaciones favoritas, todo desde una interfaz de consola intuitiva y sin necesidad de instalar nada.
 
-[![Version](https://img.shields.io/badge/version-0.1-blue.svg)]()
+[![Version](https://img.shields.io/badge/version-v0.1-blue.svg)]()
 [![PowerShell](https://img.shields.io/badge/PowerShell-5.1+-blue.svg)]()
 [![License](https://img.shields.io/badge/license-MIT-green.svg)]()
 
@@ -12,9 +12,22 @@
 
 Abrí **PowerShell como Administrador** y pegá el siguiente comando:
 
+Descargá el archivo `Lanzador.ps1` publicado en el release
+[`v0.1`](https://github.com/ggonn-arg/gonix/releases/tag/v0.1), hacé doble clic
+en él o ejecutalo desde PowerShell como administrador. El lanzador descarga
+`gonix.zip`, verifica su SHA256 contra `gonix.zip.sha256` y recién después
+ejecuta Gonix.
+
+Gonix no se instala en tu disco. Los archivos temporales se eliminan al salir y el historial se guarda en `%ProgramData%\Gonix`.
+
+## Pruebas
+
+Instalá Pester si todavía no está disponible:
+
 ```powershell
-irm https://raw.githubusercontent.com/ggonn-arg/gonix/main/Lanzador.ps1 | iex
-Gonix no se instala en tu disco. Se ejecuta de forma segura desde la nube y no deja rastro.
+Install-Module Pester -Scope CurrentUser -Force -SkipPublisherCheck
+Invoke-Pester -Path .\Tests\Gonix.Tests.ps1 -Output Detailed
+```
 
 ✨ Características Principales
 🎮 Perfiles de Optimización
@@ -27,7 +40,7 @@ Oficina / Notebook: Privacidad sin gastar batería.
 Privacidad Total: Bloquea toda la telemetría y rastreo de Microsoft.
 
 🛡️ Privacidad y Sistema
-+50 Tweaks individuales: Desactiva Cortana, Copilot, Widgets, anuncios, telemetría y más.
+Colección de tweaks individuales: privacidad, rendimiento, limpieza y aplicaciones.
 
 Zona de Peligro: Para usuarios avanzados (Plan de Máximo Rendimiento, Core Parking).
 
@@ -67,7 +80,7 @@ text
    ╚═════╝  ╚═════╝ ╚═╝  ╚═══╝╚═╝╚═╝  ╚═╝
         [ Optimizador de Windows 11 ]  v0.1
 ⚠️ Descargo de Responsabilidad
-Gonix modifica el registro y la configuración de Windows. Aunque todos los perfiles principales son 100% seguros y reversibles, los tweaks de la "Zona de Peligro" son bajo tu propio riesgo. Siempre se recomienda crear un Punto de Restauración (opción incluida en el menú).
+Gonix modifica el registro y la configuración de Windows. No todos los cambios son reversibles ni adecuados para cada equipo. Los perfiles y la "Zona de Peligro" requieren confirmación y se recomienda crear un Punto de Restauración antes de usarlos.
 
 👨‍💻 Autor
 Creado con pasión por Gonzalo (Gon).

@@ -1,9 +1,5 @@
 [
   {
-    "id": "disable-nagle-algorithm", "nombre": "Reducir Ping (Nagle)", "descripcion": "Mejora respuesta de red.", "riesgo": "bajo", "tipo": "registro",
-    "cambios": [ { "ruta": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters\\Interfaces", "nombre": "TcpAckFrequency", "valor": 1, "tipoValor": "DWord" } ]
-  },
-  {
     "id": "gpu-scheduling", "nombre": "Aceleración GPU (HAGS)", "descripcion": "Mejora FPS.", "riesgo": "bajo", "tipo": "registro",
     "cambios": [ { "ruta": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers", "nombre": "HwSchMode", "valor": 2, "tipoValor": "DWord" } ]
   },
@@ -16,13 +12,11 @@
     "cambios": [ { "ruta": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile", "nombre": "NetworkThrottlingIndex", "valor": 4294967295, "tipoValor": "DWord" } ]
   },
   {
-    "id": "disable-usb-selective-suspend", "nombre": "Evitar Suspensión USB", "descripcion": "Menos input lag.", "riesgo": "bajo", "tipo": "comando",
-    "comando": "powercfg -setacvalueindex SCHEME_CURRENT 2a737441-1930-4402-8d77-b2bebba308a3 48e6b7a6-50f5-4782-a5d4-53bb8f07e226 0; powercfg -setactive SCHEME_CURRENT",
-    "comandoOriginal": "powercfg -setacvalueindex SCHEME_CURRENT 2a737441-1930-4402-8d77-b2bebba308a3 48e6b7a6-50f5-4782-a5d4-53bb8f07e226 1; powercfg -setactive SCHEME_CURRENT"
+    "id": "disable-usb-selective-suspend", "nombre": "Evitar Suspensión USB", "descripcion": "Desactiva la suspensión selectiva mientras el equipo usa corriente alterna.", "riesgo": "bajo", "tipo": "accion",
+    "accion": "disable-usb-suspend"
   },
   {
-    "id": "optimize-services", "nombre": "Servicios Xbox en Manual", "descripcion": "Ahorra RAM.", "riesgo": "bajo", "tipo": "comando",
-    "comando": "Set-Service -Name 'XblAuthManager', 'XblGameSave', 'XboxNetApiSvc', 'XboxGipSvc' -StartupType Manual -ErrorAction SilentlyContinue",
-    "comandoOriginal": "Set-Service -Name 'XblAuthManager', 'XblGameSave', 'XboxNetApiSvc', 'XboxGipSvc' -StartupType Automatic -ErrorAction SilentlyContinue"
+    "id": "optimize-services", "nombre": "Servicios Xbox en Manual", "descripcion": "Configura los servicios Xbox para iniciar manualmente.", "riesgo": "bajo", "tipo": "accion",
+    "accion": "optimize-xbox-services"
   }
 ]

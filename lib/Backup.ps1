@@ -9,7 +9,15 @@
 $script:LoteActual = $null
 
 function Get-HistoryPath {
-    Join-Path $script:GonixRoot 'historial.json'
+    $base = if ($env:GONIX_TEST_DATA_ROOT) {
+        $env:GONIX_TEST_DATA_ROOT
+    } else {
+        Join-Path $env:ProgramData 'Gonix'
+    }
+    if (-not (Test-Path -LiteralPath $base)) {
+        New-Item -ItemType Directory -Path $base -Force | Out-Null
+    }
+    Join-Path $base 'historial.json'
 }
 
 function Start-Lote {
@@ -33,6 +41,10 @@ function Read-History {
 function Write-History {
     param($Lista)
     $p = Get-HistoryPath
+    $parent = Split-Path -Parent $p
+    if (-not (Test-Path -LiteralPath $parent)) {
+        New-Item -ItemType Directory -Path $parent -Force | Out-Null
+    }
     $arr = @($Lista | Where-Object { $_ })
     if ($arr.Count -eq 0) {
         if (Test-Path -LiteralPath $p) { Remove-Item -LiteralPath $p -Force }
@@ -91,14 +103,17 @@ function Undo-Lote {
                     Remove-ItemProperty -LiteralPath $e.Ruta -Name $e.Nombre -ErrorAction SilentlyContinue
                 }
                 else {
-                    $v = ConvertTo-RegistryValue -Valor $e.ValorAnterior -Tipo $e.TipoValor
                     $tipo = $e.TipoValor
                     if (-not $tipo) { $tipo = 'DWord' }
-                    Set-RegValue -Ruta $e.Ruta -Nombre $e.Nombre -Valor $v -Tipo $tipo
+                    Set-ItemProperty -LiteralPath $e.Ruta -Name $e.Nombre -Value $e.ValorAnterior -Type $tipo -Force -ErrorAction Stop
                 }
             }
             elseif ($e.Tipo -eq 'comando') {
-                Invoke-Expression $e.Undo | Out-Null
+                # Las entradas antiguas con tipo "comando" ya no son ejecutables.
+                throw "Entrada de historial antigua sin deshacer seguro."
+            }
+            elseif ($e.Tipo -eq 'accion') {
+                Invoke-GonixUndoAction -Accion $e.Accion
             }
             $ok++
         }

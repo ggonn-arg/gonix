@@ -1,29 +1,27 @@
 [
   {
-    "id": "disable-hibernation", "nombre": "Desactivar Hibernación", "descripcion": "Libera espacio.", "riesgo": "bajo", "tipo": "comando",
-    "comando": "powercfg -h off", "comandoOriginal": "powercfg -h on"
+    "id": "disable-hibernation", "nombre": "Desactivar Hibernación", "descripcion": "Libera espacio.", "riesgo": "bajo", "tipo": "accion",
+    "accion": "disable-hibernation", "masivoSeguro": false
   },
   {
-    "id": "enable-hibernation-laptops", "nombre": "Activar Hibernación (Notebooks)", "descripcion": "Ahorra batería en laptops con Connected Standby.", "riesgo": "bajo", "tipo": "comando",
-    "comando": "powercfg -h on", "comandoOriginal": "powercfg -h off"
+    "id": "enable-hibernation-laptops", "nombre": "Activar Hibernación (Notebooks)", "descripcion": "Ahorra batería en laptops con Connected Standby.", "riesgo": "bajo", "tipo": "accion",
+    "accion": "enable-hibernation", "masivoSeguro": false
   },
   {
     "id": "disable-gamedvr", "nombre": "Desactivar GameDVR", "descripcion": "Evita caídas de FPS.", "riesgo": "bajo", "tipo": "registro",
     "cambios": [ { "ruta": "HKCU:\\System\\GameConfigStore", "nombre": "GameDVR_Enabled", "valor": 0, "tipoValor": "DWord" } ]
   },
   {
-    "id": "disable-onedrive-startup", "nombre": "Quitar OneDrive del Inicio", "descripcion": "Arranque más rápido.", "riesgo": "bajo", "tipo": "comando",
-    "comando": "Get-Process OneDrive -ErrorAction SilentlyContinue | Stop-Process -Force",
-    "comandoOriginal": "Start-Process OneDrive"
+    "id": "disable-onedrive-startup", "nombre": "Quitar OneDrive del Inicio", "descripcion": "Arranque más rápido.", "riesgo": "bajo", "tipo": "accion",
+    "accion": "disable-onedrive"
   },
   {
     "id": "disable-startup-delay", "nombre": "Eliminar Retraso de Arranque", "descripcion": "Quita 10 seg de espera.", "riesgo": "bajo", "tipo": "registro",
     "cambios": [ { "ruta": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Serialize", "nombre": "StartupDelayInMSec", "valor": 0, "tipoValor": "DWord" } ]
   },
   {
-    "id": "set-dns-cloudflare", "nombre": "DNS Cloudflare", "descripcion": "DNS rápido y privado.", "riesgo": "bajo", "tipo": "comando",
-    "comando": "Get-DnsClientServerAddress -AddressFamily IPv4 | ForEach-Object { Set-DnsClientServerAddress -InterfaceIndex $_.InterfaceIndex -ServerAddresses ('1.1.1.1','1.0.0.1') }",
-    "comandoOriginal": "Set-DnsClientServerAddress -InterfaceIndex (Get-DnsClientServerAddress -AddressFamily IPv4).InterfaceIndex -ResetServerAddresses"
+    "id": "set-dns-cloudflare", "nombre": "DNS Cloudflare", "descripcion": "DNS rápido y privado.", "riesgo": "bajo", "tipo": "accion",
+    "accion": "set-dns-cloudflare", "masivoSeguro": false
   },
   {
     "id": "enable-end-task", "nombre": "Finalizar Tarea en Clic Derecho", "descripcion": "Cierra apps colgadas fácilmente.", "riesgo": "bajo", "tipo": "registro",
@@ -34,9 +32,8 @@
     "cambios": [ { "ruta": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\StorageSense\\Parameters\\StoragePolicy", "nombre": "01", "valor": 0, "tipoValor": "DWord" } ]
   },
   {
-    "id": "disable-teredo", "nombre": "Desactivar Teredo (IPv6)", "descripcion": "Evita problemas de conexión en juegos.", "riesgo": "bajo", "tipo": "comando",
-    "comando": "netsh interface teredo set state disabled",
-    "comandoOriginal": "netsh interface teredo set state type=default"
+    "id": "disable-teredo", "nombre": "Desactivar Teredo (IPv6)", "descripcion": "Evita problemas de conexión en juegos.", "riesgo": "bajo", "tipo": "accion",
+    "accion": "disable-teredo", "masivoSeguro": false
   },
   {
     "id": "set-visual-effects-performance", "nombre": "Efectos Visuales a Máximo Rendimiento", "descripcion": "Prioriza velocidad sobre estética.", "riesgo": "bajo", "tipo": "registro",
@@ -55,23 +52,19 @@
     "cambios": [ { "ruta": "HKCU:\\Control Panel\\Accessibility\\StickyKeys", "nombre": "Flags", "valor": "506", "tipoValor": "String" } ]
   },
   {
-    "id": "disable-diagtrack", "nombre": "Desactivar Servicio DiagTrack", "descripcion": "Apaga la telemetría de Experiencias del Usuario.", "riesgo": "medio", "tipo": "comando",
-    "comando": "Stop-Service -Name DiagTrack -Force -ErrorAction SilentlyContinue; Set-Service -Name DiagTrack -StartupType Disabled -ErrorAction SilentlyContinue",
-    "comandoOriginal": "Set-Service -Name DiagTrack -StartupType Automatic; Start-Service -Name DiagTrack"
+    "id": "disable-diagtrack", "nombre": "Desactivar Servicio DiagTrack", "descripcion": "Apaga la telemetría de Experiencias del Usuario.", "riesgo": "medio", "tipo": "accion",
+    "accion": "disable-diagtrack", "masivoSeguro": false
   },
   {
-    "id": "disable-maps-broker", "nombre": "Poner Servicio de Mapas en Manual", "descripcion": "Evita que el servicio de mapas consuma RAM de fondo.", "riesgo": "bajo", "tipo": "comando",
-    "comando": "Set-Service -Name MapsBroker -StartupType Manual -ErrorAction SilentlyContinue",
-    "comandoOriginal": "Set-Service -Name MapsBroker -StartupType Automatic"
+    "id": "disable-maps-broker", "nombre": "Poner Servicio de Mapas en Manual", "descripcion": "Evita que el servicio de mapas consuma RAM de fondo.", "riesgo": "bajo", "tipo": "accion",
+    "accion": "disable-maps-broker"
   },
   {
-    "id": "clean-temp-files", "nombre": "Limpiar Archivos Temporales", "descripcion": "Borra basura del sistema al instante.", "riesgo": "bajo", "tipo": "comando",
-    "comando": "Remove-Item -Path $env:TEMP\\* -Recurse -Force -ErrorAction SilentlyContinue; Remove-Item -Path 'C:\\Windows\\Temp\\*' -Recurse -Force -ErrorAction SilentlyContinue",
-    "comandoOriginal": "Write-Host 'No se puede deshacer la limpieza.'"
+    "id": "clean-temp-files", "nombre": "Limpiar Archivos Temporales", "descripcion": "Borra basura del sistema al instante.", "riesgo": "bajo", "tipo": "accion",
+    "accion": "clean-temp-files", "reversible": false, "masivoSeguro": false
   },
   {
-    "id": "run-disk-cleanup", "nombre": "Ejecutar Liberador de Espacio", "descripcion": "Abre la herramienta nativa de limpieza de Windows.", "riesgo": "bajo", "tipo": "comando",
-    "comando": "Start-Process cleanmgr -ArgumentList '/sagerun:1'",
-    "comandoOriginal": "Write-Host 'El liberador de espacio es de una sola vía.'"
+    "id": "run-disk-cleanup", "nombre": "Ejecutar Liberador de Espacio", "descripcion": "Abre la herramienta nativa de limpieza de Windows.", "riesgo": "bajo", "tipo": "accion",
+    "accion": "run-disk-cleanup", "reversible": false, "masivoSeguro": false
   }
 ]

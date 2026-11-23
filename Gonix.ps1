@@ -6,7 +6,7 @@
     Herramienta TUI para aplicar tweaks de privacidad, rendimiento y más.
 .NOTES
     Autor: Gon (gonnsttar)
-    Versión: 0.1
+    Versión: v0.1
 #>
 
 # --- Comprobar permisos de administrador ---

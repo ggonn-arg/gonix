@@ -1,0 +1,47 @@
+name: Gonix release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Pester
+        shell: pwsh
+        run: Install-Module Pester -Scope CurrentUser -Force -SkipPublisherCheck
+
+      - name: Run Pester
+        shell: pwsh
+        run: |
+          $result = Invoke-Pester -Path ./Tests/Gonix.Tests.ps1 -PassThru
+          if ($result.FailedCount -gt 0) { exit 1 }
+
+      - name: Create Gonix package
+        shell: pwsh
+        run: |
+          $staging = Join-Path $env:RUNNER_TEMP 'Gonix'
+          New-Item -ItemType Directory -Path $staging -Force | Out-Null
+          Get-ChildItem -LiteralPath $env:GITHUB_WORKSPACE -Force |
+            Where-Object { $_.Name -notin @('.git', '.github') } |
+            Copy-Item -Destination $staging -Recurse -Force
+          $output = Join-Path $env:GITHUB_WORKSPACE 'gonix.zip'
+          if (Test-Path -LiteralPath $output) { Remove-Item -LiteralPath $output -Force }
+          Compress-Archive -Path (Join-Path $staging '*') -DestinationPath $output -CompressionLevel Optimal
+          $hash = (Get-FileHash -LiteralPath $output -Algorithm SHA256).Hash.ToLowerInvariant()
+          Set-Content -LiteralPath (Join-Path $env:GITHUB_WORKSPACE 'gonix.zip.sha256') -Value $hash -Encoding ASCII
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            gonix.zip
+            gonix.zip.sha256

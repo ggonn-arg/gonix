@@ -62,9 +62,5 @@
   {
     "id": "disable-defender-samples", "nombre": "Desactivar Muestras de Defender", "descripcion": "No envía archivos sospechosos a Microsoft.", "riesgo": "bajo", "tipo": "registro",
     "cambios": [ { "ruta": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows Defender\\Spynet", "nombre": "SubmitSamplesConsent", "valor": 2, "tipoValor": "DWord" } ]
-  },
-  {
-    "id": "disable-wifi-sense", "nombre": "Desactivar Wifi-Sense", "descripcion": "Evita compartir contraseñas de WiFi.", "riesgo": "bajo", "tipo": "registro",
-    "cambios": [ { "ruta": "HKLM:\\SOFTWARE\\Microsoft\\WcmSvc\\wifinetworkmanager\\config", "nombre": "AutoConnectAllowedOEM", "valor": 0, "tipoValor": "DWord" } ]
   }
 ]

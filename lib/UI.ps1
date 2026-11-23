@@ -52,7 +52,7 @@ function Show-MainMenu {
         
         Write-Host ""
         Write-Host "   [9] " -ForegroundColor Green -NoNewline
-        Write-Host "⚡ OPTIMIZACIÓN RÁPIDA (Recomendado)" -ForegroundColor Green
+        Write-Host "OPTIMIZACIÓN RÁPIDA (Privacidad y sistema)" -ForegroundColor Green
         
         Write-Host ""
         Write-Host "   [0] " -ForegroundColor DarkGray -NoNewline
@@ -136,7 +136,6 @@ function Show-PrivacyTweaks {
         Write-Host "   [12] Desactivar Rastreo de Ubicación" -ForegroundColor White
         Write-Host "   [13] Desactivar Funciones de Consumidor" -ForegroundColor White
         Write-Host "   [14] Desactivar Muestras de Defender" -ForegroundColor White
-        Write-Host "   [15] Desactivar Wifi-Sense" -ForegroundColor White
         Write-Host "   [A] APLICAR TODOS LOS DE ESTA LISTA" -ForegroundColor Green
         Write-Host "   [0] Volver" -ForegroundColor DarkGray
         Write-Host ""
@@ -160,7 +159,6 @@ function Show-PrivacyTweaks {
             "12" { Invoke-Tweak -Id "disable-location-tracking" }
             "13" { Invoke-Tweak -Id "disable-consumer-features" }
             "14" { Invoke-Tweak -Id "disable-defender-samples" }
-            "15" { Invoke-Tweak -Id "disable-wifi-sense" }
             default { Write-Host "   Opción inválida." -ForegroundColor Red; Start-Sleep 1; continue }
         }
         Read-Host "   Enter para continuar"
@@ -178,7 +176,6 @@ function Show-SystemTweaks {
         Write-Host "   [5] Desactivar Animaciones" -ForegroundColor White
         Write-Host "   [6] Quitar OneDrive del Inicio" -ForegroundColor White
         Write-Host "   [7] Optimizar Servicios Xbox" -ForegroundColor White
-        Write-Host "   [8] Reducir Ping (Nagle)" -ForegroundColor White
         Write-Host "   [9] Aceleración GPU (HAGS)" -ForegroundColor White
         Write-Host "   [10] Desactivar Barra de Juegos Xbox" -ForegroundColor White
         Write-Host "   [11] Eliminar Límite de Ancho de Banda" -ForegroundColor White
@@ -212,7 +209,6 @@ function Show-SystemTweaks {
             "5" { Invoke-Tweak -Id "disable-animations" }
             "6" { Invoke-Tweak -Id "disable-onedrive-startup" }
             "7" { Invoke-Tweak -Id "optimize-services" }
-            "8" { Invoke-Tweak -Id "disable-nagle-algorithm" }
             "9" { Invoke-Tweak -Id "gpu-scheduling" }
             "10" { Invoke-Tweak -Id "disable-xbox-gamebar" }
             "11" { Invoke-Tweak -Id "disable-network-throttling" }
@@ -247,13 +243,12 @@ function Show-AdvancedTweaks {
         Write-Host "   [1] Plan de Energía 'Máximo Rendimiento'" -ForegroundColor White
         Write-Host "   [2] Desactivar Core Parking (CPU al 100%)" -ForegroundColor White
         Write-Host "   [3] Priorizar Procesos en Primer Plano" -ForegroundColor White
-        Write-Host "   [4] Desactivar Reserva de CPU del Sistema" -ForegroundColor White
+        Write-Host "   [4] Limitar Reserva de CPU del Sistema" -ForegroundColor White
         Write-Host "   [5] Desactivar BitLocker" -ForegroundColor White
         Write-Host "   [6] Desactivar y Eliminar Windows AI" -ForegroundColor White
         Write-Host "   [7] Debloat de Microsoft Edge" -ForegroundColor White
         Write-Host "   [8] Desactivar Optimizaciones de Pantalla Completa" -ForegroundColor White
-        Write-Host "   [9] Eliminar Microsoft Edge" -ForegroundColor White
-        Write-Host "   [10] Establecer Hora en UTC" -ForegroundColor White
+        Write-Host "   [9] Establecer Hora en UTC" -ForegroundColor White
         Write-Host "   [0] Volver" -ForegroundColor DarkGray
         Write-Host ""
         $op = Read-Host "   Elegí un tweak (o 0 para volver)"
@@ -278,8 +273,7 @@ function Show-AdvancedTweaks {
             "6" { Invoke-Tweak -Id "disable-windows-ai" }
             "7" { Invoke-Tweak -Id "disable-edge-debloat" }
             "8" { Invoke-Tweak -Id "disable-fso" }
-            "9" { Invoke-Tweak -Id "uninstall-edge" }
-            "10" { Invoke-Tweak -Id "set-time-utc" }
+            "9" { Invoke-Tweak -Id "set-time-utc" }
             default { Write-Host "   Opción inválida." -ForegroundColor Red; Start-Sleep 1; continue }
         }
         Read-Host "   Enter para continuar"

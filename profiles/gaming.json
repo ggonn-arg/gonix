@@ -9,7 +9,6 @@
     "disable-gamedvr",
     "disable-xbox-gamebar",
     "gpu-scheduling",
-    "disable-nagle-algorithm",
     "disable-network-throttling",
     "disable-usb-selective-suspend",
     "optimize-services",

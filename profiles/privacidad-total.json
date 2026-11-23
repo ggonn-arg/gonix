@@ -16,7 +16,6 @@
     "disable-activity-history",
     "disable-location-tracking",
     "disable-consumer-features",
-    "disable-defender-samples",
-    "disable-wifi-sense"
+    "disable-defender-samples"
   ]
 }

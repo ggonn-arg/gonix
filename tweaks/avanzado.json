@@ -1,27 +1,23 @@
 [
   {
-    "id": "ultimate-performance-plan", "nombre": "⚠️ Plan Máximo Rendimiento", "descripcion": "ADVERTENCIA: Mucho consumo y calor.", "riesgo": "alto", "tipo": "comando",
-    "comando": "powercfg -duplicatescheme e9a42b02-d5df-448d-aa00-03f14749eb61; powercfg -setactive e9a42b02-d5df-448d-aa00-03f14749eb61",
-    "comandoOriginal": "powercfg -setactive 381b4222-f694-41f0-9685-ff5bb260df2e"
+    "id": "ultimate-performance-plan", "nombre": "⚠️ Plan Máximo Rendimiento", "descripcion": "ADVERTENCIA: Mucho consumo y calor.", "riesgo": "alto", "tipo": "accion",
+    "accion": "ultimate-performance-plan"
   },
   {
-    "id": "disable-core-parking", "nombre": "⚠️ Desactivar Core Parking", "descripcion": "ADVERTENCIA: Más calor y consumo.", "riesgo": "alto", "tipo": "comando",
-    "comando": "powercfg -setacvalueindex SCHEME_CURRENT SUB_PROCESSOR CPMINCORES 100; powercfg -setactive SCHEME_CURRENT",
-    "comandoOriginal": "powercfg -setacvalueindex SCHEME_CURRENT SUB_PROCESSOR CPMINCORES 0; powercfg -setactive SCHEME_CURRENT"
+    "id": "disable-core-parking", "nombre": "⚠️ Desactivar Core Parking", "descripcion": "ADVERTENCIA: Más calor y consumo.", "riesgo": "alto", "tipo": "accion",
+    "accion": "disable-core-parking"
   },
   {
     "id": "win32-priority-separation", "nombre": "⚠️ Priorizar Primer Plano", "descripcion": "ADVERTENCIA: Puede causar BSOD.", "riesgo": "alto", "tipo": "registro",
     "cambios": [ { "ruta": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\PriorityControl", "nombre": "Win32PrioritySeparation", "valor": 40, "tipoValor": "DWord" } ]
   },
   {
-    "id": "disable-bitlocker", "nombre": "⚠️ Desactivar BitLocker", "descripcion": "ADVERTENCIA: Elimina encriptación del disco.", "riesgo": "alto", "tipo": "comando",
-    "comando": "Get-BitLockerVolume | Disable-BitLocker",
-    "comandoOriginal": "Write-Host 'No se puede reactivar automáticamente. Usá el Panel de Control.'"
+    "id": "disable-bitlocker", "nombre": "⚠️ Desactivar BitLocker", "descripcion": "ADVERTENCIA: Elimina encriptación del disco.", "riesgo": "alto", "tipo": "accion",
+    "accion": "disable-bitlocker", "reversible": false
   },
   {
-    "id": "disable-windows-ai", "nombre": "⚠️ Desactivar y Eliminar Windows AI", "descripcion": "ADVERTENCIA: Elimina componentes de IA (Recall, etc.).", "riesgo": "alto", "tipo": "comando",
-    "comando": "Dism /Online /Disable-Feature /FeatureName:Recall /NoRestart",
-    "comandoOriginal": "Write-Host 'Para reactivar, usá el Panel de Control de Windows.'"
+    "id": "disable-windows-ai", "nombre": "⚠️ Desactivar y Eliminar Windows AI", "descripcion": "ADVERTENCIA: Elimina componentes de IA (Recall, etc.).", "riesgo": "alto", "tipo": "accion",
+    "accion": "disable-windows-ai", "reversible": false
   },
   {
     "id": "disable-edge-debloat", "nombre": "⚠️ Debloat de Microsoft Edge", "descripcion": "ADVERTENCIA: Desactiva funciones de segundo plano de Edge.", "riesgo": "alto", "tipo": "registro",
@@ -32,9 +28,8 @@
     "cambios": [ { "ruta": "HKCU:\\System\\GameConfigStore", "nombre": "GameDVR_FSEBehaviorMode", "valor": 2, "tipoValor": "DWord" } ]
   },
   {
-    "id": "uninstall-edge", "nombre": "⚠️ Eliminar Microsoft Edge", "descripcion": "ADVERTENCIA: Elimina Edge del sistema. Algunos componentes de Windows lo necesitan.", "riesgo": "alto", "tipo": "comando",
-    "comando": "Get-AppxPackage *MicrosoftEdge* | Remove-AppxPackage",
-    "comandoOriginal": "Write-Host 'Reinstalar Edge requiere herramientas de terceros.'"
+    "id": "disable-system-responsiveness", "nombre": "⚠️ Limitar Reserva de CPU", "descripcion": "ADVERTENCIA: Modifica SystemResponsiveness y puede afectar servicios multimedia.", "riesgo": "alto", "tipo": "registro",
+    "cambios": [ { "ruta": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile", "nombre": "SystemResponsiveness", "valor": 10, "tipoValor": "DWord" } ]
   },
   {
     "id": "set-time-utc", "nombre": "⚠️ Establecer Hora en UTC", "descripcion": "Útil para Dual Boot con Linux. Puede desajustar la hora en Windows.", "riesgo": "alto", "tipo": "registro",
