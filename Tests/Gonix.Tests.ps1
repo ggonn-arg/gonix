@@ -116,6 +116,87 @@ Describe 'Historial de tweaks de registro' {
         $property = Get-ItemProperty -LiteralPath $script:testKey -Name 'NewValue' -ErrorAction SilentlyContinue
         @($property).Count | Should -Be 0
     }
+
+    It 'desactiva solo el tweak seleccionado y restaura su valor previo' {
+        Set-ItemProperty -LiteralPath $script:testKey -Name 'ToggleValue' -Value 7 -Type DWord
+        Set-ItemProperty -LiteralPath $script:testKey -Name 'OtherValue' -Value 4 -Type DWord
+
+        $toggle = [pscustomobject]@{
+            id = 'test-toggle'
+            tipo = 'registro'
+            cambios = @([pscustomobject]@{
+                ruta = $script:testKey
+                nombre = 'ToggleValue'
+                valor = 1
+                tipoValor = 'DWord'
+            })
+        }
+        $other = [pscustomobject]@{
+            id = 'test-other'
+            tipo = 'registro'
+            cambios = @([pscustomobject]@{
+                ruta = $script:testKey
+                nombre = 'OtherValue'
+                valor = 2
+                tipoValor = 'DWord'
+            })
+        }
+
+        (Invoke-TweakApply -Tweak $toggle).Estado | Should -Be 'ok'
+        (Invoke-TweakApply -Tweak $other).Estado | Should -Be 'ok'
+        Save-History
+
+        $result = Undo-Tweak -TweakId 'test-toggle'
+        $result.Ok | Should -Be 1
+        $result.Fallos | Should -Be 0
+        (Get-ItemPropertyValue -LiteralPath $script:testKey -Name 'ToggleValue') | Should -Be 7
+        (Get-ItemPropertyValue -LiteralPath $script:testKey -Name 'OtherValue') | Should -Be 2
+        @((Read-History) | Where-Object { $_.TweakId -eq 'test-toggle' }).Count | Should -Be 0
+        @((Read-History) | Where-Object { $_.TweakId -eq 'test-other' }).Count | Should -Be 1
+    }
+
+    It 'elimina al desactivar un valor que no existia antes' {
+        $tweak = [pscustomobject]@{
+            id = 'test-toggle-remove'
+            tipo = 'registro'
+            cambios = @([pscustomobject]@{
+                ruta = $script:testKey
+                nombre = 'ToggleNewValue'
+                valor = 1
+                tipoValor = 'DWord'
+            })
+        }
+
+        (Invoke-TweakApply -Tweak $tweak).Estado | Should -Be 'ok'
+        Save-History
+        (Undo-Tweak -TweakId 'test-toggle-remove').Ok | Should -Be 1
+        $property = Get-ItemProperty -LiteralPath $script:testKey -Name 'ToggleNewValue' -ErrorAction SilentlyContinue
+        @($property).Count | Should -Be 0
+    }
+
+    It 'al volver a elegir un tweak activo en el menú lo desactiva' {
+        Set-ItemProperty -LiteralPath $script:testKey -Name 'MenuToggleValue' -Value 9 -Type DWord
+        $tweak = [pscustomobject]@{
+            id = 'test-menu-toggle'
+            nombre = 'Tweak de prueba'
+            tipo = 'registro'
+            cambios = @([pscustomobject]@{
+                ruta = $script:testKey
+                nombre = 'MenuToggleValue'
+                valor = 1
+                tipoValor = 'DWord'
+            })
+        }
+        $script:TweakIndex[$tweak.id] = $tweak
+        (Invoke-TweakApply -Tweak $tweak).Estado | Should -Be 'ok'
+        Save-History
+        Mock Confirm-Gonix { return $true }
+
+        Invoke-TweakSet -Ids @($tweak.id) -Alternar
+
+        (Get-ItemPropertyValue -LiteralPath $script:testKey -Name 'MenuToggleValue') | Should -Be 9
+        @((Read-History) | Where-Object { $_.TweakId -eq $tweak.id }).Count | Should -Be 0
+    }
 }
 
 Describe 'Seguridad basica del proyecto' {

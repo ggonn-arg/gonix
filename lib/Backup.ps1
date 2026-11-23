@@ -24,7 +24,13 @@ function Read-History {
     try {
         $raw = Get-Content -LiteralPath $p -Raw -Encoding UTF8
         if ([string]::IsNullOrWhiteSpace($raw)) { return @() }
-        return @($raw | ConvertFrom-Json)
+        $historial = $raw | ConvertFrom-Json
+        if ($historial -is [array]) {
+            foreach ($entrada in $historial) { Write-Output $entrada }
+        }
+        else {
+            Write-Output $historial
+        }
     }
     catch {
         try { Move-Item -LiteralPath $p -Destination ("$p.corrupto-" + (Get-Date -Format 'yyyyMMddHHmmss')) -Force } catch {}
@@ -94,6 +100,72 @@ function Get-Lotes {
     return @($res | Sort-Object -Property Fecha -Descending)
 }
 
+function Invoke-HistoryUndoEntry {
+    param($Entrada)
+
+    switch ($Entrada.Tipo) {
+        'registro' {
+            if ($Entrada.Existia) {
+                $tipo = if ($Entrada.TipoValor) { $Entrada.TipoValor } else { 'DWord' }
+                Set-RegValue -Ruta $Entrada.Ruta -Nombre $Entrada.Nombre -Valor $Entrada.ValorAnterior -Tipo $tipo
+            }
+            else {
+                Remove-RegValue -Ruta $Entrada.Ruta -Nombre $Entrada.Nombre
+            }
+        }
+        'accion' {
+            $h = $script:Acciones[$Entrada.Accion]
+            if (-not $h) { throw "Acción desconocida: $($Entrada.Accion)" }
+            $sb = $h.Undo
+            [void](& $sb $Entrada.Datos)
+        }
+        default { throw 'Entrada de historial inválida (sin tipo).' }
+    }
+}
+
+function Undo-Tweak {
+    param([string]$TweakId)
+
+    $todas = @(Read-History)
+    $candidatos = @($todas | Where-Object { $_.TweakId -eq $TweakId })
+    if ($candidatos.Count -eq 0) {
+        return [pscustomobject]@{ Ok = 0; Fallos = 0; Total = 0 }
+    }
+
+    $lote = [string](($candidatos | Sort-Object -Property Lote -Descending | Select-Object -First 1).Lote)
+    $indices = New-Object System.Collections.Generic.List[int]
+    for ($i = 0; $i -lt $todas.Count; $i++) {
+        if ($todas[$i].TweakId -eq $TweakId -and [string]$todas[$i].Lote -eq $lote) {
+            $indices.Add($i)
+        }
+    }
+
+    $revertidos = @{}
+    $fallos = 0
+    for ($i = $indices.Count - 1; $i -ge 0; $i--) {
+        $indice = $indices[$i]
+        $entrada = $todas[$indice]
+        try {
+            Invoke-HistoryUndoEntry -Entrada $entrada
+            $revertidos[$indice] = $true
+        }
+        catch {
+            $fallos++
+            Write-Fail "No se pudo desactivar '$TweakId': $($_.Exception.Message)"
+            Write-Log ('TOGGLE FALLO {0}: {1}' -f $TweakId, $_.Exception.Message)
+        }
+    }
+
+    $resto = @()
+    for ($i = 0; $i -lt $todas.Count; $i++) {
+        if (-not $revertidos.ContainsKey($i)) { $resto += $todas[$i] }
+    }
+    Write-History -Lista $resto
+    $ok = $indices.Count - $fallos
+    Write-Log "TOGGLE $TweakId : $ok ok, $fallos con error"
+    return [pscustomobject]@{ Ok = $ok; Fallos = $fallos; Total = $indices.Count }
+}
+
 function Undo-Lote {
     param([string]$Lote)
     $todas = @(Read-History)
@@ -104,24 +176,7 @@ function Undo-Lote {
     for ($i = $del.Count - 1; $i -ge 0; $i--) {
         $e = $del[$i]
         try {
-            switch ($e.Tipo) {
-                'registro' {
-                    if ($e.Existia) {
-                        $tipo = if ($e.TipoValor) { $e.TipoValor } else { 'DWord' }
-                        Set-RegValue -Ruta $e.Ruta -Nombre $e.Nombre -Valor $e.ValorAnterior -Tipo $tipo
-                    }
-                    else {
-                        Remove-RegValue -Ruta $e.Ruta -Nombre $e.Nombre
-                    }
-                }
-                'accion' {
-                    $h = $script:Acciones[$e.Accion]
-                    if (-not $h) { throw "Acción desconocida: $($e.Accion)" }
-                    $sb = $h.Undo
-                    [void](& $sb $e.Datos)
-                }
-                default { throw 'Entrada de historial inválida (sin tipo).' }
-            }
+            Invoke-HistoryUndoEntry -Entrada $e
             $ok++
         }
         catch {

@@ -41,7 +41,7 @@
 
 Abrí **PowerShell como administrador** y pegá:
 
-Descargá `Lanzador.ps1` desde el release publicado más reciente y ejecútalo como administrador.
+Descargá `Lanzador.ps1` desde la sección Releases y ejecútalo como administrador. El lanzador incluido descarga la versión fija `v0.1` y verifica el SHA256 del ZIP antes de ejecutarlo.
 
 Descarga Gonix a una carpeta temporal, lo ejecuta y borra los archivos descargados al cerrar. El historial de cambios **no** se borra: se guarda en `%ProgramData%\Gonix`.
 
@@ -73,10 +73,10 @@ El lanzador incluido usa una versión fija y verifica el paquete antes de ejecut
 
 ### Cómo se usan los menús
 
-- Escribí el **número** de lo que querés aplicar. Podés elegir varios: `1,3,5-7`.
+- Escribí el **número** del tweak para activarlo o desactivarlo. Si aparece `[ON]` y Gonix guardó el valor previo, elegirlo otra vez lo restaura. Podés elegir varios: `1,3,5-7`.
 - `d 3` muestra el **detalle** del tweak 3: qué clave cambia, su valor actual y el nuevo.
 - `A` aplica todos los pendientes de **riesgo bajo** de la categoría.
-- Marcas en la lista: `[ON]` ya aplicado, `[  ]` pendiente, `[??]` no se puede detectar.
+- Marcas en la lista: `[ON]` ya aplicado, `[  ]` pendiente, `[??]` no se puede detectar (si Gonix lo aplicó, el historial permite reconocerlo).
 - Colores: blanco = riesgo bajo, amarillo = medio, rojo = alto.
 
 ### Niveles de riesgo
@@ -106,6 +106,8 @@ Los tweaks que ya están aplicados se omiten solos.
 ## Cómo funciona "Deshacer"
 
 - Antes de cada cambio, Gonix guarda el valor anterior en `%ProgramData%\Gonix\historial.json`.
+- Al volver a seleccionar un tweak activo desde el menú individual, Gonix revierte solo ese tweak y restaura el valor anterior; los demás cambios del mismo lote quedan aplicados.
+- Si un tweak ya estaba activo antes de usar Gonix y no hay un valor previo guardado, Gonix avisa y no inventa un valor para revertirlo.
 - Los cambios de una misma operación forman un **lote**. Desde **Historial y deshacer** elegís un lote y se revierte completo.
 - Si algo no se puede revertir, Gonix te lo dice y lo deja en el historial para reintentar.
 - El historial **nunca se ejecuta como código**: el deshacer solo usa acciones internas de Gonix.
