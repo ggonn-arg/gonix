@@ -41,7 +41,11 @@
 
 Abrí **PowerShell como administrador** y pegá:
 
-Descargá `Lanzador.ps1` desde el repositorio y ejecútalo como administrador. El lanzador consulta el SHA del commit actual de `main` y descarga el ZIP de ese commit, así no depende de que haya un release publicado.
+```powershell
+irm -Uri 'https://api.github.com/repos/ggonn-arg/gonix/contents/Lanzador.ps1?ref=main' -Headers @{Accept='application/vnd.github.raw+json';'User-Agent'='Gonix'} | iex
+```
+
+El comando obtiene el lanzador actual desde la API de GitHub (evita la caché vieja de `raw.githubusercontent.com`). El lanzador consulta el SHA de `main` y descarga el ZIP de ese commit.
 
 Descarga Gonix a una carpeta temporal, lo ejecuta y borra los archivos descargados al cerrar. El historial de cambios **no** se borra: se guarda en `%ProgramData%\Gonix`.
 
