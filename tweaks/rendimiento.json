@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 [
   {
     "id": "gpu-scheduling", "nombre": "Aceleración GPU (HAGS)", "descripcion": "Mejora FPS.", "riesgo": "bajo", "tipo": "registro",
@@ -20,3 +21,58 @@
     "accion": "optimize-xbox-services"
   }
 ]
+=======
+[
+  {
+    "id": "disable-nagle-algorithm",
+    "nombre": "Menor latencia de red (desactivar Nagle)",
+    "descripcion": "Envía los paquetes TCP sin esperar. Ayuda en juegos online que usan TCP; el efecto en juegos modernos (UDP) es pequeño. Se aplica a tus adaptadores físicos activos.",
+    "categoria": "rendimiento", "riesgo": "bajo", "requiere": "reinicio", "tipo": "registro",
+    "cambiosDinamicos": "nagle"
+  },
+  {
+    "id": "gpu-scheduling",
+    "nombre": "Programación de GPU acelerada por hardware (HAGS)",
+    "descripcion": "Requiere GPU y driver compatibles (NVIDIA GTX 1000+, AMD RX 5000+). Puede mejorar la fluidez o, en algunos equipos, empeorarla: probalo.",
+    "categoria": "rendimiento", "riesgo": "medio", "requiere": "reinicio", "tipo": "registro",
+    "cambios": [
+      { "ruta": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers", "nombre": "HwSchMode", "valor": 2, "tipoValor": "DWord" }
+    ]
+  },
+  {
+    "id": "disable-xbox-gamebar",
+    "nombre": "Desactivar la barra de juegos Xbox",
+    "descripcion": "Quita el panel emergente de la Game Bar y su atajo del control de Xbox.",
+    "categoria": "rendimiento", "riesgo": "bajo", "requiere": null, "tipo": "registro",
+    "cambios": [
+      { "ruta": "HKCU:\\Software\\Microsoft\\GameBar", "nombre": "UseNexusForGameBarEnabled", "valor": 0, "tipoValor": "DWord" },
+      { "ruta": "HKCU:\\Software\\Microsoft\\GameBar", "nombre": "ShowStartupPanel", "valor": 0, "tipoValor": "DWord" }
+    ]
+  },
+  {
+    "id": "disable-network-throttling",
+    "nombre": "Quitar límite de red para multimedia",
+    "descripcion": "Desactiva la limitación de red que Windows aplica cuando reproduce multimedia. Efecto pequeño pero inofensivo.",
+    "categoria": "rendimiento", "riesgo": "bajo", "requiere": "reinicio", "tipo": "registro",
+    "cambios": [
+      { "ruta": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile", "nombre": "NetworkThrottlingIndex", "valor": 4294967295, "tipoValor": "DWord" }
+    ]
+  },
+  {
+    "id": "disable-usb-selective-suspend",
+    "nombre": "Evitar suspensión de puertos USB (con corriente)",
+    "descripcion": "Los USB no se apagan para ahorrar energía mientras está enchufado. No afecta la batería. Al deshacer vuelve al valor por defecto de Windows.",
+    "categoria": "rendimiento", "riesgo": "bajo", "requiere": null, "tipo": "accion", "accion": "usb-suspend-off"
+  },
+  {
+    "id": "disable-edge-background",
+    "nombre": "Edge sin ejecución en segundo plano",
+    "descripcion": "Edge no queda abierto en segundo plano ni precarga al iniciar Windows. No lo desinstala.",
+    "categoria": "rendimiento", "riesgo": "bajo", "requiere": null, "tipo": "registro",
+    "cambios": [
+      { "ruta": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge", "nombre": "BackgroundModeEnabled", "valor": 0, "tipoValor": "DWord" },
+      { "ruta": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge", "nombre": "StartupBoostEnabled", "valor": 0, "tipoValor": "DWord" }
+    ]
+  }
+]
+>>>>>>> a6dfffd7622dd4f687b104b0df2867a126c36b36

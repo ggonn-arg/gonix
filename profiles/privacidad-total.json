@@ -1,21 +1,25 @@
 {
   "nombre": "Perfil Privacidad Total",
-  "descripcion": "Aplica TODOS los tweaks de privacidad posibles. Bloquea telemetría, voz, ubicación y rastreo de Microsoft.",
+  "descripcion": "Aplica los ajustes de privacidad disponibles en Gonix (telemetría, sugerencias, widgets, búsqueda, Copilot, Recall, voz, comentarios, historial, ubicación y Defender).",
   "tweaks": [
     "disable-telemetry",
-    "disable-cortana",
     "disable-start-suggestions",
+    "disable-consumer-features",
     "disable-widgets",
     "disable-windows-search-bing",
     "disable-background-apps",
     "disable-copilot",
+    "disable-windows-recall",
     "disable-advertising-id",
     "disable-tailored-experiences",
     "disable-online-speech-privacy",
     "disable-feedback",
     "disable-activity-history",
     "disable-location-tracking",
+<<<<<<< HEAD
     "disable-consumer-features",
+=======
+>>>>>>> a6dfffd7622dd4f687b104b0df2867a126c36b36
     "disable-defender-samples"
   ]
 }

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 [
   {
     "id": "ultimate-performance-plan", "nombre": "⚠️ Plan Máximo Rendimiento", "descripcion": "ADVERTENCIA: Mucho consumo y calor.", "riesgo": "alto", "tipo": "accion",
@@ -36,3 +37,48 @@
     "cambios": [ { "ruta": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\TimeZoneInformation", "nombre": "RealTimeIsUniversal", "valor": 1, "tipoValor": "DWord" } ]
   }
 ]
+=======
+[
+  {
+    "id": "ultimate-performance-plan",
+    "nombre": "Plan de energía 'Máximo rendimiento'",
+    "descripcion": "Mucho más consumo y calor. No disponible en equipos con Modern Standby (muchas notebooks). Al deshacer vuelve el plan anterior y se borra el nuevo.",
+    "categoria": "avanzado", "riesgo": "alto", "requiere": null, "tipo": "accion", "accion": "plan-ultimate"
+  },
+  {
+    "id": "disable-core-parking",
+    "nombre": "Desactivar Core Parking",
+    "descripcion": "Mantiene todos los núcleos del CPU despiertos (con corriente). Más calor y consumo en reposo.",
+    "categoria": "avanzado", "riesgo": "alto", "requiere": null, "tipo": "accion", "accion": "core-parking-off"
+  },
+  {
+    "id": "win32-priority-separation",
+    "nombre": "Priorizar el programa en primer plano",
+    "descripcion": "Valor 0x28 (40): turnos de CPU cortos y fijos. Efecto sutil; en equipos con muchas tareas de fondo puede ir peor.",
+    "categoria": "avanzado", "riesgo": "alto", "requiere": "reinicio", "tipo": "registro",
+    "cambios": [
+      { "ruta": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\PriorityControl", "nombre": "Win32PrioritySeparation", "valor": 40, "tipoValor": "DWord" }
+    ]
+  },
+  {
+    "id": "disable-fso",
+    "nombre": "Desactivar optimizaciones de pantalla completa",
+    "descripcion": "Puede bajar la latencia en algunos juegos, pero también causar parpadeos o colores raros en ciertos monitores.",
+    "categoria": "avanzado", "riesgo": "alto", "requiere": null, "tipo": "registro",
+    "cambios": [
+      { "ruta": "HKCU:\\System\\GameConfigStore", "nombre": "GameDVR_FSEBehaviorMode", "valor": 2, "tipoValor": "DWord" },
+      { "ruta": "HKCU:\\System\\GameConfigStore", "nombre": "GameDVR_HonorUserFSEBehaviorMode", "valor": 1, "tipoValor": "DWord" },
+      { "ruta": "HKCU:\\System\\GameConfigStore", "nombre": "GameDVR_DXGIHonorFSEWindowsCompatible", "valor": 1, "tipoValor": "DWord" }
+    ]
+  },
+  {
+    "id": "set-time-utc",
+    "nombre": "Reloj del BIOS en UTC",
+    "descripcion": "Solo para doble arranque con Linux. Si no tenés Linux, la hora de Windows quedará desfasada.",
+    "categoria": "avanzado", "riesgo": "alto", "requiere": "reinicio", "tipo": "registro",
+    "cambios": [
+      { "ruta": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\TimeZoneInformation", "nombre": "RealTimeIsUniversal", "valor": 1, "tipoValor": "DWord" }
+    ]
+  }
+]
+>>>>>>> a6dfffd7622dd4f687b104b0df2867a126c36b36

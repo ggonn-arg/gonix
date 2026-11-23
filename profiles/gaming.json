@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {
   "nombre": "Perfil Gaming Extremo (Máximo FPS y Cero Lag)",
   "descripcion": "Optimiza el sistema para jugar: sin telemetría, red optimizada, GPU al máximo y sin apps de fondo. (No incluye tweaks de riesgo).",
@@ -18,3 +19,23 @@
     "disable-mouse-acceleration"
   ]
 }
+=======
+{
+  "nombre": "Gaming",
+  "descripcion": "Menos tareas de fondo, mejor red y puntero 1:1. Incluye HAGS (riesgo medio): probalo y, si notás problemas, deshacelo desde el historial.",
+  "tweaks": [
+    "disable-telemetry",
+    "disable-background-apps",
+    "disable-gamedvr",
+    "disable-xbox-gamebar",
+    "disable-mouse-acceleration",
+    "disable-nagle-algorithm",
+    "disable-network-throttling",
+    "disable-usb-selective-suspend",
+    "gpu-scheduling",
+    "disable-edge-background",
+    "disable-advertising-id",
+    "disable-tailored-experiences"
+  ]
+}
+>>>>>>> a6dfffd7622dd4f687b104b0df2867a126c36b36
