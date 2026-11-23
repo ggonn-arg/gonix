@@ -1,77 +1,123 @@
 [
   {
-    "id": "disable-hibernation", "nombre": "Desactivar Hibernación", "descripcion": "Libera espacio.", "riesgo": "bajo", "tipo": "comando",
-    "comando": "powercfg -h off", "comandoOriginal": "powercfg -h on"
+    "id": "disable-hibernation",
+    "nombre": "Desactivar hibernación",
+    "descripcion": "Libera varios GB (hiberfil.sys) y desactiva también el Inicio rápido. No recomendado en notebooks si usás hibernar.",
+    "categoria": "sistema", "riesgo": "bajo", "requiere": null, "tipo": "accion", "accion": "hibernacion-off"
   },
   {
-    "id": "enable-hibernation-laptops", "nombre": "Activar Hibernación (Notebooks)", "descripcion": "Ahorra batería en laptops con Connected Standby.", "riesgo": "bajo", "tipo": "comando",
-    "comando": "powercfg -h on", "comandoOriginal": "powercfg -h off"
+    "id": "disable-gamedvr",
+    "nombre": "Desactivar grabación en segundo plano (GameDVR)",
+    "descripcion": "Evita la captura de juego en segundo plano, que puede bajar los FPS.",
+    "categoria": "sistema", "riesgo": "bajo", "requiere": "sesion", "tipo": "registro",
+    "cambios": [
+      { "ruta": "HKCU:\\System\\GameConfigStore", "nombre": "GameDVR_Enabled", "valor": 0, "tipoValor": "DWord" },
+      { "ruta": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\GameDVR", "nombre": "AppCaptureEnabled", "valor": 0, "tipoValor": "DWord" },
+      { "ruta": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\GameDVR", "nombre": "AllowGameDVR", "valor": 0, "tipoValor": "DWord" }
+    ]
   },
   {
-    "id": "disable-gamedvr", "nombre": "Desactivar GameDVR", "descripcion": "Evita caídas de FPS.", "riesgo": "bajo", "tipo": "registro",
-    "cambios": [ { "ruta": "HKCU:\\System\\GameConfigStore", "nombre": "GameDVR_Enabled", "valor": 0, "tipoValor": "DWord" } ]
+    "id": "disable-background-apps",
+    "nombre": "Desactivar apps en segundo plano",
+    "descripcion": "Las apps de la Tienda no corren cuando no las usás. Algunas pueden dejar de avisarte de novedades (Correo, Calendario).",
+    "categoria": "sistema", "riesgo": "bajo", "requiere": "sesion", "tipo": "registro",
+    "cambios": [
+      { "ruta": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\BackgroundAccessApplications", "nombre": "GlobalUserDisabled", "valor": 1, "tipoValor": "DWord" },
+      { "ruta": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Search", "nombre": "BackgroundAppGlobalToggle", "valor": 0, "tipoValor": "DWord" }
+    ]
   },
   {
-    "id": "disable-onedrive-startup", "nombre": "Quitar OneDrive del Inicio", "descripcion": "Arranque más rápido.", "riesgo": "bajo", "tipo": "comando",
-    "comando": "Get-Process OneDrive -ErrorAction SilentlyContinue | Stop-Process -Force",
-    "comandoOriginal": "Start-Process OneDrive"
+    "id": "disable-animations",
+    "nombre": "Desactivar animaciones de ventanas",
+    "descripcion": "Minimizar y maximizar sin animación. Se nota más en equipos lentos.",
+    "categoria": "sistema", "riesgo": "bajo", "requiere": "sesion", "tipo": "registro",
+    "cambios": [
+      { "ruta": "HKCU:\\Control Panel\\Desktop\\WindowMetrics", "nombre": "MinAnimate", "valor": "0", "tipoValor": "String" }
+    ]
   },
   {
-    "id": "disable-startup-delay", "nombre": "Eliminar Retraso de Arranque", "descripcion": "Quita 10 seg de espera.", "riesgo": "bajo", "tipo": "registro",
-    "cambios": [ { "ruta": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Serialize", "nombre": "StartupDelayInMSec", "valor": 0, "tipoValor": "DWord" } ]
+    "id": "set-visual-effects-performance",
+    "nombre": "Efectos visuales: mejor rendimiento",
+    "descripcion": "Prioriza velocidad sobre estética (sin transparencias ni sombras). Cambia bastante el aspecto de Windows.",
+    "categoria": "sistema", "riesgo": "bajo", "requiere": "sesion", "tipo": "registro",
+    "cambios": [
+      { "ruta": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\VisualEffects", "nombre": "VisualFXSetting", "valor": 2, "tipoValor": "DWord" }
+    ]
   },
   {
-    "id": "set-dns-cloudflare", "nombre": "DNS Cloudflare", "descripcion": "DNS rápido y privado.", "riesgo": "bajo", "tipo": "comando",
-    "comando": "Get-DnsClientServerAddress -AddressFamily IPv4 | ForEach-Object { Set-DnsClientServerAddress -InterfaceIndex $_.InterfaceIndex -ServerAddresses ('1.1.1.1','1.0.0.1') }",
-    "comandoOriginal": "Set-DnsClientServerAddress -InterfaceIndex (Get-DnsClientServerAddress -AddressFamily IPv4).InterfaceIndex -ResetServerAddresses"
+    "id": "disable-onedrive-startup",
+    "nombre": "Quitar OneDrive del inicio",
+    "descripcion": "OneDrive deja de arrancar con Windows (no se desinstala). Podés abrirlo a mano cuando lo necesites.",
+    "categoria": "sistema", "riesgo": "bajo", "requiere": null, "tipo": "registro",
+    "cambios": [
+      { "ruta": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Run", "nombre": "OneDrive", "eliminar": true }
+    ]
   },
   {
-    "id": "enable-end-task", "nombre": "Finalizar Tarea en Clic Derecho", "descripcion": "Cierra apps colgadas fácilmente.", "riesgo": "bajo", "tipo": "registro",
-    "cambios": [ { "ruta": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced\\TaskbarDeveloperSettings", "nombre": "TaskbarEndTask", "valor": 1, "tipoValor": "DWord" } ]
+    "id": "disable-startup-delay",
+    "nombre": "Eliminar retraso de arranque de apps",
+    "descripcion": "Las apps de inicio arrancan sin la espera artificial de unos segundos.",
+    "categoria": "sistema", "riesgo": "bajo", "requiere": "sesion", "tipo": "registro",
+    "cambios": [
+      { "ruta": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Serialize", "nombre": "StartupDelayInMSec", "valor": 0, "tipoValor": "DWord" }
+    ]
   },
   {
-    "id": "disable-storage-sense", "nombre": "Desactivar Sensor de Almacenamiento", "descripcion": "Evita borrado automático de temporales.", "riesgo": "bajo", "tipo": "registro",
-    "cambios": [ { "ruta": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\StorageSense\\Parameters\\StoragePolicy", "nombre": "01", "valor": 0, "tipoValor": "DWord" } ]
+    "id": "set-dns-cloudflare",
+    "nombre": "DNS de Cloudflare (1.1.1.1)",
+    "descripcion": "Cambia el DNS de tus adaptadores de red físicos activos. Se guarda el DNS anterior para poder restaurarlo.",
+    "categoria": "sistema", "riesgo": "bajo", "requiere": null, "tipo": "accion", "accion": "dns-cloudflare"
   },
   {
-    "id": "disable-teredo", "nombre": "Desactivar Teredo (IPv6)", "descripcion": "Evita problemas de conexión en juegos.", "riesgo": "bajo", "tipo": "comando",
-    "comando": "netsh interface teredo set state disabled",
-    "comandoOriginal": "netsh interface teredo set state type=default"
+    "id": "enable-end-task",
+    "nombre": "'Finalizar tarea' en el clic derecho de la barra",
+    "descripcion": "Permite cerrar apps colgadas con clic derecho sobre su icono de la barra de tareas.",
+    "categoria": "sistema", "riesgo": "bajo", "requiere": null, "tipo": "registro",
+    "cambios": [
+      { "ruta": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced\\TaskbarDeveloperSettings", "nombre": "TaskbarEndTask", "valor": 1, "tipoValor": "DWord" }
+    ]
   },
   {
-    "id": "set-visual-effects-performance", "nombre": "Efectos Visuales a Máximo Rendimiento", "descripcion": "Prioriza velocidad sobre estética.", "riesgo": "bajo", "tipo": "registro",
-    "cambios": [ { "ruta": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\VisualEffects", "nombre": "VisualFXSetting", "valor": 2, "tipoValor": "DWord" } ]
+    "id": "show-file-extensions",
+    "nombre": "Mostrar extensiones de archivo",
+    "descripcion": "Muestra el .exe, .pdf, .txt al final de los nombres. Ayuda a detectar archivos falsos.",
+    "categoria": "sistema", "riesgo": "bajo", "requiere": "sesion", "tipo": "registro",
+    "cambios": [
+      { "ruta": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced", "nombre": "HideFileExt", "valor": 0, "tipoValor": "DWord" }
+    ]
   },
   {
-    "id": "show-file-extensions", "nombre": "Mostrar Extensiones de Archivo", "descripcion": "Muestra el .exe o .txt al final del nombre.", "riesgo": "bajo", "tipo": "registro",
-    "cambios": [ { "ruta": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced", "nombre": "HideFileExt", "valor": 0, "tipoValor": "DWord" } ]
+    "id": "disable-mouse-acceleration",
+    "nombre": "Desactivar aceleración del mouse",
+    "descripcion": "Movimiento 1:1 del puntero, ideal para juegos de puntería. Hay que cerrar sesión para notarlo.",
+    "categoria": "sistema", "riesgo": "bajo", "requiere": "sesion", "tipo": "registro",
+    "cambios": [
+      { "ruta": "HKCU:\\Control Panel\\Mouse", "nombre": "MouseSpeed", "valor": "0", "tipoValor": "String" },
+      { "ruta": "HKCU:\\Control Panel\\Mouse", "nombre": "MouseThreshold1", "valor": "0", "tipoValor": "String" },
+      { "ruta": "HKCU:\\Control Panel\\Mouse", "nombre": "MouseThreshold2", "valor": "0", "tipoValor": "String" }
+    ]
   },
   {
-    "id": "disable-mouse-acceleration", "nombre": "Desactivar Aceleración del Mouse", "descripcion": "Precisión 1:1 (recomendado para gamers).", "riesgo": "bajo", "tipo": "registro",
-    "cambios": [ { "ruta": "HKCU:\\Control Panel\\Mouse", "nombre": "MouseSpeed", "valor": "0", "tipoValor": "String" } ]
+    "id": "disable-sticky-keys",
+    "nombre": "Desactivar atajos de accesibilidad del teclado",
+    "descripcion": "Evita los carteles de Teclas especiales, Filtro y Alternancia al apretar Shift o mantener teclas.",
+    "categoria": "sistema", "riesgo": "bajo", "requiere": "sesion", "tipo": "registro",
+    "cambios": [
+      { "ruta": "HKCU:\\Control Panel\\Accessibility\\StickyKeys", "nombre": "Flags", "valor": "506", "tipoValor": "String" },
+      { "ruta": "HKCU:\\Control Panel\\Accessibility\\Keyboard Response", "nombre": "Flags", "valor": "122", "tipoValor": "String" },
+      { "ruta": "HKCU:\\Control Panel\\Accessibility\\ToggleKeys", "nombre": "Flags", "valor": "58", "tipoValor": "String" }
+    ]
   },
   {
-    "id": "disable-sticky-keys", "nombre": "Desactivar Sticky Keys", "descripcion": "Evita el cartel de teclas pegadas.", "riesgo": "bajo", "tipo": "registro",
-    "cambios": [ { "ruta": "HKCU:\\Control Panel\\Accessibility\\StickyKeys", "nombre": "Flags", "valor": "506", "tipoValor": "String" } ]
+    "id": "disable-diagtrack",
+    "nombre": "Desactivar servicio de telemetría (DiagTrack)",
+    "descripcion": "Detiene el servicio 'Experiencias del usuario conectado y telemetría'. Windows puede reactivarlo con grandes actualizaciones.",
+    "categoria": "sistema", "riesgo": "medio", "requiere": null, "tipo": "accion", "accion": "diagtrack-off"
   },
   {
-    "id": "disable-diagtrack", "nombre": "Desactivar Servicio DiagTrack", "descripcion": "Apaga la telemetría de Experiencias del Usuario.", "riesgo": "medio", "tipo": "comando",
-    "comando": "Stop-Service -Name DiagTrack -Force -ErrorAction SilentlyContinue; Set-Service -Name DiagTrack -StartupType Disabled -ErrorAction SilentlyContinue",
-    "comandoOriginal": "Set-Service -Name DiagTrack -StartupType Automatic; Start-Service -Name DiagTrack"
-  },
-  {
-    "id": "disable-maps-broker", "nombre": "Poner Servicio de Mapas en Manual", "descripcion": "Evita que el servicio de mapas consuma RAM de fondo.", "riesgo": "bajo", "tipo": "comando",
-    "comando": "Set-Service -Name MapsBroker -StartupType Manual -ErrorAction SilentlyContinue",
-    "comandoOriginal": "Set-Service -Name MapsBroker -StartupType Automatic"
-  },
-  {
-    "id": "clean-temp-files", "nombre": "Limpiar Archivos Temporales", "descripcion": "Borra basura del sistema al instante.", "riesgo": "bajo", "tipo": "comando",
-    "comando": "Remove-Item -Path $env:TEMP\\* -Recurse -Force -ErrorAction SilentlyContinue; Remove-Item -Path 'C:\\Windows\\Temp\\*' -Recurse -Force -ErrorAction SilentlyContinue",
-    "comandoOriginal": "Write-Host 'No se puede deshacer la limpieza.'"
-  },
-  {
-    "id": "run-disk-cleanup", "nombre": "Ejecutar Liberador de Espacio", "descripcion": "Abre la herramienta nativa de limpieza de Windows.", "riesgo": "bajo", "tipo": "comando",
-    "comando": "Start-Process cleanmgr -ArgumentList '/sagerun:1'",
-    "comandoOriginal": "Write-Host 'El liberador de espacio es de una sola vía.'"
+    "id": "disable-maps-broker",
+    "nombre": "Servicio de mapas descargados en manual",
+    "descripcion": "El servicio de mapas offline solo arranca cuando una app lo pide.",
+    "categoria": "sistema", "riesgo": "bajo", "requiere": null, "tipo": "accion", "accion": "maps-manual"
   }
 ]

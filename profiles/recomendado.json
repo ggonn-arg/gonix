@@ -1,0 +1,16 @@
+{
+  "nombre": "Recomendado (1 clic)",
+  "descripcion": "Para cualquier PC: menos anuncios y rastreo, y unos ajustes cómodos. Solo tweaks de riesgo bajo, sin tocar rendimiento ni energía.",
+  "tweaks": [
+    "disable-telemetry",
+    "disable-start-suggestions",
+    "disable-consumer-features",
+    "disable-widgets",
+    "disable-windows-search-bing",
+    "disable-advertising-id",
+    "disable-tailored-experiences",
+    "disable-feedback",
+    "show-file-extensions",
+    "enable-end-task"
+  ]
+}

@@ -1,89 +1,92 @@
 [
   {
-    "categoria": "1. Navegadores Web",
+    "categoria": "Navegadores web",
     "apps": [
       { "id": "Google.Chrome", "nombre": "Google Chrome" },
       { "id": "Mozilla.Firefox", "nombre": "Mozilla Firefox" },
-      { "id": "Brave.Brave", "nombre": "Brave Browser" },
+      { "id": "Brave.Brave", "nombre": "Brave" },
       { "id": "Opera.Opera", "nombre": "Opera" },
-      { "id": "Opera.OperaGX", "nombre": "Opera GX (Gamers)" },
+      { "id": "Opera.OperaGX", "nombre": "Opera GX" },
       { "id": "Vivaldi.Vivaldi", "nombre": "Vivaldi" }
     ]
   },
   {
-    "categoria": "2. Juegos y Launchers",
+    "categoria": "Juegos y launchers",
     "apps": [
       { "id": "Valve.Steam", "nombre": "Steam" },
       { "id": "EpicGames.EpicGamesLauncher", "nombre": "Epic Games Launcher" },
       { "id": "GOG.Galaxy", "nombre": "GOG Galaxy" },
       { "id": "Ubisoft.Connect", "nombre": "Ubisoft Connect" },
       { "id": "ElectronicArts.EADesktop", "nombre": "EA App" },
-      { "id": "Blizzard.BattleNet", "nombre": "Battle.net (Blizzard)" },
-      { "id": "Playnite.Playnite", "nombre": "Playnite (Launcher universal)" }
+      { "id": "Blizzard.BattleNet", "nombre": "Battle.net" },
+      { "id": "Playnite.Playnite", "nombre": "Playnite (launcher universal)" }
     ]
   },
   {
-    "categoria": "3. Comunicación y Redes",
+    "categoria": "Comunicación",
     "apps": [
       { "id": "Discord.Discord", "nombre": "Discord" },
       { "id": "WhatsApp.WhatsApp", "nombre": "WhatsApp" },
-      { "id": "Zoom.Zoom", "nombre": "Zoom" },
       { "id": "Telegram.TelegramDesktop", "nombre": "Telegram" },
+      { "id": "Zoom.Zoom", "nombre": "Zoom" },
       { "id": "SlackTechnologies.Slack", "nombre": "Slack" },
-      { "id": "Microsoft.Teams", "nombre": "Microsoft Teams" },
-      { "id": "Skype.Skype", "nombre": "Skype" }
+      { "id": "Microsoft.Teams", "nombre": "Microsoft Teams" }
     ]
   },
   {
-    "categoria": "4. Desarrollo y Programación",
+    "categoria": "Desarrollo",
     "apps": [
       { "id": "Microsoft.VisualStudioCode", "nombre": "Visual Studio Code" },
       { "id": "Git.Git", "nombre": "Git" },
-      { "id": "Python.Python.3.12", "nombre": "Python 3.12" },
-      { "id": "OpenJS.NodeJS", "nombre": "Node.js" },
+      { "id": "GitHub.GitHubDesktop", "nombre": "GitHub Desktop" },
+      { "id": "Python.Python.3.13", "nombre": "Python 3.13" },
+      { "id": "OpenJS.NodeJS.LTS", "nombre": "Node.js (LTS)" },
+      { "id": "Microsoft.WindowsTerminal", "nombre": "Windows Terminal" },
       { "id": "Docker.DockerDesktop", "nombre": "Docker Desktop" },
       { "id": "Postman.Postman", "nombre": "Postman" },
-      { "id": "Microsoft.VisualStudio.2022.Community", "nombre": "Visual Studio 2022" },
-      { "id": "GitHub.GitHubDesktop", "nombre": "GitHub Desktop" },
+      { "id": "Microsoft.VisualStudio.2022.Community", "nombre": "Visual Studio 2022 Community" },
       { "id": "JetBrains.Toolbox", "nombre": "JetBrains Toolbox" }
     ]
   },
   {
-    "categoria": "5. Multimedia (Audio, Video, Diseño)",
+    "categoria": "Multimedia y diseño",
     "apps": [
-      { "id": "VideoLAN.VLC", "nombre": "VLC Media Player" },
+      { "id": "VideoLAN.VLC", "nombre": "VLC" },
       { "id": "Spotify.Spotify", "nombre": "Spotify" },
       { "id": "OBSProject.OBSStudio", "nombre": "OBS Studio" },
       { "id": "Audacity.Audacity", "nombre": "Audacity" },
-      { "id": "GIMP.GIMP", "nombre": "GIMP (Edición de imágenes)" },
-      { "id": "Inkscape.Inkscape", "nombre": "Inkscape (Vectores)" },
-      { "id": "KDE.Kdenlive", "nombre": "Kdenlive (Edición de video)" },
-      { "id": "DaVinciResolve.DaVinciResolve", "nombre": "DaVinci Resolve" }
+      { "id": "HandBrake.HandBrake", "nombre": "HandBrake" },
+      { "id": "ShareX.ShareX", "nombre": "ShareX (capturas)" },
+      { "id": "GIMP.GIMP", "nombre": "GIMP" },
+      { "id": "Inkscape.Inkscape", "nombre": "Inkscape" },
+      { "id": "KDE.Kdenlive", "nombre": "Kdenlive" },
+      { "id": "BlackmagicDesign.DaVinciResolve", "nombre": "DaVinci Resolve" }
     ]
   },
   {
-    "categoria": "6. Utilidades, Documentos y Sistema",
+    "categoria": "Utilidades y sistema",
     "apps": [
       { "id": "7zip.7zip", "nombre": "7-Zip" },
       { "id": "RARLab.WinRAR", "nombre": "WinRAR" },
       { "id": "Notepad++.Notepad++", "nombre": "Notepad++" },
-      { "id": "LibreOffice.LibreOffice", "nombre": "LibreOffice" },
-      { "id": "TheDocumentFoundation.LibreOffice", "nombre": "LibreOffice (Alternativa)" },
-      { "id": "Adobe.Acrobat.Reader.64-bit", "nombre": "Adobe Acrobat Reader" },
+      { "id": "Microsoft.PowerToys", "nombre": "PowerToys" },
+      { "id": "voidtools.Everything", "nombre": "Everything (búsqueda instantánea)" },
+      { "id": "WinDirStat.WinDirStat", "nombre": "WinDirStat (uso del disco)" },
       { "id": "CPUID.CPU-Z", "nombre": "CPU-Z" },
       { "id": "TechPowerUp.GPU-Z", "nombre": "GPU-Z" },
       { "id": "CrystalDewWorld.CrystalDiskInfo", "nombre": "CrystalDiskInfo" },
-      { "id": "qBittorrent.qBittorrent", "nombre": "qBittorrent" }
+      { "id": "Rufus.Rufus", "nombre": "Rufus (USB booteables)" },
+      { "id": "qBittorrent.qBittorrent", "nombre": "qBittorrent" },
+      { "id": "Bitwarden.Bitwarden", "nombre": "Bitwarden (contraseñas)" }
     ]
   },
   {
-    "categoria": "7. Productividad y Oficina",
+    "categoria": "Oficina y productividad",
     "apps": [
-      { "id": "Microsoft.Office", "nombre": "Microsoft Office" },
+      { "id": "TheDocumentFoundation.LibreOffice", "nombre": "LibreOffice" },
+      { "id": "Adobe.Acrobat.Reader.64-bit", "nombre": "Adobe Acrobat Reader" },
       { "id": "Notion.Notion", "nombre": "Notion" },
-      { "id": "Obsidian.Obsidian", "nombre": "Obsidian" },
-      { "id": "Trello.Trello", "nombre": "Trello" },
-      { "id": "Evernote.Evernote", "nombre": "Evernote" }
+      { "id": "Obsidian.Obsidian", "nombre": "Obsidian" }
     ]
   }
 ]

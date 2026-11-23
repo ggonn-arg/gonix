@@ -1,70 +1,141 @@
-﻿[
+[
   {
-    "id": "disable-telemetry", "nombre": "Desactivar Telemetría", "descripcion": "No envía datos a Microsoft.", "riesgo": "bajo", "tipo": "registro",
-    "cambios": [ { "ruta": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection", "nombre": "AllowTelemetry", "valor": 0, "tipoValor": "DWord" } ]
+    "id": "disable-telemetry",
+    "nombre": "Reducir la telemetría",
+    "descripcion": "Baja el envío de datos de diagnóstico al mínimo permitido. En Windows Home/Pro el mínimo es 'Requerido'; solo Enterprise permite apagarla del todo.",
+    "categoria": "privacidad", "riesgo": "bajo", "requiere": null, "tipo": "registro",
+    "cambios": [
+      { "ruta": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection", "nombre": "AllowTelemetry", "valor": 0, "tipoValor": "DWord" }
+    ]
   },
   {
-    "id": "disable-cortana", "nombre": "Desactivar Cortana", "descripcion": "Libera RAM.", "riesgo": "bajo", "tipo": "registro",
-    "cambios": [ { "ruta": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\Windows Search", "nombre": "AllowCortana", "valor": 0, "tipoValor": "DWord" } ]
+    "id": "disable-start-suggestions",
+    "nombre": "Quitar sugerencias y anuncios del Inicio",
+    "descripcion": "Oculta las apps sugeridas y los consejos en el menú Inicio y en Configuración.",
+    "categoria": "privacidad", "riesgo": "bajo", "requiere": "sesion", "tipo": "registro",
+    "cambios": [
+      { "ruta": "HKCU:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager", "nombre": "SubscribedContent-338388Enabled", "valor": 0, "tipoValor": "DWord" },
+      { "ruta": "HKCU:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager", "nombre": "SubscribedContent-338389Enabled", "valor": 0, "tipoValor": "DWord" },
+      { "ruta": "HKCU:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager", "nombre": "SubscribedContent-310093Enabled", "valor": 0, "tipoValor": "DWord" },
+      { "ruta": "HKCU:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager", "nombre": "SubscribedContent-353694Enabled", "valor": 0, "tipoValor": "DWord" },
+      { "ruta": "HKCU:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager", "nombre": "SubscribedContent-353696Enabled", "valor": 0, "tipoValor": "DWord" },
+      { "ruta": "HKCU:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager", "nombre": "SubscribedContent-353698Enabled", "valor": 0, "tipoValor": "DWord" },
+      { "ruta": "HKCU:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager", "nombre": "SystemPaneSuggestionsEnabled", "valor": 0, "tipoValor": "DWord" }
+    ]
   },
   {
-    "id": "disable-start-suggestions", "nombre": "Quitar Anuncios del Inicio", "descripcion": "Sin sugerencias de apps.", "riesgo": "bajo", "tipo": "registro",
-    "cambios": [ { "ruta": "HKCU:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager", "nombre": "SubscribedContent-338388Enabled", "valor": 0, "tipoValor": "DWord" } ]
+    "id": "disable-consumer-features",
+    "nombre": "Bloquear instalación automática de apps sugeridas",
+    "descripcion": "Evita que Windows instale apps promocionadas (juegos, redes sociales) en segundo plano.",
+    "categoria": "privacidad", "riesgo": "bajo", "requiere": null, "tipo": "registro",
+    "cambios": [
+      { "ruta": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\CloudContent", "nombre": "DisableWindowsConsumerFeatures", "valor": 1, "tipoValor": "DWord" },
+      { "ruta": "HKCU:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager", "nombre": "SilentInstalledAppsEnabled", "valor": 0, "tipoValor": "DWord" }
+    ]
   },
   {
-    "id": "disable-widgets", "nombre": "Desactivar Widgets", "descripcion": "Oculta noticias y clima.", "riesgo": "bajo", "tipo": "registro",
-    "cambios": [ { "ruta": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced", "nombre": "TaskbarDa", "valor": 0, "tipoValor": "DWord" } ]
+    "id": "disable-widgets",
+    "nombre": "Desactivar Widgets",
+    "descripcion": "Oculta el panel de noticias y clima de la barra de tareas y evita que corra en segundo plano.",
+    "categoria": "privacidad", "riesgo": "bajo", "requiere": "sesion", "tipo": "registro",
+    "cambios": [
+      { "ruta": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Dsh", "nombre": "AllowNewsAndInterests", "valor": 0, "tipoValor": "DWord" },
+      { "ruta": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced", "nombre": "TaskbarDa", "valor": 0, "tipoValor": "DWord" }
+    ]
   },
   {
-    "id": "disable-windows-search-bing", "nombre": "Quitar Bing", "descripcion": "Búsqueda local limpia.", "riesgo": "bajo", "tipo": "registro",
-    "cambios": [ { "ruta": "HKCU:\\Software\\Policies\\Microsoft\\Windows\\Explorer", "nombre": "DisableSearchBoxSuggestions", "valor": 1, "tipoValor": "DWord" } ]
+    "id": "disable-windows-search-bing",
+    "nombre": "Quitar Bing de la búsqueda",
+    "descripcion": "La búsqueda del Inicio muestra solo resultados locales, sin sugerencias web.",
+    "categoria": "privacidad", "riesgo": "bajo", "requiere": "sesion", "tipo": "registro",
+    "cambios": [
+      { "ruta": "HKCU:\\Software\\Policies\\Microsoft\\Windows\\Explorer", "nombre": "DisableSearchBoxSuggestions", "valor": 1, "tipoValor": "DWord" }
+    ]
   },
   {
-    "id": "disable-background-apps", "nombre": "Desactivar Apps en 2do Plano", "descripcion": "Ahorra RAM.", "riesgo": "bajo", "tipo": "registro",
-    "cambios": [ { "ruta": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\BackgroundAccessApplications", "nombre": "GlobalUserDisabled", "valor": 1, "tipoValor": "DWord" } ]
+    "id": "disable-copilot",
+    "nombre": "Desactivar Copilot",
+    "descripcion": "Aplica la política que oculta y desactiva Windows Copilot.",
+    "categoria": "privacidad", "riesgo": "bajo", "requiere": "sesion", "tipo": "registro",
+    "cambios": [
+      { "ruta": "HKCU:\\Software\\Policies\\Microsoft\\Windows\\WindowsCopilot", "nombre": "TurnOffWindowsCopilot", "valor": 1, "tipoValor": "DWord" },
+      { "ruta": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsCopilot", "nombre": "TurnOffWindowsCopilot", "valor": 1, "tipoValor": "DWord" }
+    ]
   },
   {
-    "id": "disable-animations", "nombre": "Desactivar Animaciones", "descripcion": "Windows más rápido.", "riesgo": "bajo", "tipo": "registro",
-    "cambios": [ { "ruta": "HKCU:\\Control Panel\\Desktop\\WindowMetrics", "nombre": "MinAnimate", "valor": "0", "tipoValor": "String" } ]
+    "id": "disable-windows-recall",
+    "nombre": "Desactivar Recall (análisis de IA)",
+    "descripcion": "Evita que Windows guarde capturas periódicas de pantalla. Solo aplica a equipos Copilot+.",
+    "categoria": "privacidad", "riesgo": "bajo", "requiere": null, "tipo": "registro",
+    "cambios": [
+      { "ruta": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsAI", "nombre": "DisableAIDataAnalysis", "valor": 1, "tipoValor": "DWord" }
+    ]
   },
   {
-    "id": "disable-copilot", "nombre": "Desactivar Copilot", "descripcion": "Sin IA en segundo plano.", "riesgo": "bajo", "tipo": "registro",
-    "cambios": [ { "ruta": "HKCU:\\Software\\Policies\\Microsoft\\Windows\\WindowsCopilot", "nombre": "TurnOffWindowsCopilot", "valor": 1, "tipoValor": "DWord" } ]
+    "id": "disable-advertising-id",
+    "nombre": "Desactivar ID de publicidad",
+    "descripcion": "Las apps no pueden usar tu identificador para mostrarte anuncios personalizados.",
+    "categoria": "privacidad", "riesgo": "bajo", "requiere": null, "tipo": "registro",
+    "cambios": [
+      { "ruta": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\AdvertisingInfo", "nombre": "Enabled", "valor": 0, "tipoValor": "DWord" },
+      { "ruta": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\AdvertisingInfo", "nombre": "DisabledByGroupPolicy", "valor": 1, "tipoValor": "DWord" }
+    ]
   },
   {
-    "id": "disable-advertising-id", "nombre": "Desactivar ID de Publicidad", "descripcion": "Sin anuncios personalizados.", "riesgo": "bajo", "tipo": "registro",
-    "cambios": [ { "ruta": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\AdvertisingInfo", "nombre": "Enabled", "valor": 0, "tipoValor": "DWord" } ]
+    "id": "disable-tailored-experiences",
+    "nombre": "Desactivar experiencias personalizadas",
+    "descripcion": "Windows no usa tus datos de diagnóstico para darte consejos y anuncios a medida.",
+    "categoria": "privacidad", "riesgo": "bajo", "requiere": null, "tipo": "registro",
+    "cambios": [
+      { "ruta": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Privacy", "nombre": "TailoredExperiencesWithDiagnosticDataEnabled", "valor": 0, "tipoValor": "DWord" }
+    ]
   },
   {
-    "id": "disable-tailored-experiences", "nombre": "Desactivar Experiencias", "descripcion": "Sin sugerencias personalizadas.", "riesgo": "bajo", "tipo": "registro",
-    "cambios": [ { "ruta": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Privacy", "nombre": "TailoredExperiencesWithDiagnosticDataEnabled", "valor": 0, "tipoValor": "DWord" } ]
+    "id": "disable-online-speech-privacy",
+    "nombre": "Desactivar reconocimiento de voz en línea",
+    "descripcion": "La voz se procesa en el equipo y no se envía a Microsoft. Los comandos de voz en la nube dejan de funcionar.",
+    "categoria": "privacidad", "riesgo": "bajo", "requiere": null, "tipo": "registro",
+    "cambios": [
+      { "ruta": "HKCU:\\Software\\Microsoft\\Speech_OneCore\\Settings\\OnlineSpeechPrivacy", "nombre": "HasAccepted", "valor": 0, "tipoValor": "DWord" }
+    ]
   },
   {
-    "id": "disable-online-speech-privacy", "nombre": "Desactivar Voz en Línea", "descripcion": "Sin envío de voz.", "riesgo": "bajo", "tipo": "registro",
-    "cambios": [ { "ruta": "HKCU:\\Software\\Microsoft\\Speech_OneCore\\Settings\\OnlineSpeechPrivacy", "nombre": "HasAccepted", "valor": 0, "tipoValor": "DWord" } ]
+    "id": "disable-feedback",
+    "nombre": "Desactivar solicitudes de comentarios",
+    "descripcion": "Windows deja de pedirte opiniones y encuestas.",
+    "categoria": "privacidad", "riesgo": "bajo", "requiere": null, "tipo": "registro",
+    "cambios": [
+      { "ruta": "HKCU:\\Software\\Microsoft\\Siuf\\Rules", "nombre": "NumberOfSIUFInPeriod", "valor": 0, "tipoValor": "DWord" },
+      { "ruta": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection", "nombre": "DoNotShowFeedbackNotifications", "valor": 1, "tipoValor": "DWord" }
+    ]
   },
   {
-    "id": "disable-feedback", "nombre": "Desactivar Comentarios", "descripcion": "No pide opiniones.", "riesgo": "bajo", "tipo": "registro",
-    "cambios": [ { "ruta": "HKCU:\\Software\\Microsoft\\Siuf\\Rules", "nombre": "NumberOfSIUFInPeriod", "valor": 0, "tipoValor": "DWord" } ]
+    "id": "disable-activity-history",
+    "nombre": "Desactivar historial de actividad",
+    "descripcion": "Evita que Windows registre y sincronice las apps y archivos que abrís (Cronología).",
+    "categoria": "privacidad", "riesgo": "bajo", "requiere": null, "tipo": "registro",
+    "cambios": [
+      { "ruta": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\System", "nombre": "EnableActivityFeed", "valor": 0, "tipoValor": "DWord" },
+      { "ruta": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\System", "nombre": "PublishUserActivities", "valor": 0, "tipoValor": "DWord" },
+      { "ruta": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\System", "nombre": "UploadUserActivities", "valor": 0, "tipoValor": "DWord" }
+    ]
   },
   {
-    "id": "disable-activity-history", "nombre": "Historial de Actividad", "descripcion": "Evita que registre apps y archivos abiertos.", "riesgo": "bajo", "tipo": "registro",
-    "cambios": [ { "ruta": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\System", "nombre": "EnableActivityFeed", "valor": 0, "tipoValor": "DWord" } ]
+    "id": "disable-location-tracking",
+    "nombre": "Bloquear acceso a la ubicación",
+    "descripcion": "Ninguna app puede leer tu ubicación. Dejan de funcionar el clima automático, los mapas, 'Buscar mi dispositivo' y la zona horaria automática.",
+    "categoria": "privacidad", "riesgo": "medio", "requiere": null, "tipo": "registro",
+    "cambios": [
+      { "ruta": "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\location", "nombre": "Value", "valor": "Deny", "tipoValor": "String" }
+    ]
   },
   {
-    "id": "disable-location-tracking", "nombre": "Rastreo de Ubicación", "descripcion": "Evita acceso al GPS.", "riesgo": "bajo", "tipo": "registro",
-    "cambios": [ { "ruta": "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\location", "nombre": "Value", "valor": "Deny", "tipoValor": "String" } ]
-  },
-  {
-    "id": "disable-consumer-features", "nombre": "Funciones de Consumidor", "descripcion": "Quita sugerencias de Store.", "riesgo": "bajo", "tipo": "registro",
-    "cambios": [ { "ruta": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager", "nombre": "SilentInstalledAppsEnabled", "valor": 0, "tipoValor": "DWord" } ]
-  },
-  {
-    "id": "disable-defender-samples", "nombre": "Desactivar Muestras de Defender", "descripcion": "No envía archivos sospechosos a Microsoft.", "riesgo": "bajo", "tipo": "registro",
-    "cambios": [ { "ruta": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows Defender\\Spynet", "nombre": "SubmitSamplesConsent", "valor": 2, "tipoValor": "DWord" } ]
-  },
-  {
-    "id": "disable-wifi-sense", "nombre": "Desactivar Wifi-Sense", "descripcion": "Evita compartir contraseñas de WiFi.", "riesgo": "bajo", "tipo": "registro",
-    "cambios": [ { "ruta": "HKLM:\\SOFTWARE\\Microsoft\\WcmSvc\\wifinetworkmanager\\config", "nombre": "AutoConnectAllowedOEM", "valor": 0, "tipoValor": "DWord" } ]
+    "id": "disable-defender-samples",
+    "nombre": "No enviar muestras de Defender a Microsoft",
+    "descripcion": "Defender no sube archivos sospechosos para análisis. La protección en tiempo real sigue activa.",
+    "categoria": "privacidad", "riesgo": "medio", "requiere": null, "tipo": "registro",
+    "cambios": [
+      { "ruta": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows Defender\\Spynet", "nombre": "SubmitSamplesConsent", "valor": 2, "tipoValor": "DWord" }
+    ]
   }
 ]
