@@ -320,6 +320,9 @@ Describe 'Seguridad basica del proyecto' {
         $ui | Should -Not -Match '\$script:InfoSistema'
         $ui | Should -Not -Match "Write-MenuItem '9'"
         $ui | Should -Match 'Get-TweaksByCategory'
+        $mainMenu = [regex]::Match($ui, '(?s)function Show-MainMenu \{(.*?)function Format-WrappedLines').Groups[1].Value
+        $menuNumbers = [regex]::Matches($mainMenu, "Write-MenuItem '(\d)'") | ForEach-Object { $_.Groups[1].Value }
+        ($menuNumbers -join ',') | Should -Be '1,2,3,4,5,6,7,8,0'
     }
 
     It 'todos los perfiles apuntan a tweaks existentes' {

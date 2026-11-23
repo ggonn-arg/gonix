@@ -79,16 +79,16 @@ function Show-MainMenu {
         Write-Host '   OPTIMIZAR' -ForegroundColor DarkCyan
         Write-MenuItem '1' 'Aplicar un perfil (Gaming, Recomendado y más)'
         Write-MenuItem '2' 'Elegir ajustes manualmente'
-        Write-MenuItem '8' 'Ver recomendaciones para juegos'
+        Write-MenuItem '3' 'Ver recomendaciones para juegos'
         Write-Host ''
         Write-Host '   APLICACIONES' -ForegroundColor DarkCyan
-        Write-MenuItem '3' 'Instalar programas'
+        Write-MenuItem '4' 'Instalar programas'
         Write-Host ''
         Write-Host '   MANTENIMIENTO' -ForegroundColor DarkCyan
-        Write-MenuItem '4' 'Ver historial y deshacer cambios'
-        Write-MenuItem '5' 'Configurar actualizaciones de Windows'
-        Write-MenuItem '6' 'Limpiar y reparar Windows'
-        Write-MenuItem '7' 'Crear un punto de restauración'
+        Write-MenuItem '5' 'Ver historial y deshacer cambios'
+        Write-MenuItem '6' 'Configurar actualizaciones de Windows'
+        Write-MenuItem '7' 'Limpiar y reparar Windows'
+        Write-MenuItem '8' 'Crear un punto de restauración'
         Write-Host ''
         Write-MenuItem '0' 'Salir' 'DarkGray'
         Write-Host ''
@@ -96,12 +96,12 @@ function Show-MainMenu {
         switch ($op) {
             '1' { Show-ProfilesMenu }
             '2' { Show-TweaksMenu }
-            '3' { Show-AppInstaller }
-            '4' { Show-HistoryMenu }
-            '5' { Show-UpdateMenu }
-            '6' { Show-MaintenanceMenu }
-            '7' { Show-RestorePointMenu }
-            '8' { Show-GamingAdvisor }
+            '3' { Show-GamingAdvisor }
+            '4' { Show-AppInstaller }
+            '5' { Show-HistoryMenu }
+            '6' { Show-UpdateMenu }
+            '7' { Show-MaintenanceMenu }
+            '8' { Show-RestorePointMenu }
             '0' { Write-Host '   ¡Chau, Gon!' -ForegroundColor Cyan; return }
             default { Write-Warn 'Opción inválida.'; Start-Sleep 1 }
         }
