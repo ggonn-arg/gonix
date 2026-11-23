@@ -66,7 +66,64 @@ function Show-GamingAdvisor {
     }
 
     Write-Info 'Para probar una sola opción, usá Tweaks individuales; el perfil Gaming aplica el conjunto completo.'
-    Write-Info 'Compará el mismo juego y escena antes y después, con FPS promedio y 1% lows.'
+    Write-Info 'Después de probar un cambio, la opción 9 te ayuda a comparar las mediciones.'
+    Wait-Enter
+}
+
+function Read-GamingMetric {
+    param([string]$Pregunta, [switch]$Opcional)
+
+    while ($true) {
+        $texto = Read-Host $Pregunta
+        if ($Opcional -and [string]::IsNullOrWhiteSpace($texto)) { return $null }
+        try { return (ConvertTo-GamingMetric -Texto $texto) }
+        catch { Write-Warn $_.Exception.Message }
+    }
+}
+
+function Write-GamingMetricComparison {
+    param([string]$Nombre, $Resultado)
+
+    $diferencia = '{0:N2}' -f $Resultado.Diferencia
+    $porcentaje = '{0:N1}' -f $Resultado.Porcentaje
+    if ($Resultado.Diferencia -gt 0) { $diferencia = "+$diferencia" }
+    if ($Resultado.Porcentaje -gt 0) { $porcentaje = "+$porcentaje" }
+    Write-Info ('{0}: {1:N1} -> {2:N1} ({3} FPS; {4}%)' -f $Nombre, $Resultado.Antes, $Resultado.Despues, $diferencia, $porcentaje)
+}
+
+function Show-GamingBenchmarkGuide {
+    Write-Banner
+    Write-Host '   --- Comparar mediciones de juego ---' -ForegroundColor Magenta
+    Write-Info 'Usá el benchmark del juego o una herramienta de medición que ya tengas.'
+    Write-Info 'Hacé 3 pasadas antes y 3 después; anotá el promedio de FPS y, si está disponible, el 1% low.'
+    Write-Info 'Mantené iguales la escena, resolución, calidad gráfica, límite de FPS y alimentación.'
+    Write-Info 'Probá un solo tweak por comparación; reiniciá si Gonix lo pide y esperá a que se estabilice la temperatura.'
+    Write-Warn 'No compares FPS con ping: el ping se mide en milisegundos y depende también del servidor y la ruta de red.'
+    Write-Host ''
+    if (-not (Confirm-Gonix '¿Ya tenés las mediciones de antes y después?')) {
+        Write-Info 'Volvé cuando tengas los resultados; Gonix no mide ni guarda FPS automáticamente.'
+        Write-Host ''
+        Wait-Enter
+        return
+    }
+
+    $fpsAntes = Read-GamingMetric 'FPS promedio ANTES (promedio de 3 pasadas)'
+    $lowAntes = Read-GamingMetric '1% low ANTES (Enter si no lo mediste)' -Opcional
+    $fpsDespues = Read-GamingMetric 'FPS promedio DESPUÉS (promedio de 3 pasadas)'
+    $lowDespues = Read-GamingMetric '1% low DESPUÉS (Enter si no lo mediste)' -Opcional
+
+    $resultadoFps = Compare-GamingMetric -Antes $fpsAntes -Despues $fpsDespues
+    Write-Host ''
+    Write-Host '   Resultado observado' -ForegroundColor Cyan
+    Write-GamingMetricComparison -Nombre 'FPS promedio' -Resultado $resultadoFps
+    if ($null -ne $lowAntes -and $null -ne $lowDespues) {
+        $resultadoLow = Compare-GamingMetric -Antes $lowAntes -Despues $lowDespues
+        Write-GamingMetricComparison -Nombre '1% low' -Resultado $resultadoLow
+    } else {
+        Write-Info '1% low: no comparado (hace falta medirlo en ambos momentos).'
+    }
+    Write-Warn 'Una diferencia no prueba que el tweak la causó; repetí la prueba si el resultado es pequeño o inestable.'
+    Write-Host ''
     Wait-Enter
 }
 
@@ -85,6 +142,7 @@ function Show-MainMenu {
         Write-MenuItem '6' 'Limpieza y reparación'
         Write-MenuItem '7' 'Crear punto de restauración'
         Write-MenuItem '8' 'Asistente Gaming (diagnóstico sin cambios)'
+        Write-MenuItem '9' 'Comparar FPS antes/después'
         Write-Host ''
         Write-MenuItem '0' 'Salir' 'DarkGray'
         Write-Host ''
@@ -98,6 +156,7 @@ function Show-MainMenu {
             '6' { Show-MaintenanceMenu }
             '7' { Show-RestorePointMenu }
             '8' { Show-GamingAdvisor }
+            '9' { Show-GamingBenchmarkGuide }
             '0' { Write-Host '   ¡Chau, Gon!' -ForegroundColor Cyan; return }
             default { Write-Warn 'Opción inválida.'; Start-Sleep 1 }
         }

@@ -312,7 +312,9 @@ Describe 'Seguridad basica del proyecto' {
         $ui | Should -Match 'function Show-MainMenu'
         $ui | Should -Match 'function Show-TweaksMenu'
         $ui | Should -Match 'function Show-GamingAdvisor'
+        $ui | Should -Match 'function Show-GamingBenchmarkGuide'
         $ui | Should -Match 'Asistente Gaming'
+        $ui | Should -Match 'Comparar FPS antes/despu.s'
         $ui | Should -Match 'Get-TweaksByCategory'
     }
 
@@ -430,6 +432,15 @@ Describe 'Seguridad basica del proyecto' {
         $energia = @($recomendaciones | Where-Object { $_.Titulo -match 'Energ' })
         $energia[0].Nivel | Should -Be 'ALTO'
         $energia[0].Advertencia | Should -Match 'No lo recomiendo con bater'
+    }
+
+    It 'calcula cambios porcentuales y acepta coma decimal en mediciones' {
+        (ConvertTo-GamingMetric -Texto '60,5') | Should -Be 60.5
+        $resultado = Compare-GamingMetric -Antes 60 -Despues 66
+        $resultado.Diferencia | Should -Be 6
+        $resultado.Porcentaje | Should -Be 10
+        { ConvertTo-GamingMetric -Texto '0' } | Should -Throw
+        { Compare-GamingMetric -Antes 0 -Despues 60 } | Should -Throw
     }
 
     It 'Read-JsonArray carga los objetos individuales en Windows PowerShell' {
