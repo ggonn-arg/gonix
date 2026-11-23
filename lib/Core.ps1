@@ -109,6 +109,19 @@ function Get-NagleChanges {
     return $res
 }
 
+function Get-NagleResetChanges {
+    $base = 'HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\Interfaces'
+    $res = @()
+    foreach ($a in @(Get-NetAdapter -Physical -ErrorAction SilentlyContinue)) {
+        $ruta = "$base\$($a.InterfaceGuid)"
+        if (Test-Path -LiteralPath $ruta) {
+            $res += [pscustomobject]@{ ruta = $ruta; nombre = 'TcpAckFrequency'; eliminar = $true }
+            $res += [pscustomobject]@{ ruta = $ruta; nombre = 'TCPNoDelay'; eliminar = $true }
+        }
+    }
+    return $res
+}
+
 function Get-TweakChanges {
     param($Tweak)
     if ($Tweak.cambiosDinamicos -eq 'nagle') { return @(Get-NagleChanges) }
@@ -164,6 +177,10 @@ $script:Acciones = @{
                 if ($LASTEXITCODE -ne 0) { throw "powercfg devolvió el código $LASTEXITCODE" }
             }
         }
+        Reset = {
+            & powercfg.exe -h on
+            if ($LASTEXITCODE -ne 0) { throw "powercfg devolvió el código $LASTEXITCODE" }
+        }
     }
 
     'dns-cloudflare' = @{
@@ -197,18 +214,36 @@ $script:Acciones = @{
             }
             Clear-DnsClientCache
         }
+        Reset = {
+            $adaptadores = @(Get-NetAdapter -Physical -ErrorAction Stop)
+            if ($adaptadores.Count -eq 0) { throw 'No hay adaptadores de red físicos para restablecer.' }
+            foreach ($a in $adaptadores) {
+                Set-DnsClientServerAddress -InterfaceIndex $a.ifIndex -ResetServerAddresses -ErrorAction Stop
+            }
+            Clear-DnsClientCache
+        }
     }
 
     'diagtrack-off' = @{
         Test  = { Test-ServiceTweak -Nombre 'DiagTrack' -Start 4 }
         Apply = { Set-ServiceTweak -Nombre 'DiagTrack' -Start 4 }
         Undo  = { param($d) Restore-ServiceTweak -Datos $d }
+        Reset = {
+            Set-ServiceStartup -Nombre 'DiagTrack' -Start 2 -Delayed $true
+            Start-Service -Name 'DiagTrack' -ErrorAction Stop
+        }
     }
 
     'maps-manual' = @{
-        Test  = { Test-ServiceTweak -Nombre 'MapsBroker' -Start 3 }
+        Test  = {
+            $s = Get-ServiceStartup 'MapsBroker'
+            if (-not $s) { return $null }
+            if ($s.Start -eq 3) { return $null }
+            return $false
+        }
         Apply = { Set-ServiceTweak -Nombre 'MapsBroker' -Start 3 }
         Undo  = { param($d) Restore-ServiceTweak -Datos $d }
+        Reset = { Set-ServiceStartup -Nombre 'MapsBroker' -Start 3 }
     }
 
     # Solo con corriente (AC). El valor por defecto de Windows es 1 (suspensión habilitada).
@@ -224,6 +259,12 @@ $script:Acciones = @{
             & powercfg.exe -setacvalueindex SCHEME_CURRENT 2a737441-1930-4402-8d77-b2bebba308a3 48e6b7a6-50f5-4782-a5d4-53bb8f07e226 1
             if ($LASTEXITCODE -ne 0) { throw "powercfg devolvió el código $LASTEXITCODE" }
             & powercfg.exe -setactive SCHEME_CURRENT
+        }
+        Reset = {
+            & powercfg.exe -setacvalueindex SCHEME_CURRENT 2a737441-1930-4402-8d77-b2bebba308a3 48e6b7a6-50f5-4782-a5d4-53bb8f07e226 1
+            if ($LASTEXITCODE -ne 0) { throw "powercfg devolvió el código $LASTEXITCODE" }
+            & powercfg.exe -setactive SCHEME_CURRENT
+            if ($LASTEXITCODE -ne 0) { throw "powercfg devolvió el código $LASTEXITCODE" }
         }
     }
 
@@ -243,6 +284,11 @@ $script:Acciones = @{
             & powercfg.exe -setactive $d.Anterior
             if ($LASTEXITCODE -ne 0) { throw "No se pudo reactivar el plan anterior (código $LASTEXITCODE)." }
             & powercfg.exe -delete $d.Nuevo
+        }
+        Reset = {
+            & powercfg.exe -setactive SCHEME_BALANCED
+            if ($LASTEXITCODE -ne 0) { throw "No se pudo activar el plan Equilibrado (código $LASTEXITCODE)." }
+            Write-Warn 'Se activó Equilibrado; sin historial no se puede identificar ni borrar con seguridad el plan duplicado.'
         }
     }
 
@@ -275,6 +321,15 @@ $script:Acciones = @{
             }
             & powercfg.exe -setactive $d.Esquema
         }
+        Reset = {
+            $esquema = Get-ActiveSchemeGuid
+            $ruta = Get-CoreParkingPath $esquema
+            if ((Get-RegState $ruta 'ACSettingIndex').Existe) {
+                Remove-ItemProperty -LiteralPath $ruta -Name 'ACSettingIndex' -Force -ErrorAction Stop
+            }
+            & powercfg.exe -setactive $esquema
+            if ($LASTEXITCODE -ne 0) { throw "powercfg devolvió el código $LASTEXITCODE" }
+        }
     }
 }
 
@@ -293,16 +348,19 @@ function Test-TweakApplied {
         }
         $cambios = @(Get-TweakChanges $Tweak)
         if ($cambios.Count -eq 0) { return $null }
+        $estadoDesconocido = $false
         foreach ($c in $cambios) {
             $s = Get-RegState $c.ruta $c.nombre
             if ($c.eliminar) {
                 if ($s.Existe) { return $false }
+                $estadoDesconocido = $true
                 continue
             }
             if (-not $s.Existe) { return $false }
             $tipo = if ($c.tipoValor) { $c.tipoValor } else { 'DWord' }
             if (-not (Test-RegValueEqual $s.Valor $c.valor $tipo)) { return $false }
         }
+        if ($estadoDesconocido) { return $null }
         return $true
     }
     catch { return $null }
@@ -317,6 +375,50 @@ function Get-TweakAppliedState {
         if ($historial.Count -gt 0) { return $true }
     }
     return $estado
+}
+
+function Invoke-TweakResetToDefault {
+    param($Tweak)
+
+    if ($Tweak.tipo -eq 'accion') {
+        $h = $script:Acciones[$Tweak.accion]
+        if (-not $h -or -not $h.Reset) {
+            throw "No hay un restablecimiento predeterminado definido para '$($Tweak.id)'."
+        }
+        $sb = $h.Reset
+        [void](& $sb)
+    }
+    else {
+        $cambios = if ($Tweak.cambiosDinamicos -eq 'nagle') {
+            @(Get-NagleResetChanges)
+        }
+        else {
+            @(Get-TweakChanges $Tweak)
+        }
+        if ($cambios.Count -eq 0) { throw 'No se encontraron valores para restablecer.' }
+
+        foreach ($c in $cambios) {
+            if ($c.eliminar) {
+                if (-not $c.restablecer) {
+                    throw "No se puede reconstruir el valor eliminado de '$($Tweak.id)' sin historial."
+                }
+                if ($c.restablecer.validarExiste) {
+                    $archivo = [Environment]::ExpandEnvironmentVariables([string]$c.restablecer.validarExiste)
+                    if (-not (Test-Path -LiteralPath $archivo)) {
+                        throw "No se encontró el archivo necesario para restablecer '$($Tweak.id)': $archivo"
+                    }
+                }
+                $tipo = if ($c.restablecer.tipoValor) { $c.restablecer.tipoValor } else { 'String' }
+                $valor = [Environment]::ExpandEnvironmentVariables([string]$c.restablecer.valor)
+                Set-RegValue -Ruta $c.ruta -Nombre $c.nombre -Valor $valor -Tipo $tipo
+            }
+            elseif ((Get-RegState $c.ruta $c.nombre).Existe) {
+                Remove-ItemProperty -LiteralPath $c.ruta -Name $c.nombre -Force -ErrorAction Stop
+            }
+        }
+    }
+
+    Write-Log "RESTABLECER DEFAULT $($Tweak.id)"
 }
 
 function Show-TweakDetail {
@@ -418,11 +520,39 @@ function Invoke-TweakSet {
 
     $pendientes = @()
     $aplicados = @()
+    $sinHistorial = @()
+    $historialActual = if ($Alternar) { @(Read-History) } else { @() }
+    $cancelado = $false
     foreach ($t in $tweaks) {
-        if ((Get-TweakAppliedState $t) -eq $true) {
+        $estado = Get-TweakAppliedState $t
+        if ($Alternar -and $null -eq $estado) {
+            $decision = (Read-Host "   Estado desconocido para '$($t.nombre)'. [A] aplicar / [R] restablecer valor predeterminado / Enter cancelar").Trim().ToUpperInvariant()
+            if ($decision -eq 'R') {
+                $aplicados += $t
+                $sinHistorial += $t
+                Write-Host ('   [restablecer] {0}' -f $t.nombre) -ForegroundColor Yellow
+            }
+            elseif ($decision -eq 'A') {
+                $pendientes += $t
+                Write-Host ('   [  aplicar  ] {0}{1}' -f $t.nombre, (Get-RiskSuffix $t)) -ForegroundColor (Get-RiskColor $t)
+            }
+            else {
+                Write-Warn 'Operación cancelada.'
+                $cancelado = $true
+                break
+            }
+        }
+        elseif ($estado -eq $true) {
             if ($Alternar) {
                 $aplicados += $t
-                Write-Host ('   [desactivar] {0}' -f $t.nombre) -ForegroundColor Yellow
+                $hayHistorial = @($historialActual | Where-Object { $_.TweakId -eq $t.id }).Count -gt 0
+                if (-not $hayHistorial) {
+                    $sinHistorial += $t
+                    Write-Host ('   [restablecer] {0}' -f $t.nombre) -ForegroundColor Yellow
+                }
+                else {
+                    Write-Host ('   [desactivar] {0}' -f $t.nombre) -ForegroundColor Yellow
+                }
             }
             else {
                 Write-Host ('   [ya aplicado] {0}' -f $t.nombre) -ForegroundColor DarkGray
@@ -433,8 +563,13 @@ function Invoke-TweakSet {
             Write-Host ('   [  aplicar  ] {0}{1}' -f $t.nombre, (Get-RiskSuffix $t)) -ForegroundColor (Get-RiskColor $t)
         }
     }
+    if ($cancelado) { return }
     Write-Host ''
     if ($pendientes.Count -eq 0 -and $aplicados.Count -eq 0) { Write-Ok 'Todo esto ya estaba aplicado.'; return }
+
+    if ($sinHistorial.Count -gt 0) {
+        Write-Warn 'Sin historial, se usarán los valores predeterminados documentados de Windows; no se recuperarán personalizaciones anteriores.'
+    }
 
     $hayAlto = @($pendientes | Where-Object { $_.riesgo -eq 'alto' }).Count -gt 0
     if ($hayAlto) {
@@ -443,7 +578,11 @@ function Invoke-TweakSet {
         if ($c -cne 'ACEPTO') { Write-Warn 'Cancelado.'; return }
     }
     else {
-        $pregunta = if ($aplicados.Count -gt 0) {
+        $pregunta = if ($sinHistorial.Count -gt 0) {
+            $conHistorial = $aplicados.Count - $sinHistorial.Count
+            "¿Aplicar $($pendientes.Count), desactivar $conHistorial y restablecer $($sinHistorial.Count) al valor predeterminado?"
+        }
+        elseif ($aplicados.Count -gt 0) {
             "¿Aplicar $($pendientes.Count) y desactivar $($aplicados.Count) tweak(s)?"
         }
         else {
@@ -463,15 +602,34 @@ function Invoke-TweakSet {
 
     Write-Host ''
     foreach ($t in $aplicados) {
-        $r = Undo-Tweak -TweakId $t.id
-        if ($r.Total -eq 0) {
-            Write-Fail "$($t.nombre): no hay una copia previa en el historial; no se puede restaurar sin adivinar el valor original."
-        }
-        elseif ($r.Fallos -gt 0) {
-            Write-Warn "$($t.nombre): se revirtieron $($r.Ok) de $($r.Total) cambios."
+        if ($sinHistorial.id -contains $t.id) {
+            try {
+                Invoke-TweakResetToDefault -Tweak $t
+                Write-Ok "$($t.nombre) restablecido al valor predeterminado de Windows."
+            }
+            catch {
+                Write-Fail "$($t.nombre): $($_.Exception.Message)"
+                Write-Log "RESTABLECER DEFAULT FALLO $($t.id): $($_.Exception.Message)"
+            }
         }
         else {
-            Write-Ok "$($t.nombre) desactivado; se restauró su estado anterior."
+            $r = Undo-Tweak -TweakId $t.id
+            if ($r.Total -eq 0) {
+                try {
+                    Invoke-TweakResetToDefault -Tweak $t
+                    Write-Ok "$($t.nombre) restablecido al valor predeterminado de Windows."
+                }
+                catch {
+                    Write-Fail "$($t.nombre): $($_.Exception.Message)"
+                    Write-Log "RESTABLECER DEFAULT FALLO $($t.id): $($_.Exception.Message)"
+                }
+            }
+            elseif ($r.Fallos -gt 0) {
+                Write-Warn "$($t.nombre): se revirtieron $($r.Ok) de $($r.Total) cambios."
+            }
+            else {
+                Write-Ok "$($t.nombre) desactivado; se restauró su estado anterior."
+            }
         }
     }
 

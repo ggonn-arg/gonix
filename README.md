@@ -107,7 +107,7 @@ Los tweaks que ya están aplicados se omiten solos.
 
 - Antes de cada cambio, Gonix guarda el valor anterior en `%ProgramData%\Gonix\historial.json`.
 - Al volver a seleccionar un tweak activo desde el menú individual, Gonix revierte solo ese tweak y restaura el valor anterior; los demás cambios del mismo lote quedan aplicados.
-- Si un tweak ya estaba activo antes de usar Gonix y no hay un valor previo guardado, Gonix avisa y no inventa un valor para revertirlo.
+- Si un tweak ya estaba activo antes de usar Gonix y no hay historial, Gonix ofrece restablecer el valor predeterminado documentado de Windows. Esto no recupera personalizaciones previas y no se puede deshacer desde el historial; para estados que no puede detectar, pregunta si querés aplicarlo o restablecerlo.
 - Los cambios de una misma operación forman un **lote**. Desde **Historial y deshacer** elegís un lote y se revierte completo.
 - Si algo no se puede revertir, Gonix te lo dice y lo deja en el historial para reintentar.
 - El historial **nunca se ejecuta como código**: el deshacer solo usa acciones internas de Gonix.
@@ -184,6 +184,7 @@ Todo el menú se genera desde los JSON, así que agregar un tweak es agregar un 
 - `riesgo`: `bajo`, `medio` o `alto`.
 - `requiere`: `reinicio`, `sesion` o `null`.
 - Para **borrar** un valor, usá `"eliminar": true` en lugar de `valor`.
+- Si un cambio borrado debe poder restablecerse sin historial, definí también `restablecer` con su `valor` y `tipoValor`; opcionalmente, `validarExiste` puede exigir que exista un archivo antes de escribirlo.
 - Para acciones más complejas (servicios, planes de energía, DNS), usá `"tipo": "accion"` y agregá un manejador con `Apply`, `Undo` y, opcionalmente, `Test` en `lib\Core.ps1`.
 - Para sumarlo a un perfil, agregá su `id` en `profiles\<perfil>.json`.
 

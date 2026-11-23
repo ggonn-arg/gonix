@@ -197,6 +197,30 @@ Describe 'Historial de tweaks de registro' {
         (Get-ItemPropertyValue -LiteralPath $script:testKey -Name 'MenuToggleValue') | Should -Be 9
         @((Read-History) | Where-Object { $_.TweakId -eq $tweak.id }).Count | Should -Be 0
     }
+
+    It 'restablece al valor predeterminado si está activo pero no hay historial' {
+        Set-ItemProperty -LiteralPath $script:testKey -Name 'ExternalValue' -Value 1 -Type DWord
+        $tweak = [pscustomobject]@{
+            id = 'test-external-toggle'
+            nombre = 'Tweak externo'
+            tipo = 'registro'
+            riesgo = 'bajo'
+            cambios = @([pscustomobject]@{
+                ruta = $script:testKey
+                nombre = 'ExternalValue'
+                valor = 1
+                tipoValor = 'DWord'
+            })
+        }
+        $script:TweakIndex[$tweak.id] = $tweak
+        Mock Confirm-Gonix { return $true }
+
+        Invoke-TweakSet -Ids @($tweak.id) -Alternar
+
+        $property = Get-ItemProperty -LiteralPath $script:testKey -Name 'ExternalValue' -ErrorAction SilentlyContinue
+        @($property).Count | Should -Be 0
+        @((Read-History) | Where-Object { $_.TweakId -eq $tweak.id }).Count | Should -Be 0
+    }
 }
 
 Describe 'Seguridad basica del proyecto' {

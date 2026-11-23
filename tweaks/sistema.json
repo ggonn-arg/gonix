@@ -50,7 +50,16 @@
     "descripcion": "OneDrive deja de arrancar con Windows (no se desinstala). Podés abrirlo a mano cuando lo necesites.",
     "categoria": "sistema", "riesgo": "bajo", "requiere": null, "tipo": "registro",
     "cambios": [
-      { "ruta": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Run", "nombre": "OneDrive", "eliminar": true }
+      {
+        "ruta": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+        "nombre": "OneDrive",
+        "eliminar": true,
+        "restablecer": {
+          "valor": "\"%LOCALAPPDATA%\\Microsoft\\OneDrive\\OneDrive.exe\" /background",
+          "tipoValor": "String",
+          "validarExiste": "%LOCALAPPDATA%\\Microsoft\\OneDrive\\OneDrive.exe"
+        }
+      }
     ]
   },
   {
