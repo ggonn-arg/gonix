@@ -41,7 +41,7 @@
 
 Abrí **PowerShell como administrador** y pegá:
 
-Descargá `Lanzador.ps1` desde la sección Releases y ejecútalo como administrador. El lanzador incluido descarga la versión fija `v0.1` y verifica el SHA256 del ZIP antes de ejecutarlo.
+Descargá `Lanzador.ps1` desde el repositorio y ejecútalo como administrador. El lanzador consulta el SHA del commit actual de `main` y descarga el ZIP de ese commit, así no depende de que haya un release publicado.
 
 Descarga Gonix a una carpeta temporal, lo ejecuta y borra los archivos descargados al cerrar. El historial de cambios **no** se borra: se guarda en `%ProgramData%\Gonix`.
 
@@ -50,9 +50,9 @@ Descarga Gonix a una carpeta temporal, lo ejecuta y borra los archivos descargad
 1. En GitHub: **Code → Download ZIP**, y extraé la carpeta.
 2. Doble clic en `Gonix.bat`. Pide permisos de administrador solo.
 
-### Opción 3: una versión fija (recomendado si querés revisar el código)
+### Opción 3: revisar el código antes de usarlo
 
-El lanzador incluido usa una versión fija y verifica el paquete antes de ejecutarlo.
+Podés descargar el ZIP desde GitHub, revisar los scripts y después ejecutar `Gonix.bat` como administrador.
 
 > Ejecutar un script de internet con permisos de administrador exige confianza. Podés leer todo el código antes de usarlo: es texto plano, sin binarios.
 

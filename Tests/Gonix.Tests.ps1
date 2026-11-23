@@ -224,11 +224,13 @@ Describe 'Historial de tweaks de registro' {
 }
 
 Describe 'Seguridad basica del proyecto' {
-    It 'el lanzador usa un release fijado y verifica SHA256' {
+    It 'el lanzador resuelve main a un SHA y descarga el ZIP de ese commit' {
         $launcher = Get-Content -LiteralPath (Join-Path $script:root 'Lanzador.ps1') -Raw -Encoding UTF8
-        $launcher | Should -Match "\`$ref = 'v0\.1'"
-        $launcher | Should -Match 'Get-FileHash.*SHA256'
-        ($launcher -split "`n" | Where-Object { $_ -match 'Invoke-Expression|irm .*\\|.*iex|/main/' }).Count | Should -Be 0
+        $launcher | Should -Match '/commits/main'
+        $launcher | Should -Match '\$ref = \[string\]\$commit\.sha'
+        $launcher | Should -Match '\{40\}'
+        $launcher | Should -Match 'archive/\$ref\.zip'
+        ($launcher -split "`n" | Where-Object { $_ -match 'Invoke-Expression|irm .*\\|.*iex|releases/download' }).Count | Should -Be 0
     }
 
     It 'no usa Invoke-Expression en los scripts activos' {
