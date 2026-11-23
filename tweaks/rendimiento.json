@@ -1,5 +1,15 @@
 [
   {
+    "id": "enable-game-mode",
+    "nombre": "Activar Modo Juego de Windows",
+    "descripcion": "Permite que Windows aplique el Modo Juego automáticamente mientras jugás. No garantiza más FPS; el resultado depende del equipo y del juego.",
+    "categoria": "rendimiento", "riesgo": "bajo", "requiere": null, "tipo": "registro",
+    "cambios": [
+      { "ruta": "HKCU:\\Software\\Microsoft\\GameBar", "nombre": "AllowAutoGameMode", "valor": 1, "tipoValor": "DWord" },
+      { "ruta": "HKCU:\\Software\\Microsoft\\GameBar", "nombre": "AutoGameModeEnabled", "valor": 1, "tipoValor": "DWord" }
+    ]
+  },
+  {
     "id": "disable-nagle-algorithm",
     "nombre": "Menor latencia de red (desactivar Nagle)",
     "descripcion": "Envía los paquetes TCP sin esperar. Ayuda en juegos online que usan TCP; el efecto en juegos modernos (UDP) es pequeño. Se aplica a tus adaptadores físicos activos.",

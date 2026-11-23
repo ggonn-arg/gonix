@@ -155,6 +155,25 @@ Describe 'Historial de tweaks de registro' {
         @((Read-History) | Where-Object { $_.TweakId -eq 'test-other' }).Count | Should -Be 1
     }
 
+    It 'restaura el valor personalizado de suspension USB al deshacer' {
+        Mock powercfg.exe { $global:LASTEXITCODE = 0 }
+        $datos = [pscustomobject]@{
+            Esquema = '11111111-2222-3333-4444-555555555555'
+            Tenia = $true
+            Anterior = 2
+        }
+
+        $undo = $script:Acciones['usb-suspend-off'].Undo
+        & $undo $datos
+
+        Should -Invoke powercfg.exe -Times 1 -Exactly -ParameterFilter {
+            $args -contains '-setacvalueindex' -and $args -contains '2'
+        }
+        Should -Invoke powercfg.exe -Times 1 -Exactly -ParameterFilter {
+            $args -contains '-setactive'
+        }
+    }
+
     It 'deshace solo la aplicacion mas reciente si dos lotes ocurren en el mismo segundo' {
         Set-ItemProperty -LiteralPath $script:testKey -Name 'RapidToggleValue' -Value 5 -Type DWord
         $tweak = [pscustomobject]@{
@@ -314,6 +333,16 @@ Describe 'Seguridad basica del proyecto' {
             }
         }
         @($invalid).Count | Should -Be 0
+    }
+
+    It 'el perfil Gaming incluye ajustes de FPS, latencia y energía' {
+        $profile = Read-JsonObject (Join-Path $script:root 'profiles\gaming.json')
+        $profile.tweaks | Should -Contain 'enable-game-mode'
+        $profile.tweaks | Should -Contain 'disable-nagle-algorithm'
+        $profile.tweaks | Should -Contain 'disable-usb-selective-suspend'
+        $profile.tweaks | Should -Contain 'gpu-scheduling'
+        $profile.tweaks | Should -Contain 'ultimate-performance-plan'
+        $profile.tweaks | Should -Contain 'disable-core-parking'
     }
 
     It 'Read-JsonArray carga los objetos individuales en Windows PowerShell' {

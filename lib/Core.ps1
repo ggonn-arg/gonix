@@ -249,16 +249,55 @@ $script:Acciones = @{
     # Solo con corriente (AC). El valor por defecto de Windows es 1 (suspensión habilitada).
     'usb-suspend-off' = @{
         Apply = {
-            & powercfg.exe -setacvalueindex SCHEME_CURRENT 2a737441-1930-4402-8d77-b2bebba308a3 48e6b7a6-50f5-4782-a5d4-53bb8f07e226 0
+            $esquema = Get-ActiveSchemeGuid
+            $ruta = "HKLM:\SYSTEM\CurrentControlSet\Control\Power\User\PowerSchemes\$esquema\2a737441-1930-4402-8d77-b2bebba308a3\48e6b7a6-50f5-4782-a5d4-53bb8f07e226"
+            $prev = Get-RegState $ruta 'ACSettingIndex'
+            $valorAnterior = 0
+            if ($prev.Existe) { $valorAnterior = [int]$prev.Valor }
+
+            & powercfg.exe -setacvalueindex $esquema 2a737441-1930-4402-8d77-b2bebba308a3 48e6b7a6-50f5-4782-a5d4-53bb8f07e226 0
             if ($LASTEXITCODE -ne 0) { throw "powercfg devolvió el código $LASTEXITCODE" }
-            & powercfg.exe -setactive SCHEME_CURRENT
-            return @{ Defecto = 1 }
+            try {
+                & powercfg.exe -setactive $esquema
+                if ($LASTEXITCODE -ne 0) { throw "powercfg devolvió el código $LASTEXITCODE" }
+            }
+            catch {
+                if ($prev.Existe) {
+                    & powercfg.exe -setacvalueindex $esquema 2a737441-1930-4402-8d77-b2bebba308a3 48e6b7a6-50f5-4782-a5d4-53bb8f07e226 $valorAnterior
+                    if ($LASTEXITCODE -ne 0) { throw "No se pudo activar el plan ni restaurar el valor anterior del ahorro USB." }
+                }
+                else {
+                    Remove-RegValue -Ruta $ruta -Nombre 'ACSettingIndex'
+                }
+                throw
+            }
+            return @{ Esquema = $esquema; Tenia = [bool]$prev.Existe; Anterior = $valorAnterior }
         }
         Undo  = {
             param($d)
-            & powercfg.exe -setacvalueindex SCHEME_CURRENT 2a737441-1930-4402-8d77-b2bebba308a3 48e6b7a6-50f5-4782-a5d4-53bb8f07e226 1
+            $esquema = if ($d.Esquema) { [string]$d.Esquema } else { Get-ActiveSchemeGuid }
+            $teniaValor = if ($d -is [System.Collections.IDictionary]) {
+                $d.Contains('Tenia')
+            } else {
+                [bool]$d.PSObject.Properties['Tenia']
+            }
+            if ($teniaValor) {
+                if ([bool]$d.Tenia) {
+                    $anterior = [int]$d.Anterior
+                    & powercfg.exe -setacvalueindex $esquema 2a737441-1930-4402-8d77-b2bebba308a3 48e6b7a6-50f5-4782-a5d4-53bb8f07e226 $anterior
+                    if ($LASTEXITCODE -ne 0) { throw "powercfg devolvió el código $LASTEXITCODE" }
+                }
+                else {
+                    $ruta = "HKLM:\SYSTEM\CurrentControlSet\Control\Power\User\PowerSchemes\$esquema\2a737441-1930-4402-8d77-b2bebba308a3\48e6b7a6-50f5-4782-a5d4-53bb8f07e226"
+                    Remove-RegValue -Ruta $ruta -Nombre 'ACSettingIndex'
+                }
+            }
+            else {
+                & powercfg.exe -setacvalueindex $esquema 2a737441-1930-4402-8d77-b2bebba308a3 48e6b7a6-50f5-4782-a5d4-53bb8f07e226 1
+                if ($LASTEXITCODE -ne 0) { throw "powercfg devolvió el código $LASTEXITCODE" }
+            }
+            & powercfg.exe -setactive $esquema
             if ($LASTEXITCODE -ne 0) { throw "powercfg devolvió el código $LASTEXITCODE" }
-            & powercfg.exe -setactive SCHEME_CURRENT
         }
         Reset = {
             & powercfg.exe -setacvalueindex SCHEME_CURRENT 2a737441-1930-4402-8d77-b2bebba308a3 48e6b7a6-50f5-4782-a5d4-53bb8f07e226 1

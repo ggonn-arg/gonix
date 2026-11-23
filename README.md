@@ -73,7 +73,7 @@ Podés descargar el ZIP desde GitHub, revisar los scripts y después ejecutar `G
 | Menú | Para qué sirve |
 |---|---|
 | **Perfiles** | Aplica un conjunto de ajustes con un solo paso (Recomendado, Gaming, Oficina, Notebook, Privacidad total). Antes de aplicar te muestra la lista. |
-| **Tweaks individuales** | 39 ajustes en 4 categorías: Privacidad, Sistema, Rendimiento y Zona de peligro. Cada uno muestra si ya está aplicado y su nivel de riesgo. |
+| **Tweaks individuales** | 40 ajustes en 4 categorías: Privacidad, Sistema, Rendimiento y Zona de peligro. Cada uno muestra si ya está aplicado y su nivel de riesgo. |
 | **Apps preinstaladas** | Desinstala 17 apps de Windows que quizás no uses (Skype, Noticias, Clipchamp, etc.). |
 | **Instalar aplicaciones** | 55 programas populares en 7 categorías, instalados con winget. |
 | **Historial y deshacer** | Revierte los cambios de cualquier operación anterior. |
@@ -104,10 +104,12 @@ Podés descargar el ZIP desde GitHub, revisar los scripts y después ejecutar `G
 | Perfil | Pensado para | Qué hace |
 |---|---|---|
 | **Recomendado** | Cualquier PC | Menos anuncios y rastreo, extensiones de archivo visibles. Solo riesgo bajo. |
-| **Gaming** | Jugar | Sin tareas de fondo, GameDVR y Game Bar fuera, mejor red, puntero 1:1 y HAGS. |
+| **Gaming** | Jugar | Reúne ajustes de FPS, latencia, controles y energía; incluye opciones avanzadas que requieren confirmación explícita. |
 | **Oficina** | Trabajar | Privacidad y limpieza sin tocar rendimiento ni energía. |
 | **Notebook** | Más batería | Privacidad y menos procesos de fondo. No toca hibernación ni planes de energía. |
 | **Privacidad total** | Máxima privacidad | Todos los tweaks de privacidad, incluidos ubicación y muestras de Defender. Algunas funciones online dejan de funcionar. |
+
+El perfil Gaming no promete una cantidad fija de FPS: el resultado depende del hardware, los controladores, las temperaturas y cada juego. Incluye opciones de efecto variable y alto consumo/calor; Gonix pide escribir `ACEPTO` y ofrece crear un punto de restauración antes de aplicarlas. La Game Bar sigue disponible, aunque se desactiva la grabación en segundo plano.
 
 Los tweaks que ya están aplicados se omiten solos.
 

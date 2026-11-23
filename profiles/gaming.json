@@ -1,18 +1,19 @@
 {
   "nombre": "Gaming",
-  "descripcion": "Menos tareas de fondo, mejor red y puntero 1:1. Incluye HAGS (riesgo medio): probalo y, si notás problemas, deshacelo desde el historial.",
+  "descripcion": "Incluye ajustes de FPS, latencia, controles y energía. Algunos pueden aumentar el consumo/calor o causar problemas de compatibilidad; Gonix pedirá escribir ACEPTO y ofrecerá crear un punto de restauración. No garantiza más FPS.",
   "tweaks": [
-    "disable-telemetry",
-    "disable-background-apps",
+    "enable-game-mode",
     "disable-gamedvr",
-    "disable-xbox-gamebar",
+    "disable-background-apps",
     "disable-mouse-acceleration",
     "disable-nagle-algorithm",
     "disable-network-throttling",
     "disable-usb-selective-suspend",
     "gpu-scheduling",
     "disable-edge-background",
-    "disable-advertising-id",
-    "disable-tailored-experiences"
+    "ultimate-performance-plan",
+    "disable-core-parking",
+    "win32-priority-separation",
+    "disable-fso"
   ]
 }
