@@ -1,64 +1,58 @@
 #Requires -Version 5.1
-$ErrorActionPreference = 'Stop'
-$ProgressPreference = 'SilentlyContinue'
+<#
+.SYNOPSIS
+    Lanzador remoto de Gonix.
+.DESCRIPTION
+    Descarga la última versión de Gonix desde GitHub y la ejecuta.
+    No requiere instalación.
+#>
 
-$repo = 'ggonn-arg/gonix'
-$ref = 'v0.1'
-$urlBase = "https://github.com/$repo/releases/download/$ref"
-$zipUrl = "$urlBase/gonix.zip"
-$hashUrl = "$urlBase/gonix.zip.sha256"
-
-$esAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole(
-    [Security.Principal.WindowsBuiltInRole]::Administrator
-)
-if (-not $esAdmin) {
-    Start-Process powershell.exe -Verb RunAs -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`""
+# 1. Comprobar Administrador
+if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+    Write-Host "  [!] Se necesitan permisos de administrador." -ForegroundColor Yellow
+    Write-Host "      Relanzando..." -ForegroundColor Yellow
+    Start-Process powershell -Verb RunAs -ArgumentList "-NoProfile -ExecutionPolicy Bypass -Command `"irm https://raw.githubusercontent.com/ggonn-arg/gonix/main/Lanzador.ps1 | iex`""
     exit
 }
 
-$base = Join-Path $env:TEMP ("gonix-{0}" -f [guid]::NewGuid())
-$zip = Join-Path $env:TEMP ("gonix-{0}.zip" -f [guid]::NewGuid())
-$checksum = $zip + '.sha256'
+# 2. Configuración de la descarga
+$urlZip = "https://github.com/ggonn-arg/gonix/archive/refs/heads/main.zip"
+$carpetaDestino = Join-Path $env:TEMP "Gonix"
 
+Write-Host "`n  ⚡ Iniciando Gonix..." -ForegroundColor Cyan
+Write-Host "  Descargando archivos necesarios..." -ForegroundColor Gray
+
+# 3. Limpiar versiones anteriores
+if (Test-Path $carpetaDestino) {
+    Remove-Item -Path $carpetaDestino -Recurse -Force -ErrorAction SilentlyContinue
+}
+
+# 4. Descargar y extraer
 try {
-    New-Item -ItemType Directory -Path $base -Force | Out-Null
-    $releasedPackage = $true
-    try {
-        Invoke-WebRequest -Uri $zipUrl -OutFile $zip -UseBasicParsing -ErrorAction Stop
-        Invoke-WebRequest -Uri $hashUrl -OutFile $checksum -UseBasicParsing -ErrorAction Stop
-    }
-    catch {
-        $releasedPackage = $false
-        Remove-Item -LiteralPath $zip -Force -ErrorAction SilentlyContinue
-        Remove-Item -LiteralPath $checksum -Force -ErrorAction SilentlyContinue
-        Write-Host '  [!] El release v0.1 todavia no tiene el paquete publicado. Usando la rama main...' -ForegroundColor Yellow
-        Invoke-WebRequest -Uri "https://github.com/$repo/archive/refs/heads/main.zip" -OutFile $zip -UseBasicParsing -ErrorAction Stop
-    }
+    $zipTemp = Join-Path $env:TEMP "gonix_temp.zip"
+    Invoke-WebRequest -Uri $urlZip -OutFile $zipTemp -UseBasicParsing
+    Expand-Archive -Path $zipTemp -DestinationPath $carpetaDestino -Force
+    Remove-Item $zipTemp -Force
 
-    if ($releasedPackage) {
-        $expected = (Get-Content -LiteralPath $checksum -Raw -Encoding ASCII).Trim()
-        if ($expected -notmatch '^[A-Fa-f0-9]{64}$') { throw 'El checksum descargado no es valido.' }
-        $actual = (Get-FileHash -LiteralPath $zip -Algorithm SHA256).Hash.ToLowerInvariant()
-        if ($actual -ne $expected.ToLowerInvariant()) { throw 'Checksum SHA256 incorrecto.' }
-    }
+    # 5. Buscar el ejecutable dentro de la carpeta extraída
+    $carpetaReal = Get-ChildItem -Path $carpetaDestino -Directory | Select-Object -First 1
+    $scriptPath = Join-Path $carpetaReal.FullName "Gonix.ps1"
 
-    Expand-Archive -LiteralPath $zip -DestinationPath $base -Force
-    $script = Join-Path $base 'Gonix.ps1'
-    if (-not (Test-Path -LiteralPath $script)) {
-        $folder = Get-ChildItem -LiteralPath $base -Directory |
-            Where-Object { Test-Path -LiteralPath (Join-Path $_.FullName 'Gonix.ps1') } |
-            Select-Object -First 1
-        if ($folder) { $script = Join-Path $folder.FullName 'Gonix.ps1' }
+    if (Test-Path $scriptPath) {
+        # 6. Ejecutar Gonix
+        & $scriptPath
+    } else {
+        Write-Host "  [X] Error: No se encontró Gonix.ps1 en el paquete descargado." -ForegroundColor Red
+        Pause
     }
-    if (-not (Test-Path -LiteralPath $script)) { throw 'No se encontro Gonix.ps1.' }
-    & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $script
 }
 catch {
-    Write-Host "  [X] $($_.Exception.Message)" -ForegroundColor Red
-    Read-Host '  Enter para salir' | Out-Null
+    Write-Host "  [X] Error al descargar: $($_.Exception.Message)" -ForegroundColor Red
+    Pause
 }
 finally {
-    Remove-Item -LiteralPath $zip -Force -Recurse -ErrorAction SilentlyContinue
-    Remove-Item -LiteralPath $checksum -Force -Recurse -ErrorAction SilentlyContinue
-    Remove-Item -LiteralPath $base -Force -Recurse -ErrorAction SilentlyContinue
+    # 7. Limpiar rastro al salir
+    if (Test-Path $carpetaDestino) {
+        Remove-Item -Path $carpetaDestino -Recurse -Force -ErrorAction SilentlyContinue
+    }
 }
