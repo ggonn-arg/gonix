@@ -42,10 +42,16 @@
 Abrí **PowerShell como administrador** y pegá:
 
 ```powershell
-irm -Uri 'https://api.github.com/repos/ggonn-arg/gonix/contents/Lanzador.ps1?ref=main' -Headers @{Accept='application/vnd.github.raw+json';'User-Agent'='Gonix'} | iex
+irm https://ggonn-arg.github.io/gonix/win.txt | iex
 ```
 
-El comando obtiene el lanzador actual desde la API de GitHub (evita la caché vieja de `raw.githubusercontent.com`). El lanzador consulta el SHA de `main` y descarga el ZIP de ese commit.
+La URL es pública y gratuita. Después de subir estos cambios a `main`, en GitHub abrí **Settings → Pages** y elegí **GitHub Actions** como fuente. Cuando termine el workflow **Publish Gonix PowerShell launcher**, el comando queda disponible. Si el primer intento falló antes de configurar Pages, podés volver a ejecutarlo desde **Actions → Publish Gonix PowerShell launcher → Run workflow**. Cada cambio posterior de `Lanzador.ps1` en `main` se publica automáticamente. El lanzador consulta el SHA actual de `main` y descarga el ZIP de ese commit.
+
+Como alternativa mientras Pages se publica, podés obtener el lanzador directamente desde la API de GitHub:
+
+```powershell
+irm -Uri 'https://api.github.com/repos/ggonn-arg/gonix/contents/Lanzador.ps1?ref=main' -Headers @{Accept='application/vnd.github.raw+json';'User-Agent'='Gonix'} | iex
+```
 
 Descarga Gonix a una carpeta temporal, lo ejecuta y borra los archivos descargados al cerrar. El historial de cambios **no** se borra: se guarda en `%ProgramData%\Gonix`.
 
