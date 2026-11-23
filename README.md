@@ -76,7 +76,7 @@ Podés descargar el ZIP desde GitHub, revisar los scripts y después ejecutar `G
 | **Elegir ajustes manualmente** | 40 ajustes en 4 categorías: Privacidad, Sistema, Rendimiento y Zona de peligro. Cada uno muestra si ya está aplicado y su nivel de riesgo. |
 | **Ver recomendaciones para juegos** | Recomienda qué probar según la GPU y la configuración actual, explicando el motivo y los riesgos; no aplica cambios ni mide FPS. |
 | **Apps preinstaladas** | Desinstala 17 apps de Windows que quizás no uses (Skype, Noticias, Clipchamp, etc.). |
-| **Instalar programas** | 55 programas populares en 7 categorías, instalados con winget. |
+| **Administrar aplicaciones** | Instala 55 programas con winget y administra de forma reversible el inicio de sesión de tu usuario (Registro Run y carpeta Inicio); no desinstala esas apps. |
 | **Ver historial y deshacer cambios** | Revierte los cambios de cualquier operación anterior. |
 | **Configurar actualizaciones de Windows** | Pausa las actualizaciones por 7, 14 o 35 días, o las reanuda. |
 | **Limpiar y reparar Windows** | Temporales y papelera, SFC, DISM y reparación de red y de Windows Update. |

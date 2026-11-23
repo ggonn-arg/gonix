@@ -82,7 +82,17 @@ function Get-Lotes {
         $nombres = @()
         foreach ($id in $ids) {
             $t = Get-TweakById -Id $id
-            if ($t) { $nombres += $t.nombre } else { $nombres += $id }
+            if ($t) {
+                $nombres += $t.nombre
+            }
+            else {
+                $entrada = @($g.Group | Where-Object { $_.TweakId -eq $id -and $_.Nombre } | Select-Object -Last 1)
+                if ($entrada.Count -gt 0) {
+                    $nombreSeguro = [regex]::Replace([string]$entrada[0].Nombre, '[\x00-\x1F\x7F]', ' ')
+                    $nombres += $nombreSeguro
+                }
+                else { $nombres += $id }
+            }
         }
         
         # Forzamos a que el Lote sea un string plano, no un objeto
@@ -118,6 +128,25 @@ function Invoke-HistoryUndoEntry {
             if (-not $h) { throw "Acción desconocida: $($Entrada.Accion)" }
             $sb = $h.Undo
             [void](& $sb $Entrada.Datos)
+        }
+        'inicio-registro' {
+            if (-not $Entrada.Existia) { throw 'El historial no contiene el valor original de inicio.' }
+            if ((Get-RegState -Ruta $Entrada.Ruta -Nombre $Entrada.NombreValor).Existe) {
+                $nombreSeguro = [regex]::Replace([string]$Entrada.Nombre, '[\x00-\x1F\x7F]', ' ')
+                throw "La entrada '$nombreSeguro' ya existe; no se sobrescribió."
+            }
+            Set-RegValue -Ruta $Entrada.Ruta -Nombre $Entrada.NombreValor `
+                -Valor $Entrada.ValorAnterior -Tipo $Entrada.TipoValor
+        }
+        'inicio-archivo' {
+            if (-not (Test-Path -LiteralPath $Entrada.ArchivoDeshabilitado)) {
+                throw "No se encontró el elemento deshabilitado: $($Entrada.ArchivoDeshabilitado)"
+            }
+            if (Test-Path -LiteralPath $Entrada.ArchivoOriginal) {
+                throw "Ya existe un elemento en la ubicación original: $($Entrada.ArchivoOriginal)"
+            }
+            Move-Item -LiteralPath $Entrada.ArchivoDeshabilitado `
+                -Destination $Entrada.ArchivoOriginal -ErrorAction Stop
         }
         default { throw 'Entrada de historial inválida (sin tipo).' }
     }

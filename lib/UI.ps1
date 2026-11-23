@@ -82,7 +82,7 @@ function Show-MainMenu {
         Write-MenuItem '3' 'Ver recomendaciones para juegos'
         Write-Host ''
         Write-Host '   APLICACIONES' -ForegroundColor DarkCyan
-        Write-MenuItem '4' 'Instalar programas'
+        Write-MenuItem '4' 'Administrar aplicaciones'
         Write-Host ''
         Write-Host '   MANTENIMIENTO' -ForegroundColor DarkCyan
         Write-MenuItem '5' 'Ver historial y deshacer cambios'
@@ -97,7 +97,7 @@ function Show-MainMenu {
             '1' { Show-ProfilesMenu }
             '2' { Show-TweaksMenu }
             '3' { Show-GamingAdvisor }
-            '4' { Show-AppInstaller }
+            '4' { Show-ApplicationsMenu }
             '5' { Show-HistoryMenu }
             '6' { Show-UpdateMenu }
             '7' { Show-MaintenanceMenu }
@@ -105,6 +105,103 @@ function Show-MainMenu {
             '0' { Write-Host '   ¡Chau, Gon!' -ForegroundColor Cyan; return }
             default { Write-Warn 'Opción inválida.'; Start-Sleep 1 }
         }
+    }
+}
+
+function Show-ApplicationsMenu {
+    while ($true) {
+        Write-Banner
+        Write-Host '   --- Aplicaciones ---' -ForegroundColor Magenta
+        Write-Host ''
+        Write-MenuItem '1' 'Instalar programas'
+        Write-MenuItem '2' 'Administrar programas al iniciar'
+        Write-MenuItem '0' 'Volver' 'DarkGray'
+        Write-Host ''
+        $op = Read-Host '   Elegí una opción'
+        switch ($op) {
+            '1' { Show-AppInstaller }
+            '2' { Show-StartupMenu }
+            '0' { return }
+            default { Write-Warn 'Opción inválida.'; Start-Sleep 1 }
+        }
+    }
+}
+
+function Show-StartupMenu {
+    while ($true) {
+        Write-Banner
+        Write-Host '   --- Programas al iniciar ---' -ForegroundColor Magenta
+        Write-Info 'Solo administra el inicio de sesión de tu usuario actual.'
+        Write-Info 'Incluye entradas del Registro y de la carpeta Inicio; no desinstala programas.'
+        Write-Info 'No incluye servicios, tareas programadas ni ajustes hechos desde el Administrador de tareas.'
+        Write-Warn 'Desactivar una entrada puede impedir que una app se abra o sincronice automáticamente.'
+        Write-Host ''
+
+        try { $items = @(Get-StartupItems) }
+        catch {
+            Write-Fail "No se pudo leer el inicio de Windows: $($_.Exception.Message)"
+            Write-Host ''; Wait-Enter
+            continue
+        }
+        if ($items.Count -eq 0) {
+            Write-Info 'No se encontraron programas de inicio para este usuario.'
+            Write-Host ''; Wait-Enter
+            return
+        }
+
+        for ($i = 0; $i -lt $items.Count; $i++) {
+            $item = $items[$i]
+            $nombre = [regex]::Replace([string]$item.Nombre, '[\x00-\x1F\x7F]', ' ')
+            $estado = if ($item.Estado -eq 'Activado') { 'ON' } else { 'OFF' }
+            $color = if ($item.Estado -eq 'Activado') { 'Green' } else { 'DarkGray' }
+            Write-Host ('   {0,2}. [{1}] {2}  -  {3}' -f ($i + 1), $estado, $nombre, $item.Fuente) -ForegroundColor $color
+        }
+
+        Write-Host ''
+        Write-Info 'Elegí un número para activar o desactivar. "d 2" muestra la ubicación del elemento.'
+        Write-Info 'Podés elegir varios (ej: 1,3). Enter o 0 para volver.'
+        Write-Host ''
+        $op = (Read-Host '   Tu elección').Trim()
+        if ($op -eq '' -or $op -eq '0') { return }
+
+        if ($op -match '^[dD]\s*(\d{1,3})$') {
+            $n = [int]$Matches[1]
+            if ($n -lt 1 -or $n -gt $items.Count) {
+                Write-Warn 'Número inválido.'
+            }
+            else {
+                $item = $items[$n - 1]
+                Write-Host ''
+                Write-Host "   $($item.Nombre)" -ForegroundColor Cyan
+                $ubicacion = [regex]::Replace([string]$item.Comando, '[\x00-\x1F\x7F]', ' ')
+                Write-Info "Ubicación o comando: $ubicacion"
+            }
+            Write-Host ''; Wait-Enter
+            continue
+        }
+
+        $indices = @(ConvertTo-Indices -Texto $op -Max $items.Count)
+        if ($indices.Count -eq 0) {
+            Write-Warn 'No entendí esa selección.'
+            Start-Sleep 1
+            continue
+        }
+        foreach ($indice in $indices) {
+            $item = $items[$indice]
+            $accion = if ($item.Estado -eq 'Activado') { 'desactivar' } else { 'volver a activar' }
+            $nombreSeguro = [regex]::Replace([string]$item.Nombre, '[\x00-\x1F\x7F]', ' ')
+            if (-not (Confirm-Gonix "¿$accion '$nombreSeguro'?")) { continue }
+            try {
+                Toggle-StartupItem -Item $item
+                $estadoFinal = if ($item.Estado -eq 'Activado') { 'desactivado' } else { 'activado' }
+                Write-Ok "'$nombreSeguro' $estadoFinal."
+            }
+            catch {
+                Write-Fail "No se pudo cambiar '$nombreSeguro': $($_.Exception.Message)"
+                Write-Log "INICIO $($item.Id): $($_.Exception.Message)"
+            }
+        }
+        Write-Host ''; Wait-Enter
     }
 }
 

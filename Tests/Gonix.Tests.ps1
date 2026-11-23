@@ -275,6 +275,66 @@ Describe 'Historial de tweaks de registro' {
         @($property).Count | Should -Be 0
         @((Read-History) | Where-Object { $_.TweakId -eq $tweak.id }).Count | Should -Be 0
     }
+
+    It 'desactiva y reactiva una entrada Run del usuario sin perder el valor original' {
+        Set-ItemProperty -LiteralPath $script:testKey -Name 'TestApp' `
+            -Value '%LOCALAPPDATA%\Apps\TestApp.exe' -Type ExpandString
+        $startupFolder = Join-Path $env:GONIX_TEST_DATA_ROOT 'Run-Startup'
+
+        $items = @(Get-StartupItems -RunKey $script:testKey -StartupFolder $startupFolder)
+        $item = $items | Where-Object { $_.Nombre -eq 'TestApp' } | Select-Object -First 1
+        $item | Should -Not -BeNullOrEmpty
+        $item.Estado | Should -Be 'Activado'
+
+        Toggle-StartupItem -Item $item
+        (Get-ItemProperty -LiteralPath $script:testKey -Name 'TestApp' -ErrorAction SilentlyContinue) |
+            Should -BeNullOrEmpty
+        @((Read-History) | Where-Object { $_.Tipo -eq 'inicio-registro' }).Count | Should -Be 1
+
+        $disabled = @(Get-StartupItems -RunKey $script:testKey -StartupFolder $startupFolder) |
+            Where-Object { $_.Id -eq $item.Id } | Select-Object -First 1
+        $disabled.Estado | Should -Be 'Desactivado'
+        Toggle-StartupItem -Item $disabled
+
+        $restaurado = Get-RegState -Ruta $script:testKey -Nombre 'TestApp'
+        $restaurado.Valor | Should -Be '%LOCALAPPDATA%\Apps\TestApp.exe'
+        $restaurado.Tipo | Should -Be 'ExpandString'
+    }
+
+    It 'desactiva un elemento de la carpeta Inicio y lo recupera desde el historial' {
+        $startupFolder = Join-Path $env:GONIX_TEST_DATA_ROOT 'Startup'
+        New-Item -ItemType Directory -Path $startupFolder -Force | Out-Null
+        $original = Join-Path $startupFolder 'TestApp.lnk'
+        Set-Content -LiteralPath $original -Value 'shortcut test' -Encoding UTF8
+
+        $item = @(Get-StartupItems -RunKey $script:testKey -StartupFolder $startupFolder) |
+            Where-Object { $_.Nombre -eq 'TestApp' } | Select-Object -First 1
+        Toggle-StartupItem -Item $item
+
+        Test-Path -LiteralPath $original | Should -BeFalse
+        Test-Path -LiteralPath "$original.gonix-disabled" | Should -BeTrue
+        $lote = Get-Lotes | Select-Object -First 1
+        $lote.Nombres | Should -Be 'TestApp'
+        (Undo-Lote -Lote $lote.Lote).Fallos | Should -Be 0
+        Test-Path -LiteralPath $original | Should -BeTrue
+        Test-Path -LiteralPath "$original.gonix-disabled" | Should -BeFalse
+    }
+
+    It 'no sobrescribe una entrada Run que se recreó mientras estaba desactivada' {
+        Mock Write-Fail {}
+        Set-ItemProperty -LiteralPath $script:testKey -Name 'TestApp' -Value 'original.exe' -Type String
+        $startupFolder = Join-Path $env:GONIX_TEST_DATA_ROOT 'Run-Startup'
+        $item = @(Get-StartupItems -RunKey $script:testKey -StartupFolder $startupFolder) |
+            Where-Object { $_.Nombre -eq 'TestApp' } | Select-Object -First 1
+        Toggle-StartupItem -Item $item
+
+        $disabled = @(Get-StartupItems -RunKey $script:testKey -StartupFolder $startupFolder) |
+            Where-Object { $_.Id -eq $item.Id } | Select-Object -First 1
+        Set-ItemProperty -LiteralPath $script:testKey -Name 'TestApp' -Value 'new.exe' -Type String
+        { Toggle-StartupItem -Item $disabled } | Should -Throw
+        (Get-ItemPropertyValue -LiteralPath $script:testKey -Name 'TestApp') | Should -Be 'new.exe'
+        @((Read-History) | Where-Object { $_.Tipo -eq 'inicio-registro' }).Count | Should -Be 1
+    }
 }
 
 Describe 'Seguridad basica del proyecto' {
@@ -312,6 +372,8 @@ Describe 'Seguridad basica del proyecto' {
         $ui | Should -Match 'function Show-MainMenu'
         $ui | Should -Match 'function Show-TweaksMenu'
         $ui | Should -Match 'function Show-GamingAdvisor'
+        $ui | Should -Match 'function Show-ApplicationsMenu'
+        $ui | Should -Match 'function Show-StartupMenu'
         $ui | Should -Match 'Asistente Gaming'
         $ui | Should -Match 'OPTIMIZAR'
         $ui | Should -Match 'APLICACIONES'
@@ -320,7 +382,7 @@ Describe 'Seguridad basica del proyecto' {
         $ui | Should -Not -Match '\$script:InfoSistema'
         $ui | Should -Not -Match "Write-MenuItem '9'"
         $ui | Should -Match 'Get-TweaksByCategory'
-        $mainMenu = [regex]::Match($ui, '(?s)function Show-MainMenu \{(.*?)function Format-WrappedLines').Groups[1].Value
+        $mainMenu = [regex]::Match($ui, '(?s)function Show-MainMenu \{(.*?)function Show-ApplicationsMenu').Groups[1].Value
         $menuNumbers = [regex]::Matches($mainMenu, "Write-MenuItem '(\d)'") | ForEach-Object { $_.Groups[1].Value }
         ($menuNumbers -join ',') | Should -Be '1,2,3,4,5,6,7,8,0'
     }

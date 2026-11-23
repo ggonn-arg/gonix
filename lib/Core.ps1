@@ -257,6 +257,162 @@ function Get-TweaksByCategory {
     return @($script:Tweaks | Where-Object { $_.categoria -eq $Categoria })
 }
 
+function Get-StartupItemId {
+    param([string]$Fuente, [string]$Identidad)
+
+    $sha = [System.Security.Cryptography.SHA256]::Create()
+    try {
+        $contenido = [System.Text.Encoding]::UTF8.GetBytes("$Fuente`0$Identidad".ToLowerInvariant())
+        $hash = [BitConverter]::ToString($sha.ComputeHash($contenido)).Replace('-', '').ToLowerInvariant()
+    }
+    finally { $sha.Dispose() }
+    return "startup-$hash"
+}
+
+function Get-StartupItems {
+    param(
+        [string]$RunKey = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run',
+        [string]$StartupFolder = ''
+    )
+
+    if (-not $StartupFolder) { $StartupFolder = [Environment]::GetFolderPath('Startup') }
+    $items = New-Object System.Collections.ArrayList
+    $vistos = @{}
+    $historial = @(Read-History)
+    $extensiones = @('.lnk', '.url', '.bat', '.cmd', '.exe', '.ps1', '.vbs', '.js')
+
+    if (Test-Path -LiteralPath $RunKey) {
+        try {
+            $run = Get-Item -LiteralPath $RunKey -ErrorAction Stop
+            foreach ($nombre in $run.GetValueNames()) {
+                if ([string]::IsNullOrWhiteSpace($nombre)) { continue }
+                $tipo = $run.GetValueKind($nombre).ToString()
+                if ($tipo -notin @('String', 'ExpandString')) {
+                    $nombreSeguro = [regex]::Replace([string]$nombre, '[\x00-\x1F\x7F]', ' ')
+                    Write-Warn "Se omitió '$nombreSeguro': su valor de inicio no es texto."
+                    continue
+                }
+                $id = Get-StartupItemId -Fuente 'registro' -Identidad "$RunKey|$nombre"
+                $valor = $run.GetValue($nombre, $null, [Microsoft.Win32.RegistryValueOptions]::DoNotExpandEnvironmentNames)
+                [void]$items.Add([pscustomobject]@{
+                    Id = $id; Tipo = 'inicio-registro'; Nombre = $nombre
+                    Fuente = 'Registro de inicio'; Estado = 'Activado'
+                    Ruta = $RunKey; NombreValor = $nombre; Valor = $valor; TipoValor = $tipo
+                    Comando = [string]$valor; ArchivoOriginal = ''; ArchivoDeshabilitado = ''
+                })
+                $vistos[$id] = $true
+            }
+        }
+        catch { Write-Warn "No se pudo leer el Registro de inicio del usuario: $($_.Exception.Message)" }
+    }
+
+    $registroDeshabilitado = @{}
+    foreach ($entrada in $historial) {
+        if ($entrada.Tipo -eq 'inicio-registro' -and $entrada.Ruta -eq $RunKey) {
+            $registroDeshabilitado[[string]$entrada.TweakId] = $entrada
+        }
+    }
+    foreach ($id in @($registroDeshabilitado.Keys)) {
+        if ($vistos.ContainsKey($id)) { continue }
+        $entrada = $registroDeshabilitado[$id]
+        if ((Get-RegState -Ruta $RunKey -Nombre $entrada.NombreValor).Existe) { continue }
+        [void]$items.Add([pscustomobject]@{
+            Id = $id; Tipo = 'inicio-registro'; Nombre = $entrada.Nombre
+            Fuente = 'Registro de inicio'; Estado = 'Desactivado'
+            Ruta = $RunKey; NombreValor = $entrada.NombreValor
+            Valor = $entrada.ValorAnterior; TipoValor = $entrada.TipoValor
+            Comando = [string]$entrada.ValorAnterior; ArchivoOriginal = ''; ArchivoDeshabilitado = ''
+        })
+    }
+
+    if ($StartupFolder -and (Test-Path -LiteralPath $StartupFolder)) {
+        try {
+            foreach ($archivo in (Get-ChildItem -LiteralPath $StartupFolder -File -Force -ErrorAction Stop)) {
+                if ($archivo.Extension -notin $extensiones) { continue }
+                $id = Get-StartupItemId -Fuente 'carpeta' -Identidad $archivo.FullName
+                [void]$items.Add([pscustomobject]@{
+                    Id = $id; Tipo = 'inicio-archivo'; Nombre = $archivo.BaseName
+                    Fuente = 'Carpeta Inicio'; Estado = 'Activado'
+                    Ruta = ''; NombreValor = ''; Valor = ''; TipoValor = ''
+                    Comando = $archivo.FullName; ArchivoOriginal = $archivo.FullName
+                    ArchivoDeshabilitado = ''
+                })
+                $vistos[$id] = $true
+            }
+        }
+        catch { Write-Warn "No se pudo leer la carpeta Inicio del usuario: $($_.Exception.Message)" }
+    }
+
+    $archivosDeshabilitados = @{}
+    foreach ($entrada in $historial) {
+        if ($entrada.Tipo -eq 'inicio-archivo') {
+            $archivosDeshabilitados[[string]$entrada.TweakId] = $entrada
+        }
+    }
+    foreach ($id in @($archivosDeshabilitados.Keys)) {
+        if ($vistos.ContainsKey($id)) { continue }
+        $entrada = $archivosDeshabilitados[$id]
+        if (-not (Test-Path -LiteralPath $entrada.ArchivoDeshabilitado)) { continue }
+        if (Test-Path -LiteralPath $entrada.ArchivoOriginal) { continue }
+        [void]$items.Add([pscustomobject]@{
+            Id = $id; Tipo = 'inicio-archivo'
+            Nombre = [System.IO.Path]::GetFileNameWithoutExtension($entrada.ArchivoOriginal)
+            Fuente = 'Carpeta Inicio'; Estado = 'Desactivado'
+            Ruta = ''; NombreValor = ''; Valor = ''; TipoValor = ''
+            Comando = $entrada.ArchivoDeshabilitado
+            ArchivoOriginal = $entrada.ArchivoOriginal
+            ArchivoDeshabilitado = $entrada.ArchivoDeshabilitado
+        })
+    }
+
+    return @($items | Sort-Object -Property Fuente, Nombre)
+}
+
+function Toggle-StartupItem {
+    param($Item)
+
+    if ($Item.Estado -eq 'Desactivado') {
+        $resultado = Undo-Tweak -TweakId $Item.Id
+        if ($resultado.Total -eq 0) { throw 'No se encontró el historial necesario para reactivar este elemento.' }
+        if ($resultado.Fallos -gt 0) { throw 'No se pudo reactivar el elemento; sigue registrado en el historial.' }
+        return
+    }
+
+    Start-Lote
+    try {
+        if ($Item.Tipo -eq 'inicio-registro') {
+            $actual = Get-RegState -Ruta $Item.Ruta -Nombre $Item.NombreValor
+            if (-not $actual.Existe) { throw 'La entrada ya no está en el Registro; actualizá la lista.' }
+            if ($actual.Tipo -ne $Item.TipoValor -or
+                -not (Test-RegValueEqual -Actual $actual.Valor -Deseado $Item.Valor -Tipo $Item.TipoValor)) {
+                throw 'La entrada cambió desde que se mostró; actualizá la lista antes de continuar.'
+            }
+            Remove-ItemProperty -LiteralPath $Item.Ruta -Name $Item.NombreValor -Force -ErrorAction Stop
+            Add-History @{
+                Tipo = 'inicio-registro'; TweakId = $Item.Id; Nombre = $Item.Nombre
+                Ruta = $Item.Ruta; NombreValor = $Item.NombreValor
+                Existia = $true; ValorAnterior = $actual.Valor; TipoValor = $actual.Tipo
+            }
+        }
+        elseif ($Item.Tipo -eq 'inicio-archivo') {
+            if (-not (Test-Path -LiteralPath $Item.ArchivoOriginal -PathType Leaf)) {
+                throw 'El acceso directo o archivo ya no está en la carpeta Inicio; actualizá la lista.'
+            }
+            $deshabilitado = "$($Item.ArchivoOriginal).gonix-disabled"
+            if (Test-Path -LiteralPath $deshabilitado) {
+                throw "Ya existe un archivo de respaldo: $deshabilitado"
+            }
+            Move-Item -LiteralPath $Item.ArchivoOriginal -Destination $deshabilitado -ErrorAction Stop
+            Add-History @{
+                Tipo = 'inicio-archivo'; TweakId = $Item.Id; Nombre = $Item.Nombre
+                ArchivoOriginal = $Item.ArchivoOriginal; ArchivoDeshabilitado = $deshabilitado
+            }
+        }
+        else { throw 'Tipo de elemento de inicio desconocido.' }
+    }
+    finally { Save-History }
+}
+
 function Get-RiskColor {
     param($T)
     switch ($T.riesgo) { 'alto' { 'Red' } 'medio' { 'Yellow' } default { 'White' } }
