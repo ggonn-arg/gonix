@@ -12,11 +12,68 @@ $script:Tweaks         = @()
 $script:TweakIndex     = @{}
 $script:Perfiles       = @()
 $script:InfoSistema    = ''
+$script:BuildWindows   = 0
 $script:PuntoOfrecido  = $false
 
 # ------------------------------------------------------------
 #  Carga inicial
 # ------------------------------------------------------------
+function Initialize-Gonix {
+    $script:Tweaks = @()
+    $script:TweakIndex = @{}
+
+    foreach ($f in 'privacidad', 'sistema', 'rendimiento', 'avanzado') {
+        $p = Join-Path $script:GonixRoot "tweaks\$f.json"
+        if (-not (Test-Path -LiteralPath $p)) { Write-Warn "Falta tweaks\$f.json"; continue }
+        try {
+            $items = @(Read-JsonArray $p)
+        }
+        catch {
+            Write-Fail "Error al leer tweaks\$f.json: $($_.Exception.Message)"
+            continue
+        }
+        foreach ($t in $items) {
+            if (-not $t.id) { Write-Warn "Tweak sin 'id' en tweaks\$f.json"; continue }
+            if ($script:TweakIndex.ContainsKey($t.id)) { Write-Warn "Id de tweak duplicado: $($t.id)"; continue }
+            if ($t.tipo -eq 'accion' -and -not $script:Acciones.ContainsKey($t.accion)) {
+                Write-Warn "El tweak '$($t.id)' usa una acción inexistente: $($t.accion)"; continue
+            }
+            $script:TweakIndex[$t.id] = $t
+            $script:Tweaks += $t
+        }
+    }
+
+    # Perfiles (orden fijo para los conocidos, después cualquier otro .json)
+    $script:Perfiles = @()
+    $orden = 'recomendado', 'gaming', 'oficina', 'notebook', 'privacidad-total'
+    $archivos = @(Get-ChildItem -LiteralPath (Join-Path $script:GonixRoot 'profiles') -Filter *.json -ErrorAction SilentlyContinue)
+    $archivos = @($archivos | Sort-Object { $i = [array]::IndexOf($orden, $_.BaseName); if ($i -lt 0) { 99 } else { $i } }, Name)
+    foreach ($a in $archivos) {
+        try {
+            $pf = Read-JsonObject $a.FullName
+            foreach ($id in @($pf.tweaks)) {
+                if (-not $script:TweakIndex.ContainsKey($id)) {
+                    Write-Warn "El perfil '$($a.BaseName)' menciona un tweak inexistente: $id"
+                }
+            }
+            $script:Perfiles += $pf
+        }
+        catch { Write-Warn "No se pudo leer el perfil $($a.Name): $($_.Exception.Message)" }
+    }
+
+    # Info del sistema (se calcula una sola vez)
+    try {
+        $os  = Get-CimInstance Win32_OperatingSystem
+        $cpu = (Get-CimInstance Win32_Processor | Select-Object -First 1).Name.Trim()
+        $ram = [math]::Round($os.TotalVisibleMemorySize / 1MB, 1)
+        $script:InfoSistema = "$($os.Caption) | CPU: $cpu | RAM: $ram GB"
+        $script:BuildWindows = [int]$os.BuildNumber
+    }
+    catch {
+        $script:InfoSistema = 'No se pudo leer la información del sistema'
+        $script:BuildWindows = 0
+    }
+}
 function Initialize-Gonix {
     $script:Tweaks = @()
     $script:TweakIndex = @{}

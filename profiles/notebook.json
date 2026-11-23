@@ -1,0 +1,15 @@
+{
+  "nombre": "Notebook",
+  "descripcion": "Ajustes de privacidad y procesos en segundo plano pensados para cuidar la batería. No desactiva la hibernación ni fuerza planes de alto consumo.",
+  "tweaks": [
+    "disable-telemetry",
+    "disable-start-suggestions",
+    "disable-consumer-features",
+    "disable-widgets",
+    "disable-windows-search-bing",
+    "disable-background-apps",
+    "disable-advertising-id",
+    "disable-tailored-experiences",
+    "disable-edge-background"
+  ]
+}

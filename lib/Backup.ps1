@@ -44,7 +44,8 @@ function Write-History {
     $json = ConvertTo-Json -InputObject $arr -Depth 8
     $tmp = "$p.tmp"
     Set-Content -LiteralPath $tmp -Value $json -Encoding UTF8
-    Move-Item -LiteralPath $tmp -Destination $p -Force
+    [System.IO.File]::Copy($tmp, $p, $true)
+    Remove-Item -LiteralPath $tmp -Force -ErrorAction SilentlyContinue
 }
 
 # Acumula en memoria; Save-History lo escribe a disco de una sola vez

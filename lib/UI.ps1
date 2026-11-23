@@ -61,6 +61,37 @@ function Show-MainMenu {
 # ------------------------------------------------------------
 #  Perfiles
 # ------------------------------------------------------------
+function Format-WrappedLines {
+    param(
+        [string]$Texto,
+        [int]$Sangria = 7
+    )
+    if ([string]::IsNullOrWhiteSpace($Texto)) { return @() }
+    $anchoVentana = try { [Console]::WindowWidth } catch { 100 }
+    $maxAncho = [Math]::Max(36, $anchoVentana - $Sangria - 2)
+    $prefijo = ' ' * $Sangria
+    $palabras = $Texto -split '\s+'
+    $lineas = New-Object System.Collections.Generic.List[string]
+    $actual = ''
+
+    foreach ($w in $palabras) {
+        if ([string]::IsNullOrWhiteSpace($w)) { continue }
+        $candidato = if ($actual) { "$actual $w" } else { $w }
+        if ($candidato.Length -le $maxAncho) {
+            $actual = $candidato
+        }
+        else {
+            if ($actual) { $lineas.Add("$prefijo$actual") }
+            $actual = $w
+        }
+    }
+    if ($actual) { $lineas.Add("$prefijo$actual") }
+    return @($lineas)
+}
+
+# ------------------------------------------------------------
+#  Perfiles
+# ------------------------------------------------------------
 function Show-ProfilesMenu {
     while ($true) {
         Write-Banner
@@ -69,9 +100,11 @@ function Show-ProfilesMenu {
         for ($i = 0; $i -lt $script:Perfiles.Count; $i++) {
             $p = $script:Perfiles[$i]
             Write-MenuItem ($i + 1) $p.nombre
-            Write-Host "       $($p.descripcion)" -ForegroundColor DarkGray
+            foreach ($l in (Format-WrappedLines -Texto $p.descripcion -Sangria 7)) {
+                Write-Host $l -ForegroundColor DarkGray
+            }
+            Write-Host ''
         }
-        Write-Host ''
         Write-MenuItem '0' 'Volver' 'DarkGray'
         Write-Host ''
         $op = Read-Host '   Elegí un perfil'

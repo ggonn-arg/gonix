@@ -1,4 +1,4 @@
-# Gonix - lanzador remoto (no instala nada).
+﻿# Gonix - lanzador remoto (no instala nada).
 # Uso, en PowerShell como administrador:
 #   irm https://raw.githubusercontent.com/ggonn-arg/gonix/main/Lanzador.ps1 | iex
 # Para una version fija:  $env:GONIX_REF = 'v1.0.0'; irm <url-del-tag>/Lanzador.ps1 | iex

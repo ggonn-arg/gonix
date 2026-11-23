@@ -1,0 +1,4 @@
+*.tmp
+*.log
+*.corrupto-*
+historial.json
