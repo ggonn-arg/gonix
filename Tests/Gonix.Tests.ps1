@@ -144,5 +144,34 @@ Describe 'Seguridad basica del proyecto' {
         }
         @($invalid).Count | Should -Be 0
     }
+
+    It 'conserva el logo y los menus dinamicos principales' {
+        $ui = Get-Content -LiteralPath (Join-Path $script:root 'lib\UI.ps1') -Raw -Encoding UTF8
+        $ui | Should -Match 'Optimizador de Windows 11'
+        $ui | Should -Match 'function Show-MainMenu'
+        $ui | Should -Match 'function Show-TweaksMenu'
+        $ui | Should -Match 'Get-TweaksByCategory'
+    }
+
+    It 'todos los perfiles apuntan a tweaks existentes' {
+        $ids = @{}
+        Get-ChildItem -LiteralPath (Join-Path $script:root 'tweaks') -Filter *.json |
+            Where-Object { $_.Name -notin @('apps.json','bloatware.json') } |
+            ForEach-Object {
+                $items = Get-Content -LiteralPath $_.FullName -Raw -Encoding UTF8 | ConvertFrom-Json
+                foreach ($item in $items) {
+                    if ($item.id) { $ids[$item.id] = $true }
+                }
+            }
+
+        $invalid = @()
+        Get-ChildItem -LiteralPath (Join-Path $script:root 'profiles') -Filter *.json | ForEach-Object {
+            $profile = Get-Content -LiteralPath $_.FullName -Raw -Encoding UTF8 | ConvertFrom-Json
+            foreach ($id in @($profile.tweaks)) {
+                if (-not $ids.ContainsKey($id)) { $invalid += "$($_.Name): $id" }
+            }
+        }
+        @($invalid).Count | Should -Be 0
+    }
 }
 }
