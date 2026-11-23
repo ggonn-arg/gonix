@@ -252,39 +252,6 @@ function Get-GamingRecommendations {
     return @($recomendaciones.ToArray())
 }
 
-function ConvertTo-GamingMetric {
-    param([string]$Texto)
-
-    $normalizado = $Texto.Trim().Replace(',', '.')
-    $valor = 0.0
-    $estilo = [System.Globalization.NumberStyles]::AllowDecimalPoint
-    $cultura = [System.Globalization.CultureInfo]::InvariantCulture
-    if ($normalizado -notmatch '^\d+(\.\d+)?$' -or
-        -not [double]::TryParse($normalizado, $estilo, $cultura, [ref]$valor) -or
-        $valor -le 0 -or [double]::IsInfinity($valor)) {
-        throw 'Ingresá un número mayor que 0, por ejemplo 60 o 60,5.'
-    }
-    return $valor
-}
-
-function Compare-GamingMetric {
-    param([double]$Antes, [double]$Despues)
-
-    if ($Antes -le 0 -or $Despues -le 0 -or
-        [double]::IsNaN($Antes) -or [double]::IsNaN($Despues) -or
-        [double]::IsInfinity($Antes) -or [double]::IsInfinity($Despues)) {
-        throw 'Las dos mediciones deben ser números mayores que 0.'
-    }
-
-    $diferencia = $Despues - $Antes
-    return [pscustomobject]@{
-        Antes = $Antes
-        Despues = $Despues
-        Diferencia = [math]::Round($diferencia, 2)
-        Porcentaje = [math]::Round(($diferencia / $Antes) * 100, 1)
-    }
-}
-
 function Get-TweaksByCategory {
     param([string]$Categoria)
     return @($script:Tweaks | Where-Object { $_.categoria -eq $Categoria })

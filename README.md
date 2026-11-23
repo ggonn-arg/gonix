@@ -74,7 +74,6 @@ Podés descargar el ZIP desde GitHub, revisar los scripts y después ejecutar `G
 |---|---|
 | **Perfiles** | Aplica un conjunto de ajustes con un solo paso (Recomendado, Gaming, Oficina, Notebook, Privacidad total). Antes de aplicar te muestra la lista. |
 | **Asistente Gaming** | Recomienda qué probar según la GPU y la configuración actual, explicando el motivo y los riesgos; no aplica cambios ni mide FPS. |
-| **Comparar FPS** | Calcula la diferencia entre mediciones de antes y después; vos ingresás los resultados de 3 pasadas por etapa. |
 | **Tweaks individuales** | 40 ajustes en 4 categorías: Privacidad, Sistema, Rendimiento y Zona de peligro. Cada uno muestra si ya está aplicado y su nivel de riesgo. |
 | **Apps preinstaladas** | Desinstala 17 apps de Windows que quizás no uses (Skype, Noticias, Clipchamp, etc.). |
 | **Instalar aplicaciones** | 55 programas populares en 7 categorías, instalados con winget. |
@@ -97,7 +96,7 @@ Podés descargar el ZIP desde GitHub, revisar los scripts y después ejecutar `G
 |---|---|
 | **Bajo** | Cambia una preferencia o política. No afecta la estabilidad. |
 | **Medio** | Puede desactivar una función que quizás uses (por ejemplo, la ubicación) o depende de tu hardware. |
-| **Alto** | Solo en la **Zona de peligro**. Puede causar calor, consumo o inestabilidad. Pide escribir `ACEPTO` para continuar. |
+| **Alto** | Puede causar calor, consumo o inestabilidad. Pide escribir `ACEPTO`; aparece en la **Zona de peligro** y en perfiles con ajustes avanzados. |
 
 ---
 
@@ -115,7 +114,7 @@ El perfil Gaming no promete una cantidad fija de FPS: el resultado depende del h
 
 El **Asistente Gaming** evita repetir la información del encabezado y se centra en recomendaciones concretas. Indica por qué probar cada ajuste, su riesgo y sus posibles desventajas. No cambia el equipo ni mide FPS; compará la misma escena antes y después y anotá FPS promedio y 1% lows.
 
-La opción **Comparar FPS antes/después** calcula la diferencia de los valores que ingresás. No captura métricas ni prueba que un tweak haya causado el cambio; mantené iguales el juego, la escena y la configuración, y repetí las mediciones si el resultado varía.
+Para comprobar un ajuste, usá el benchmark del juego con la misma escena y configuración antes y después de cambiar un solo tweak. Gonix no mide ni calcula FPS automáticamente.
 
 Los tweaks que ya están aplicados se omiten solos.
 
