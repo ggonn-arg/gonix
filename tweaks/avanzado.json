@@ -1,43 +1,3 @@
-<<<<<<< HEAD
-[
-  {
-    "id": "ultimate-performance-plan", "nombre": "⚠️ Plan Máximo Rendimiento", "descripcion": "ADVERTENCIA: Mucho consumo y calor.", "riesgo": "alto", "tipo": "accion",
-    "accion": "ultimate-performance-plan"
-  },
-  {
-    "id": "disable-core-parking", "nombre": "⚠️ Desactivar Core Parking", "descripcion": "ADVERTENCIA: Más calor y consumo.", "riesgo": "alto", "tipo": "accion",
-    "accion": "disable-core-parking"
-  },
-  {
-    "id": "win32-priority-separation", "nombre": "⚠️ Priorizar Primer Plano", "descripcion": "ADVERTENCIA: Puede causar BSOD.", "riesgo": "alto", "tipo": "registro",
-    "cambios": [ { "ruta": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\PriorityControl", "nombre": "Win32PrioritySeparation", "valor": 40, "tipoValor": "DWord" } ]
-  },
-  {
-    "id": "disable-bitlocker", "nombre": "⚠️ Desactivar BitLocker", "descripcion": "ADVERTENCIA: Elimina encriptación del disco.", "riesgo": "alto", "tipo": "accion",
-    "accion": "disable-bitlocker", "reversible": false
-  },
-  {
-    "id": "disable-windows-ai", "nombre": "⚠️ Desactivar y Eliminar Windows AI", "descripcion": "ADVERTENCIA: Elimina componentes de IA (Recall, etc.).", "riesgo": "alto", "tipo": "accion",
-    "accion": "disable-windows-ai", "reversible": false
-  },
-  {
-    "id": "disable-edge-debloat", "nombre": "⚠️ Debloat de Microsoft Edge", "descripcion": "ADVERTENCIA: Desactiva funciones de segundo plano de Edge.", "riesgo": "alto", "tipo": "registro",
-    "cambios": [ { "ruta": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge", "nombre": "BackgroundModeEnabled", "valor": 0, "tipoValor": "DWord" } ]
-  },
-  {
-    "id": "disable-fso", "nombre": "⚠️ Desactivar Optimizaciones de Pantalla Completa", "descripcion": "Puede mejorar el rendimiento en juegos, pero romper el color en algunos monitores.", "riesgo": "alto", "tipo": "registro",
-    "cambios": [ { "ruta": "HKCU:\\System\\GameConfigStore", "nombre": "GameDVR_FSEBehaviorMode", "valor": 2, "tipoValor": "DWord" } ]
-  },
-  {
-    "id": "disable-system-responsiveness", "nombre": "⚠️ Limitar Reserva de CPU", "descripcion": "ADVERTENCIA: Modifica SystemResponsiveness y puede afectar servicios multimedia.", "riesgo": "alto", "tipo": "registro",
-    "cambios": [ { "ruta": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile", "nombre": "SystemResponsiveness", "valor": 10, "tipoValor": "DWord" } ]
-  },
-  {
-    "id": "set-time-utc", "nombre": "⚠️ Establecer Hora en UTC", "descripcion": "Útil para Dual Boot con Linux. Puede desajustar la hora en Windows.", "riesgo": "alto", "tipo": "registro",
-    "cambios": [ { "ruta": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\TimeZoneInformation", "nombre": "RealTimeIsUniversal", "valor": 1, "tipoValor": "DWord" } ]
-  }
-]
-=======
 [
   {
     "id": "ultimate-performance-plan",
@@ -81,4 +41,3 @@
     ]
   }
 ]
->>>>>>> a6dfffd7622dd4f687b104b0df2867a126c36b36

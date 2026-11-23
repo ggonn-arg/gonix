@@ -1,27 +1,3 @@
-<<<<<<< HEAD
-[
-  {
-    "id": "gpu-scheduling", "nombre": "Aceleración GPU (HAGS)", "descripcion": "Mejora FPS.", "riesgo": "bajo", "tipo": "registro",
-    "cambios": [ { "ruta": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers", "nombre": "HwSchMode", "valor": 2, "tipoValor": "DWord" } ]
-  },
-  {
-    "id": "disable-xbox-gamebar", "nombre": "Desactivar Barra Xbox", "descripcion": "Ahorra recursos.", "riesgo": "bajo", "tipo": "registro",
-    "cambios": [ { "ruta": "HKCU:\\Software\\Microsoft\\GameBar", "nombre": "UseNexusForGameBarEnabled", "valor": 0, "tipoValor": "DWord" } ]
-  },
-  {
-    "id": "disable-network-throttling", "nombre": "Eliminar Límite de Red", "descripcion": "Sin restricción de ancho de banda.", "riesgo": "bajo", "tipo": "registro",
-    "cambios": [ { "ruta": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile", "nombre": "NetworkThrottlingIndex", "valor": 4294967295, "tipoValor": "DWord" } ]
-  },
-  {
-    "id": "disable-usb-selective-suspend", "nombre": "Evitar Suspensión USB", "descripcion": "Desactiva la suspensión selectiva mientras el equipo usa corriente alterna.", "riesgo": "bajo", "tipo": "accion",
-    "accion": "disable-usb-suspend"
-  },
-  {
-    "id": "optimize-services", "nombre": "Servicios Xbox en Manual", "descripcion": "Configura los servicios Xbox para iniciar manualmente.", "riesgo": "bajo", "tipo": "accion",
-    "accion": "optimize-xbox-services"
-  }
-]
-=======
 [
   {
     "id": "disable-nagle-algorithm",
@@ -75,4 +51,3 @@
     ]
   }
 ]
->>>>>>> a6dfffd7622dd4f687b104b0df2867a126c36b36

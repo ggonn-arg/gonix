@@ -16,10 +16,6 @@
     "disable-feedback",
     "disable-activity-history",
     "disable-location-tracking",
-<<<<<<< HEAD
-    "disable-consumer-features",
-=======
->>>>>>> a6dfffd7622dd4f687b104b0df2867a126c36b36
     "disable-defender-samples"
   ]
 }

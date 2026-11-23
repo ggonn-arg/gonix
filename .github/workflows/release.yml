@@ -17,7 +17,7 @@ jobs:
 
       - name: Install Pester
         shell: pwsh
-        run: Install-Module Pester -Scope CurrentUser -Force -SkipPublisherCheck
+        run: Install-Module Pester -RequiredVersion 5.7.1 -Scope CurrentUser -Force -SkipPublisherCheck
 
       - name: Run Pester
         shell: pwsh

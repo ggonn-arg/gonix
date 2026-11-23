@@ -1,4 +1,4 @@
-﻿# ============================================================
+# ============================================================
 #  Helpers.ps1 - Utilidades comunes (mensajes, registro, servicios)
 # ============================================================
 
@@ -11,7 +11,11 @@ function Test-Admin {
 
 # Carpeta de datos persistente (historial y log). No se borra al cerrar Gonix.
 function Get-DataDir {
-    $d = Join-Path $env:ProgramData 'Gonix'
+    $d = if ($env:GONIX_TEST_DATA_ROOT) {
+        $env:GONIX_TEST_DATA_ROOT
+    } else {
+        Join-Path $env:ProgramData 'Gonix'
+    }
     if (-not (Test-Path -LiteralPath $d)) { New-Item -ItemType Directory -Path $d -Force | Out-Null }
     return $d
 }
