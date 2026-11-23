@@ -173,5 +173,15 @@ Describe 'Seguridad basica del proyecto' {
         }
         @($invalid).Count | Should -Be 0
     }
+
+    It 'Read-JsonArray carga los objetos individuales en Windows PowerShell' {
+        foreach ($categoria in @('privacidad','sistema','rendimiento','avanzado')) {
+            $items = @(Read-JsonArray (Join-Path $script:GonixRoot "tweaks\$categoria.json"))
+            @($items).Count | Should -BeGreaterThan 0
+            foreach ($item in $items) {
+                $item.id | Should -Not -BeNullOrEmpty
+            }
+        }
+    }
 }
 }

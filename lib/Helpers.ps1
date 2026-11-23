@@ -68,10 +68,51 @@ function ConvertTo-Indices {
 }
 
 # ---------- JSON (siempre UTF-8, con o sin BOM) ----------
+function Convert-JsObject {
+    param($Value)
+
+    if ($null -eq $Value) { return $null }
+    if ($Value -is [System.Collections.Generic.Dictionary[string,object]]) {
+        $properties = [ordered]@{}
+        foreach ($key in $Value.Keys) {
+            $properties[$key] = Convert-JsObject $Value[$key]
+        }
+        return [pscustomobject]$properties
+    }
+    if ($Value -is [System.Collections.IDictionary]) {
+        $properties = [ordered]@{}
+        foreach ($key in $Value.Keys) {
+            $properties[$key] = Convert-JsObject $Value[$key]
+        }
+        return [pscustomobject]$properties
+    }
+    if ($Value -is [System.Collections.IEnumerable] -and $Value -isnot [string]) {
+        $items = New-Object System.Collections.Generic.List[object]
+        foreach ($item in $Value) {
+            $items.Add((Convert-JsObject $item))
+        }
+        return $items.ToArray()
+    }
+    return $Value
+}
+
 function Read-JsonArray {
     param([string]$Ruta)
     $raw = Get-Content -LiteralPath $Ruta -Raw -Encoding UTF8
-    return , @($raw | ConvertFrom-Json)
+    try {
+        Add-Type -AssemblyName System.Web.Extensions -ErrorAction Stop
+        $serializer = New-Object System.Web.Script.Serialization.JavaScriptSerializer
+        $serializer.MaxJsonLength = [int]::MaxValue
+        $value = $serializer.DeserializeObject($raw)
+        $result = New-Object System.Collections.Generic.List[object]
+        foreach ($item in @($value)) {
+            $result.Add((Convert-JsObject $item))
+        }
+        return $result.ToArray()
+    }
+    catch {
+        throw "No se pudo leer JSON desde '$Ruta': $($_.Exception.Message)"
+    }
 }
 
 function Read-JsonObject {
