@@ -78,8 +78,13 @@ function Get-Lotes {
             $t = Get-TweakById -Id $id
             if ($t) { $nombres += $t.nombre } else { $nombres += $id }
         }
+        
+        # Forzamos a que el Lote sea un string plano, no un objeto
+        $nombreLote = [string]$g.Name
+        if ($nombreLote -eq "System.Object[]") { $nombreLote = "Lote sin nombre" }
+
         $res += [pscustomobject]@{
-            Lote    = $g.Name
+            Lote    = $nombreLote
             Fecha   = $g.Group[0].Fecha
             Cambios = $g.Count
             Tweaks  = $ids.Count

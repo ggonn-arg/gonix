@@ -1,6 +1,8 @@
 #Requires -Version 5.1
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 $OutputEncoding = [System.Text.Encoding]::UTF8
+
+
 <#
 .SYNOPSIS
     Gonix - Optimizador de Windows 11 en PowerShell.
